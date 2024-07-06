@@ -1,11 +1,9 @@
 ﻿#pragma once
 
+#include "pch.h"
 #include "Nous/Core.h"
 
 #include "spdlog/fmt/ostr.h"
-
-#include <string>
-#include <functional>
 
 namespace Nous {
 
@@ -41,6 +39,10 @@ namespace Nous {
     {
         friend class EventDispatcher;
     public:
+        virtual ~Event() = default;
+
+        bool Handled = false; // 是否已被处理
+
         virtual EventType GetEventType() const = 0;
         virtual const char* GetName() const = 0;
         virtual int GetCategoryFlags() const = 0;
@@ -50,8 +52,6 @@ namespace Nous {
         {
             return GetCategoryFlags() & category;
         }
-    protected:
-        bool m_Handled = false; // 是否已被处理
     };
 
     // 事件分发器
@@ -65,14 +65,14 @@ namespace Nous {
         {
         }
 
-        template<typename T>
-        bool Dispatch(EventFn<T> func)
+        template<typename T, typename F>
+        bool Dispatch(const F& func)
         {
             // 判断事件类型是否合法
             if (m_Event.GetEventType() == T::GetStaticType())
             {
                 // 处理事件，返回成功与否
-                m_Event.m_Handled = func(*(T*)&m_Event);
+                m_Event.Handled |= func(static_cast<T&>(m_Event));
                 return true;
             }
             return false;

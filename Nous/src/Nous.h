@@ -3,6 +3,7 @@
 // 供Nous应用使用
 
 #include "Nous/Application.h"
+#include "Nous/Layer.h"
 #include "Nous/Log.h"
 
 // ------入口点------

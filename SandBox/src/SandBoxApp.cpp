@@ -1,11 +1,31 @@
 #include <Nous.h>
 
+class ExampleLayer : public Nous::Layer
+{
+public:
+    ExampleLayer()
+            : Layer("Example")
+    {
+
+    }
+
+    void OnUpdate() override
+    {
+        NS_INFO("ExampleLayer::Update");
+    }
+
+    void OnEvent(Nous::Event& event) override
+    {
+        NS_TRACE("{}", event);
+    }
+};
+
 class Sandbox : public Nous::Application
 {
 public:
     Sandbox()
     {
-
+        PushLayer(new ExampleLayer());
     }
 
     ~Sandbox()
