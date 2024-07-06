@@ -26,7 +26,6 @@ target_precompile_headers(Nous PRIVATE "Nous/src/pch.h")
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES "Nous/src/**")
-message(${SOURCES})
 target_sources(Nous PRIVATE ${SOURCES})
 
 #添加依赖包含目录
