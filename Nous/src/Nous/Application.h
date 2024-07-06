@@ -21,7 +21,11 @@ namespace Nous {
         void OnEvent(Event& e);
 
         void PushLayer(Layer* layer);
-        void PopLayer(Layer* layer);
+        void PushOverlay(Layer* overlay);
+
+        inline static Application& Get() { return *s_Instance; }
+
+        inline Window& GetWindow() { return *m_Window; }
 
     private:
         bool OnWindowClose(WindowCloseEvent& e);
@@ -29,6 +33,9 @@ namespace Nous {
         std::unique_ptr<Window> m_Window;
         bool m_Running = true;
         LayerStack m_LayerStack;
+
+    private:
+        static Application* s_Instance;
     };
 
     // 需要在客户端中定义

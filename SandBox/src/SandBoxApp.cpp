@@ -1,4 +1,5 @@
 #include <Nous.h>
+#include "Nous/ImGui/ImGuiLayer.h"
 
 class ExampleLayer : public Nous::Layer
 {
@@ -26,6 +27,7 @@ public:
     Sandbox()
     {
         PushLayer(new ExampleLayer());
+        PushOverlay(new Nous::ImGuiLayer());
     }
 
     ~Sandbox()

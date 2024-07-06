@@ -7,13 +7,16 @@
 
 namespace Nous {
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+    Application* Application::s_Instance = nullptr;
 
     Application::Application()
     {
+        NS_CORE_ASSERT(!s_Instance, "Application already exists!");
+        s_Instance = this;
+
         // 唯一指针，当Application销毁时一并销毁
         m_Window = std::unique_ptr<Window>(Window::Create());
-        m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+        m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
     }
 
     Application::~Application()
@@ -25,7 +28,7 @@ namespace Nous {
     {
         // 处理窗口关闭事件
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
 
         // 从后往前逐层处理事件，直到这个事件被处理完毕
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
@@ -39,11 +42,13 @@ namespace Nous {
     void Application::PushLayer(Layer* layer)
     {
         m_LayerStack.PushLayer(layer);
+        layer->OnAttached();
     }
 
-    void Application::PopLayer(Layer* layer)
+    void Application::PushOverlay(Layer* overlay)
     {
-        m_LayerStack.PopLayer(layer);
+        m_LayerStack.PushOverlay(overlay);
+        overlay->OnAttached();
     }
 
     void Application::Run()

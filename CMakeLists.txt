@@ -22,13 +22,14 @@ set(OUTPUT_DIR "${CMAKE_BUILD_TYPE}-${SYSTEM_NAME}-${ARCHITECTURE}")
 
 # 添加子模块
 set(VENDOR_DIR Nous/vendor)
-
 set(BUILD_SHARED_LIBS ON)
 set(GLFW_BUILD_SHARED_LIBRARY ON)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
+
 add_subdirectory(${VENDOR_DIR}/GLFW)
 add_subdirectory(${VENDOR_DIR}/glad)
+add_subdirectory(${VENDOR_DIR}/imgui)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -65,12 +66,14 @@ target_include_directories(${MODULE_NAME} PUBLIC
         ${MODULE_NAME}/vendor/spdlog/include
         ${MODULE_NAME}/vendor/GLFW/include
         ${MODULE_NAME}/vendor/glad/include
+        ${MODULE_NAME}/vendor/imgui
 )
 
 # 链接依赖库
 target_link_libraries(${MODULE_NAME} PRIVATE
         glfw
         glad
+        ImGui
         opengl32.lib
 )
 
