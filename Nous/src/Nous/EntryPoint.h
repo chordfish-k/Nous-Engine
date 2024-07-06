@@ -10,9 +10,7 @@ extern Nous::Application* Nous::CreateApplication();
 int main(int argc, char** argv)
 {
     Nous::Log::Init();
-    NS_CORE_WARN("初始化Log");
-    int a = 5;
-    NS_INFO("Hello! Ver={0}", a);
+    NS_CORE_WARN("初始化日志系统");
 
     auto app = Nous::CreateApplication();
     app->Run();
