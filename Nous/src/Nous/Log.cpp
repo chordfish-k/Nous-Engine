@@ -10,7 +10,7 @@ namespace Nous {
 
     void Log::Init()
     {
-        spdlog::set_pattern("%^[%T] %n: %v%$");
+        spdlog::set_pattern("%^[%T] [%L] %n: %v%$");
         s_CoreLogger = spdlog::stdout_color_mt("NOUS");
         s_CoreLogger->set_level(spdlog::level::trace);
 
