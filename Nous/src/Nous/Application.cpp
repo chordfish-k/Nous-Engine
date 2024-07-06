@@ -1,21 +1,32 @@
 ﻿#include "pch.h"
 #include "Application.h"
 
-#include "Nous/Event/ApplicationEvent.h"
+#include "Nous/Log.h"
 
 #include <GLFW/glfw3.h>
 
 namespace Nous {
 
+#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
     Application::Application()
     {
         // 唯一指针，当Application销毁时一并销毁
         m_Window = std::unique_ptr<Window>(Window::Create());
+        m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
     }
 
     Application::~Application()
     {
 
+    }
+
+    void Application::OnEvent(Event& e)
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+
+        NS_CORE_TRACE("{}", e);
     }
 
     void Application::Run()
@@ -28,4 +39,9 @@ namespace Nous {
         }
     }
 
+    bool Application::OnWindowClose(WindowCloseEvent& e)
+    {
+        m_Running = false;
+        return true;
+    }
 }

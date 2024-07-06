@@ -72,7 +72,7 @@ namespace Nous {
             if (m_Event.GetEventType() == T::GetStaticType())
             {
                 // 处理事件，返回成功与否
-                m_Event.m_Handled = fun(*(T*)&m_Event);
+                m_Event.m_Handled = func(*(T*)&m_Event);
                 return true;
             }
             return false;
