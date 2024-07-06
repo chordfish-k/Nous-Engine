@@ -21,11 +21,14 @@ endif()
 set(OUTPUT_DIR "${CMAKE_BUILD_TYPE}-${SYSTEM_NAME}-${ARCHITECTURE}")
 
 # 添加子模块
+set(VENDOR_DIR Nous/vendor)
+
 set(BUILD_SHARED_LIBS ON)
 set(GLFW_BUILD_SHARED_LIBRARY ON)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
-add_subdirectory(Nous/vendor/GLFW)
+add_subdirectory(${VENDOR_DIR}/GLFW)
+add_subdirectory(${VENDOR_DIR}/glad)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,7 +47,7 @@ if (WIN32)
     target_compile_definitions(${MODULE_NAME} PRIVATE
             NS_PLATFORM_WINDOWS
             NS_BUILD_DLL
-#            GLFW_INCLUDE_NONE
+            GLFW_INCLUDE_NONE
     )
 endif ()
 
@@ -61,11 +64,13 @@ target_include_directories(${MODULE_NAME} PUBLIC
         ${MODULE_NAME}/src
         ${MODULE_NAME}/vendor/spdlog/include
         ${MODULE_NAME}/vendor/GLFW/include
+        ${MODULE_NAME}/vendor/glad/include
 )
 
 # 链接依赖库
 target_link_libraries(${MODULE_NAME} PRIVATE
         glfw
+        glad
         opengl32.lib
 )
 
@@ -93,26 +98,26 @@ target_link_libraries(${MODULE_NAME} PRIVATE
 )
 
 # 添加依赖的头文件
-target_include_directories(SandBox PRIVATE
+target_include_directories(${MODULE_NAME} PRIVATE
         Nous/src
         Nous/vendor/spdlog/include
 )
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES "SandBox/src/**")
-target_sources(SandBox PRIVATE ${SOURCES})
+target_sources(${MODULE_NAME} PRIVATE ${SOURCES})
 
 # 针对MSVC，确保DLL导出所有符号
 if (MSVC)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    foreach(TARGET_NAME SandBox)
-        set_target_properties(SandBox PROPERTIES
+    foreach(TARGET_NAME ${MODULE_NAME})
+        set_target_properties(${MODULE_NAME} PROPERTIES
                 WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
     endforeach()
 endif()
 
 # 添加构建后命令：将所有DLL复制到SandBox的二进制文件目录
-add_custom_command(TARGET SandBox POST_BUILD
+add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:Nous>"
         "${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/SandBox/$<TARGET_FILE_NAME:Nous>"
