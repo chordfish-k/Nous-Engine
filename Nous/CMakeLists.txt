@@ -64,6 +64,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/GLFW/include
         vendor/glad/include
         vendor/imgui
+        vendor/glm
 )
 
 # 链接依赖库
