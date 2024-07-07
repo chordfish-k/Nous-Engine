@@ -7,14 +7,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${OUTPUT_DIR}/${PROJ
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/${PROJECT_NAME}")
 
 # 添加子模块
-set(VENDOR_DIR vendor)
-set(BUILD_SHARED_LIBS ON)
-set(GLFW_BUILD_SHARED_LIBRARY ON)
-set(GLFW_BUILD_EXAMPLES OFF)
-set(GLFW_BUILD_TESTS OFF)
-add_subdirectory(${VENDOR_DIR}/GLFW)
-add_subdirectory(${VENDOR_DIR}/glad)
-add_subdirectory(${VENDOR_DIR}/imgui)
+add_subdirectory(vendor/GLFW)
+add_subdirectory(vendor/glad)
+add_subdirectory(vendor/imgui)
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES
@@ -73,6 +68,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         glad
         ImGui
         opengl32.lib
+)
+
+# 添加构建后命令：将所有DLL复制到SandBox的二进制文件目录
+set(TARGET_DIR ${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/SandBox/)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "$<TARGET_FILE:${PROJECT_NAME}>"
+        "${TARGET_DIR}$<TARGET_FILE_NAME:${PROJECT_NAME}>"
 )
 
 # 针对不同的构建类型设置编译选项

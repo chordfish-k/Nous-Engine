@@ -49,18 +49,6 @@ if (MSVC)
     endforeach()
 endif()
 
-# 添加构建后命令：将所有DLL复制到SandBox的二进制文件目录
-set(TARGET_DIR ${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/SandBox/)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:Nous>"
-        "${TARGET_DIR}$<TARGET_FILE_NAME:Nous>"
-
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:glfw>"
-        "${TARGET_DIR}$<TARGET_FILE_NAME:glfw>"
-)
-
 # 针对不同的构建类型设置编译选项
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     # 添加宏定义

@@ -6,6 +6,7 @@
 #include "Nous/LayerStack.h"
 #include "Nous/Event/Event.h"
 #include "Nous/Event/ApplicationEvent.h"
+#include "Nous/ImGui/ImGuiLayer.h"
 
 namespace Nous {
 
@@ -31,6 +32,7 @@ namespace Nous {
         bool OnWindowClose(WindowCloseEvent& e);
 
         std::unique_ptr<Window> m_Window;
+        ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
         LayerStack m_LayerStack;
 

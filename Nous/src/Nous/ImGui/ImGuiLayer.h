@@ -15,17 +15,10 @@ namespace Nous {
 
         void OnAttached() override;
         void OnDetached() override;
-        void OnUpdate() override;
-        void OnEvent(Event& event) override;
-    private:
-        bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
-        bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
-        bool OnMouseMovedEvent(MouseMovedEvent& e);
-        bool OnMouseScrolledEvent(MouseScrolledEvent& e);
-        bool OnKeyPressedEvent(KeyPressedEvent& e);
-        bool OnKeyReleasedEvent(KeyReleasedEvent& e);
-        //bool OnKeyTypedEvent(KeyTypedEvent& e);
-        bool OnWindowResizedEvent(WindowResizeEvent& e);
+        void OnImGuiRender() override;
+
+        void Begin();
+        void End();
     private:
         float m_Time = 0.0f;
     };

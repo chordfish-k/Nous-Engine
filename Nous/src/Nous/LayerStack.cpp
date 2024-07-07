@@ -3,7 +3,6 @@
 
 Nous::LayerStack::LayerStack()
 {
-    m_LayerInsert = m_Layers.begin();
 }
 
 Nous::LayerStack::~LayerStack()
@@ -15,13 +14,14 @@ Nous::LayerStack::~LayerStack()
 void Nous::LayerStack::PushLayer(Layer* layer)
 {
     // 在最后一个非覆盖层后插入
-    m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
+    m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 }
 
 void Nous::LayerStack::PushOverlay(Layer* overlay)
 {
     // 在列表最后插入
     m_Layers.emplace_back(overlay);
+    m_LayerInsertIndex++;
 }
 
 void Nous::LayerStack::PopLayer(Layer* layer)
@@ -30,7 +30,6 @@ void Nous::LayerStack::PopLayer(Layer* layer)
     if (it != m_Layers.end())
     {
         m_Layers.erase(it);
-        m_LayerInsert--;
     }
 }
 
@@ -40,5 +39,6 @@ void Nous::LayerStack::PopOverlay(Layer* overlay)
     if (it != m_Layers.end())
     {
         m_Layers.erase(it);
+        m_LayerInsertIndex--;
     }
 }

@@ -22,7 +22,7 @@ namespace Nous {
 
     private:
         std::vector<Layer*> m_Layers;
-        std::vector<Layer*>::iterator m_LayerInsert; // 分隔普通层和覆盖层
+        unsigned int m_LayerInsertIndex = 0; // 分隔普通层和覆盖层
     };
 
 }
