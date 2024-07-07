@@ -24,7 +24,7 @@ if (WIN32)
     )
 endif ()
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 # 设置输出目录
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -37,6 +37,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 # 宏定义
+target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
             NS_PLATFORM_WINDOWS
@@ -70,19 +71,32 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         opengl32.lib
 )
 
-# 添加构建后命令：将所有DLL复制到SandBox的二进制文件目录
-set(TARGET_DIR ${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/SandBox/)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "$<TARGET_FILE:${PROJECT_NAME}>"
-        "${TARGET_DIR}$<TARGET_FILE_NAME:${PROJECT_NAME}>"
-)
-
 # 针对不同的构建类型设置编译选项
+if (MSVC)
+    # 静态运行时库
+    foreach(flag_var
+            CMAKE_C_FLAGS
+            CMAKE_C_FLAGS_DEBUG
+            CMAKE_C_FLAGS_RELEASE
+            CMAKE_C_FLAGS_MINSIZEREL
+            CMAKE_C_FLAGS_RELWITHDEBINFO
+            CMAKE_CXX_FLAGS
+            CMAKE_CXX_FLAGS_DEBUG
+            CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_CXX_FLAGS_MINSIZEREL
+            CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+        if(${flag_var} MATCHES "/MD")
+            string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+        endif()
+        if(${flag_var} MATCHES "/MDd")
+            string(REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
+        endif()
+    endforeach()
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(${PROJECT_NAME} PRIVATE NS_DEBUG)
     if(MSVC)
-        string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
         string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
     else ()
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:-O3>)
@@ -92,6 +106,7 @@ endif ()
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_definitions(${PROJECT_NAME} PRIVATE NS_RELEASE)
     if(MSVC)
+        string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
         target_compile_options(${PROJECT_NAME} PRIVATE "/Ox")
     else ()
         target_compile_options(${PROJECT_NAME} PRIVATE "-O3")

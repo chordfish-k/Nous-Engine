@@ -31,7 +31,7 @@ else ()
 endif()
 
 # 设置输出目录
-set(OUTPUT_DIR "${CMAKE_BUILD_TYPE}-${SYSTEM_NAME}-${ARCHITECTURE}")
+set(OUTPUT_DIR "${SYSTEM_NAME}-${ARCHITECTURE}")
 
 add_subdirectory(Nous)
 add_subdirectory(SandBox)

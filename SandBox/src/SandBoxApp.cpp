@@ -1,5 +1,6 @@
 #include <Nous.h>
-#include "Nous/ImGui/ImGuiLayer.h"
+
+#include "imgui/imgui.h"
 
 class ExampleLayer : public Nous::Layer
 {
@@ -15,6 +16,13 @@ public:
         // 轮询方式
         if (Nous::Input::IsKeyPressed(NS_KEY_TAB))
             NS_TRACE("Tab key is pressed! (poll)");
+    }
+
+    void OnImGuiRender() override
+    {
+        ImGui::Begin("Text");
+        ImGui::Text("Hello ImGui!");
+        ImGui::End();
     }
 
     void OnEvent(Nous::Event& event) override
