@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef NS_PLATFORM_WINDOWS
 #ifdef NS_BUILD_DLL

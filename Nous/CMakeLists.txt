@@ -17,7 +17,18 @@ add_subdirectory(${VENDOR_DIR}/glad)
 add_subdirectory(${VENDOR_DIR}/imgui)
 
 # 源码搜集
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES
+        src/Nous/*.cpp
+        src/Platform/OpenGL/*.cpp
+)
+
+if (WIN32)
+    file(GLOB_RECURSE SOURCES
+            ${SOURCES}
+            src/Platform/Windows/*.cpp
+    )
+endif ()
+
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # 设置输出目录

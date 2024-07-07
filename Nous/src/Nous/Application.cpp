@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "Nous/Log.h"
+#include "Nous/Input.h"
 
 #include <glad/glad.h>
 
@@ -61,6 +62,9 @@ namespace Nous {
             for (auto* layer : m_LayerStack)
             {
                 layer->OnUpdate();
+
+                auto[x, y] = Input::GetMousePos();
+                NS_CORE_TRACE("{0} {1}", x, y);
             }
 
             m_Window->OnUpdate();
