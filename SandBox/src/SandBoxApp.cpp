@@ -12,12 +12,21 @@ public:
 
     void OnUpdate() override
     {
-        NS_INFO("ExampleLayer::Update");
+        // 轮询方式
+        if (Nous::Input::IsKeyPressed(NS_KEY_TAB))
+            NS_TRACE("Tab key is pressed! (poll)");
     }
 
     void OnEvent(Nous::Event& event) override
     {
-        NS_TRACE("{}", event);
+        // 事件方式
+        if (event.GetEventType() == Nous::EventType::KeyPressed)
+        {
+            auto& e = (Nous::KeyPressedEvent&)event;
+            if (e.GetKeyCode() == NS_KEY_TAB)
+                NS_TRACE("Tab key is pressed!");
+            NS_TRACE("{}", (char)e.GetKeyCode());
+        }
     }
 };
 

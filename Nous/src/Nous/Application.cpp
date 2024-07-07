@@ -64,7 +64,7 @@ namespace Nous {
                 layer->OnUpdate();
 
                 auto[x, y] = Input::GetMousePos();
-                NS_CORE_TRACE("{0} {1}", x, y);
+//                NS_CORE_TRACE("{0} {1}", x, y);
             }
 
             m_Window->OnUpdate();
