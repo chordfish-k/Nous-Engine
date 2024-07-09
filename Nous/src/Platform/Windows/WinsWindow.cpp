@@ -4,8 +4,7 @@
 #include "Nous/Event/ApplicationEvent.h"
 #include "Nous/Event/KeyEvent.h"
 #include "Nous/Event/MouseButtonEvent.h"
-
-#include <glad/glad.h>
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Nous {
 
@@ -50,9 +49,9 @@ namespace Nous {
         }
 
         m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), NULL, NULL);
-        glfwMakeContextCurrent(m_Window);
-        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        NS_CORE_ASSERT(status, "Failed to initialze Glad!");
+        // 初始化上下文
+        m_Context = new OpenGLContext(m_Window);
+        m_Context->Init();
 
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
@@ -156,7 +155,7 @@ namespace Nous {
     void WinsWindow::OnUpdate()
     {
         glfwPollEvents();
-        glfwSwapBuffers(m_Window);
+        m_Context->SwapBuffers();
     }
 
     void WinsWindow::Shutdown()

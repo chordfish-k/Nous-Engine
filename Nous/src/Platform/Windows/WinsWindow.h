@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Nous/Window.h"
+#include "Nous/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>
 
@@ -35,6 +36,7 @@ namespace Nous {
 
     private:
         GLFWwindow *m_Window;
+        GraphicsContext *m_Context;
 
         struct WindowData
         {
@@ -44,7 +46,6 @@ namespace Nous {
 
             EventCallbackFn EventCallback;
         };
-
         WindowData m_Data;
     };
 
