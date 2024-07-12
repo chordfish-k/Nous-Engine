@@ -38,7 +38,7 @@ namespace Nous {
         m_Data.Width = props.Width;
         m_Data.Height = props.Height;
 
-        NS_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+        NS_CORE_INFO("创建窗口: {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
         if (!s_GLFWInitialized)
         {

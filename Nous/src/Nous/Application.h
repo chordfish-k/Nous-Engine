@@ -6,7 +6,10 @@
 #include "Nous/LayerStack.h"
 #include "Nous/Event/Event.h"
 #include "Nous/Event/ApplicationEvent.h"
+
 #include "Nous/ImGui/ImGuiLayer.h"
+
+#include "Nous/Renderer/Shader.h"
 
 namespace Nous {
 
@@ -35,6 +38,9 @@ namespace Nous {
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
         LayerStack m_LayerStack;
+
+        unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+        std::unique_ptr<Shader> m_Shader;
 
     private:
         static Application* s_Instance;
