@@ -10,6 +10,7 @@
 #include "Nous/ImGui/ImGuiLayer.h"
 
 #include "Nous/Renderer/Shader.h"
+#include "Nous/Renderer/Buffer.h"
 
 namespace Nous {
 
@@ -39,8 +40,10 @@ namespace Nous {
         bool m_Running = true;
         LayerStack m_LayerStack;
 
-        unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+        unsigned int m_VertexArray;
         std::unique_ptr<Shader> m_Shader;
+        std::unique_ptr<VertexBuffer> m_VertexBuffer;
+        std::unique_ptr<IndexBuffer> m_IndexBuffer;
 
     private:
         static Application* s_Instance;
