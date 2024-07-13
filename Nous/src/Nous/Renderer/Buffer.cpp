@@ -11,10 +11,10 @@ namespace Nous {
     VertexBuffer *VertexBuffer::Create(float *vertices, uint32_t size)
     {
         switch (Renderer::GetAPI()) {
-            case RendererAPI::None:
+            case RendererAPI::API::None:
                 NS_CORE_ASSERT(false, "RendererAPI 未选择");
                 return nullptr;
-            case RendererAPI::OpenGL:
+            case RendererAPI::API::OpenGL:
                 return new OpenGLVertexBuffer(vertices, size);
         }
 
@@ -25,10 +25,10 @@ namespace Nous {
     IndexBuffer *IndexBuffer::Create(uint32_t *indices, uint32_t size)
     {
         switch (Renderer::GetAPI()) {
-            case RendererAPI::None:
+            case RendererAPI::API::None:
                 NS_CORE_ASSERT(false, "RendererAPI 未选择");
                 return nullptr;
-            case RendererAPI::OpenGL:
+            case RendererAPI::API::OpenGL:
                 return new OpenGLIndexBuffer(indices, size);
         }
 
