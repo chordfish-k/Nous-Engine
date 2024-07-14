@@ -24,6 +24,9 @@ namespace Nous {
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
 
+        // 初始化相机
+        m_Camera.SetSize({1.6f, 0.9f});
+
         // 三角形
         m_VertexArray.reset(VertexArray::Create());
         float vertices[3 * 7] = {
@@ -68,22 +71,24 @@ namespace Nous {
         // 着色器
         std::string vertexSrc = R"(
             #version 330 core
-
 			layout(location = 0) in vec3 a_Position;
 			layout(location = 1) in vec4 a_Color;
+
+            uniform mat4 u_ViewProjection;
+
 			out vec3 v_Position;
 			out vec4 v_Color;
+
 			void main()
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 			}
 
         )";
         std::string fragmentSrc = R"(
             #version 330 core
-
 			in vec3 v_Position;
 			in vec4 v_Color;
 
@@ -100,13 +105,16 @@ namespace Nous {
 
         std::string blueShaderVertexSrc = R"(
 			#version 330 core
-
 			layout(location = 0) in vec3 a_Position;
+
+            uniform mat4 u_ViewProjection;
+
 			out vec3 v_Position;
+
 			void main()
 			{
 				v_Position = a_Position;
-				gl_Position = vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 			}
 		)";
 
@@ -115,6 +123,7 @@ namespace Nous {
 
 			layout(location = 0) out vec4 color;
 			in vec3 v_Position;
+
 			void main()
 			{
 				color = vec4(0.2, 0.3, 0.8, 1.0);
@@ -161,13 +170,10 @@ namespace Nous {
             RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
             RenderCommand::Clear();
 
-            Renderer::BeginScene();
+            Renderer::BeginScene(m_Camera);
 
-            m_BlueShader->Bind();
-            Renderer::Submit(m_SquareVA);
-
-            m_Shader->Bind();
-            Renderer::Submit(m_VertexArray);
+            Renderer::Submit(m_BlueShader, m_SquareVA);
+            Renderer::Submit(m_Shader, m_VertexArray);
 
             Renderer::EndScene();
 

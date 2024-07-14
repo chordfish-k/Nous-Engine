@@ -1,17 +1,18 @@
 ﻿#pragma once
 
 #include "Core.h"
-
 #include "Window.h"
+
 #include "Nous/LayerStack.h"
 #include "Nous/Event/Event.h"
 #include "Nous/Event/ApplicationEvent.h"
-
 #include "Nous/ImGui/ImGuiLayer.h"
 
 #include "Nous/Renderer/Shader.h"
+
 #include "Nous/Renderer/Buffer.h"
 #include "Nous/Renderer/VertexArray.h"
+#include "Nous/Renderer/Camera.h"
 
 namespace Nous {
 
@@ -20,6 +21,7 @@ namespace Nous {
     {
     public:
         Application();
+
         virtual ~Application();
 
         void Run();
@@ -27,6 +29,7 @@ namespace Nous {
         void OnEvent(Event& e);
 
         void PushLayer(Layer* layer);
+
         void PushOverlay(Layer* overlay);
 
         inline static Application& Get() { return *s_Instance; }
@@ -46,6 +49,8 @@ namespace Nous {
 
         std::shared_ptr<Shader> m_BlueShader;
         std::shared_ptr<VertexArray> m_SquareVA;
+
+        Camera m_Camera;
 
     private:
         static Application* s_Instance;
