@@ -2,6 +2,7 @@
 
 #include "Nous/Core.h"
 #include "Nous/Event/Event.h"
+#include "Nous/Core/Timestep.h"
 
 namespace Nous {
 
@@ -13,7 +14,7 @@ namespace Nous {
 
         virtual void OnAttached() {};
         virtual void OnDetached() {};
-        virtual void OnUpdate() {};
+        virtual void OnUpdate(Timestep dt) {};
         virtual void OnImGuiRender() {}
         virtual void OnEvent(Event& event) {};
 

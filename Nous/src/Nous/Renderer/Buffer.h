@@ -13,7 +13,8 @@ namespace Nous {
 
     static uint32_t ShaderDataTypeSize(ShaderDataType type)
     {
-        switch (type) {
+        switch (type)
+        {
             case ShaderDataType::Float:
                 return 4;
             case ShaderDataType::Float2:
@@ -51,13 +52,14 @@ namespace Nous {
         bool Normalized;
 
         BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-                : Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
+            : Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
         {
         }
 
         uint32_t GetComponentCount() const
         {
-            switch (Type) {
+            switch (Type)
+            {
                 case ShaderDataType::None:
                     return 1;
                 case ShaderDataType::Float:
@@ -94,7 +96,7 @@ namespace Nous {
         BufferLayout() {}
 
         BufferLayout(const std::initializer_list<BufferElement>& element)
-                : m_Elements(element)
+            : m_Elements(element)
         {
             CalculateOffsetsAndStride();
         };
@@ -116,7 +118,8 @@ namespace Nous {
         void CalculateOffsetsAndStride()
         {
             uint32_t offset = 0;
-            for (auto& element: m_Elements) {
+            for (auto& element: m_Elements)
+            {
                 element.Offset = offset;
                 offset += element.Size;
                 m_Stride += element.Size;
