@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "RenderCommand.h"
 #include "Shader.h"
@@ -13,7 +13,7 @@ namespace Nous {
 
         static void EndScene();
 
-        static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray);
+        static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
         inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -23,7 +23,7 @@ namespace Nous {
             // 相机在帧内不移动，记录其矩阵的缓存
             glm::mat4 ViewProjectionMatrix;
         };
-        
+
         static SceneData* m_SceneData;
     };
 
