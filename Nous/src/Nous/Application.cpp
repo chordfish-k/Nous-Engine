@@ -16,7 +16,7 @@ namespace Nous {
         s_Instance = this;
 
         // 唯一指针，当Application销毁时一并销毁
-        m_Window = std::unique_ptr<Window>(Window::Create());
+        m_Window = Scope<Window>(Window::Create());
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
 
         // 创建ImGui层

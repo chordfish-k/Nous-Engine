@@ -181,11 +181,11 @@ public:
     }
 
 private:
-    std::shared_ptr<Nous::Shader> m_Shader;
-    std::shared_ptr<Nous::VertexArray> m_VertexArray;
+    Nous::Ref<Nous::Shader> m_Shader;
+    Nous::Ref<Nous::VertexArray> m_VertexArray;
 
-    std::shared_ptr<Nous::Shader> m_FlatColorShader;
-    std::shared_ptr<Nous::VertexArray> m_SquareVA;
+    Nous::Ref<Nous::Shader> m_FlatColorShader;
+    Nous::Ref<Nous::VertexArray> m_SquareVA;
 
     Nous::Camera m_Camera;
     glm::vec3 m_CameraPosition;

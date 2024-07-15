@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <memory>
+
 #ifdef NS_PLATFORM_WINDOWS
 #ifdef NS_DYNAMIC_LINK
 #ifdef NS_BUILD_DLL
@@ -25,3 +27,14 @@
 #define BIT(x) (1 << x)
 
 #define NS_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+namespace Nous {
+
+    template <typename T>
+    using Scope = std::unique_ptr<T>;
+
+    template <typename T>
+    using Ref = std::shared_ptr<T>;
+
+
+}
