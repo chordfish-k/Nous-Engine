@@ -15,6 +15,8 @@ namespace Nous {
 
         void Unbind() const override;
 
+        void UploadInt(const std::string& name, int value);
+
         void UploadFloat(const std::string& name, float value);
 
         void UploadFloat2(const std::string& name, const glm::vec2& value);

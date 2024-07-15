@@ -34,8 +34,7 @@ namespace Nous {
             glDeleteShader(vertexShader);
 
             // Use the infoLog as you see fit.
-            NS_CORE_ERROR("{0}", infoLog.data());
-            NS_CORE_ASSERT(false, "顶点着色器编译失败！");
+            NS_CORE_ASSERT_F(false, "顶点着色器编译失败！{0}", infoLog.data());
 
             // In this simple m_RendererID, we'll just leave
             return;
@@ -68,8 +67,7 @@ namespace Nous {
             glDeleteShader(vertexShader);
 
             // Use the infoLog as you see fit.
-            NS_CORE_ERROR("{0}", infoLog.data());
-            NS_CORE_ASSERT(false, "片段着色器编译失败！");
+            NS_CORE_ASSERT_F(false, "片段着色器编译失败！{0}", infoLog.data());
 
             // In this simple m_RendererID, we'll just leave
             return;
@@ -129,6 +127,12 @@ namespace Nous {
     void OpenGLShader::Unbind() const
     {
         glUseProgram(0);
+    }
+
+    void OpenGLShader::UploadInt(const std::string& name, int value)
+    {
+        GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+        glUniform1i(location, value);
     }
 
     void OpenGLShader::UploadFloat(const std::string& name, float value)

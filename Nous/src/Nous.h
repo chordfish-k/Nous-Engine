@@ -23,6 +23,8 @@
 #include "Nous/Renderer/VertexArray.h"
 
 #include "Nous/Renderer/Camera.h"
+
+#include "Nous/Renderer/Texture.h"
 // ---------------------------------------
 
 // -----------------入口点-----------------

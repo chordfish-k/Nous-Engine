@@ -18,7 +18,7 @@ namespace Nous {
                 return new OpenGLVertexBuffer(vertices, size);
         }
 
-        NS_CORE_ASSERT(false, "未知的RendererAPI")
+        NS_CORE_ASSERT(false, "RendererAPI 未知")
         return nullptr;
     }
 
@@ -32,7 +32,7 @@ namespace Nous {
                 return new OpenGLIndexBuffer(indices, size);
         }
 
-        NS_CORE_ASSERT(false, "未知的RendererAPI")
+        NS_CORE_ASSERT(false, "RendererAPI 未知")
         return nullptr;
     }
 }

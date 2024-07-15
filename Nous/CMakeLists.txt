@@ -13,8 +13,12 @@ add_subdirectory(vendor/imgui)
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES
-        src/Nous/*.cpp
-        src/Platform/OpenGL/*.cpp
+        src/*.h
+        src/*.cpp
+        vendor/stb_image/*.h
+        vendor/stb_image/*.cpp
+        vendor/glm/glm/*.hpp
+        vendor/glm/glm/*.inl
 )
 
 if (WIN32)
@@ -37,7 +41,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 # 宏定义
-target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        NS_ENABLE_ASSERTS
+)
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
             NS_PLATFORM_WINDOWS
@@ -61,6 +68,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/glad/include
         vendor/imgui
         vendor/glm
+        vendor/stb_image
 )
 
 # 链接依赖库

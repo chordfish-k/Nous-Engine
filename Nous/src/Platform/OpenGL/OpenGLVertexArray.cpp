@@ -48,10 +48,10 @@ namespace Nous {
 
     void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
     {
+        NS_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "顶点缓冲区没有设定布局！");
+
         glBindVertexArray(m_RendererID);
         vertexBuffer->Bind();
-
-        NS_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "顶点缓冲区没有设定布局！");
 
         uint32_t index = 0;
         const BufferLayout& layout = vertexBuffer->GetLayout();
