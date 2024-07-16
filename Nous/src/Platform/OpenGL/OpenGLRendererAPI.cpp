@@ -5,6 +5,11 @@
 
 namespace Nous {
 
+    void OpenGLRendererAPI::Init()
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // c1 * a1 + c2 * (1-a1)
+    }
 
     void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
     {

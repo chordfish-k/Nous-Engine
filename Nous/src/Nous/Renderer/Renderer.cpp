@@ -5,6 +5,11 @@
 
 namespace Nous {
 
+    void Renderer::Init()
+    {
+        RenderCommand::Init();
+    }
+
     Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
 
     void Renderer::BeginScene(Camera& camera)

@@ -162,6 +162,7 @@ public:
         m_TextureShader.reset(Nous::Shader::Create(textureShaderVertexSrc, textureShaderFragmentSrc));
 
         m_Texture = Nous::Texture2D::Create("assets/textures/Checkerboard.png");
+        m_MarioTexture = Nous::Texture2D::Create("assets/textures/Mario.png");
 
         std::dynamic_pointer_cast<Nous::OpenGLShader>(m_FlatColorShader)->Bind();
         std::dynamic_pointer_cast<Nous::OpenGLShader>(m_FlatColorShader)->UploadInt("u_Texture", 0);
@@ -209,6 +210,8 @@ public:
         }
         m_Texture->Bind();
         Nous::Renderer::Submit(m_TextureShader, m_SquareVA);
+        m_MarioTexture->Bind();
+        Nous::Renderer::Submit(m_TextureShader, m_SquareVA);
 
         Nous::Renderer::EndScene();
     }
@@ -232,6 +235,7 @@ private:
     Nous::Ref<Nous::VertexArray> m_SquareVA;
 
     Nous::Ref<Nous::Texture2D> m_Texture;
+    Nous::Ref<Nous::Texture2D> m_MarioTexture;
 
     Nous::Camera m_Camera;
     glm::vec3 m_CameraPosition;

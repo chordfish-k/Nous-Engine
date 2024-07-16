@@ -3,6 +3,7 @@
 
 #include "Nous/Log.h"
 #include "Nous/Input.h"
+#include "Nous/Renderer/Renderer.h"
 
 #include <GLFW/glfw3.h>
 
@@ -18,6 +19,8 @@ namespace Nous {
         // 唯一指针，当Application销毁时一并销毁
         m_Window = Scope<Window>(Window::Create());
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
+
+        Renderer::Init();
 
         // 创建ImGui层
         m_ImGuiLayer = new ImGuiLayer();
