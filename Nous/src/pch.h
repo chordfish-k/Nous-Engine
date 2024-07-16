@@ -5,7 +5,9 @@
 #include <memory>
 #include <algorithm>
 #include <functional>
+#include <filesystem>
 
+#include <array>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -17,3 +19,5 @@
 #ifdef NS_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
+
+namespace fs = std::filesystem;

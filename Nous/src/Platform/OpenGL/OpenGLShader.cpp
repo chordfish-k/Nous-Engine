@@ -23,9 +23,14 @@ namespace Nous {
         std::string source = ReadFile(path);
         auto shaderSrcs = PreProcess(source);
         Compile(shaderSrcs);
+
+        // 从路径中提取名字
+        fs::path filepath = path;
+        m_Name = filepath.stem().string();
     }
 
-    OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+        : m_Name(name)
     {
         std::unordered_map<GLenum, std::string> sources;
         sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -41,7 +46,7 @@ namespace Nous {
     std::string OpenGLShader::ReadFile(const std::string& path)
     {
         std::string result;
-        std::ifstream in(path, std::ios::in, std::ios::binary);
+        std::ifstream in(path, std::ios::in | std::ios::binary);
         if (in)
         {
             in.seekg(0, std::ios::end);
@@ -83,12 +88,12 @@ namespace Nous {
     // https://www.khronos.org/opengl/wiki/Shader_Compilation#Example
     void OpenGLShader::Compile(std::unordered_map<GLenum, std::string>& shaderSources)
     {
+        NS_CORE_ASSERT(shaderSources.size() <= 2, "着色器数量不能多于两个！");
         // 创建着色器程序
         GLenum program = glCreateProgram();
-
-        std::vector<GLenum> glShaderIds(shaderSources.size());
-
+        std::array<GLenum, 2> glShaderIDs;
         // 编译各个着色器
+        int glShaderIDIndex = 0;
         for (auto& kv: shaderSources)
         {
             GLenum type = kv.first;
@@ -117,7 +122,7 @@ namespace Nous {
                 return;
             }
             glAttachShader(program, shader);
-            glShaderIds.push_back(shader);
+            glShaderIDs[glShaderIDIndex++] = shader;
         }
 
         m_RendererID = program;
@@ -140,7 +145,7 @@ namespace Nous {
             // We don't need the m_RendererID anymore.
             glDeleteProgram(m_RendererID);
             // Don't leak shaders either.
-            for (auto& id: glShaderIds)
+            for (auto& id: glShaderIDs)
                 glDeleteShader(id);
 
             // Use the infoLog as you see fit.
@@ -151,7 +156,7 @@ namespace Nous {
         }
 
         // Always detach shaders after a successful link.
-        for (auto& id: glShaderIds)
+        for (auto& id: glShaderIDs)
             glDeleteShader(id);
     }
 

@@ -93,7 +93,7 @@ public:
 			}
 
         )";
-        m_Shader.reset(Nous::Shader::Create(vertexSrc, fragmentSrc));
+        m_Shader = Nous::Shader::Create("VertexColor", vertexSrc, fragmentSrc);
 
         std::string flatColorShaderVertexSrc = R"(
 			#version 330 core
@@ -124,14 +124,14 @@ public:
 			}
 		)";
 
-        m_FlatColorShader.reset(Nous::Shader::Create(flatColorShaderVertexSrc, flatColorShaderFragmentSrc));
-        m_TextureShader.reset(Nous::Shader::Create("assets/shaders/Texture.glsl"));
+        m_FlatColorShader = Nous::Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
+        auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 
         m_Texture = Nous::Texture2D::Create("assets/textures/Checkerboard.png");
         m_MarioTexture = Nous::Texture2D::Create("assets/textures/Mario.png");
 
-        std::dynamic_pointer_cast<Nous::OpenGLShader>(m_FlatColorShader)->Bind();
-        std::dynamic_pointer_cast<Nous::OpenGLShader>(m_FlatColorShader)->UploadInt("u_Texture", 0);
+        std::dynamic_pointer_cast<Nous::OpenGLShader>(textureShader)->Bind();
+        std::dynamic_pointer_cast<Nous::OpenGLShader>(textureShader)->UploadInt("u_Texture", 0);
 
     }
 
@@ -174,10 +174,12 @@ public:
                 Nous::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
             }
         }
+
+        auto textureShader = m_ShaderLibrary.Get("Texture");
         m_Texture->Bind();
-        Nous::Renderer::Submit(m_TextureShader, m_SquareVA);
+        Nous::Renderer::Submit(textureShader, m_SquareVA);
         m_MarioTexture->Bind();
-        Nous::Renderer::Submit(m_TextureShader, m_SquareVA);
+        Nous::Renderer::Submit(textureShader, m_SquareVA);
 
         Nous::Renderer::EndScene();
     }
@@ -194,10 +196,11 @@ public:
     }
 
 private:
+    Nous::ShaderLibrary m_ShaderLibrary;
     Nous::Ref<Nous::Shader> m_Shader;
     Nous::Ref<Nous::VertexArray> m_VertexArray;
 
-    Nous::Ref<Nous::Shader> m_FlatColorShader, m_TextureShader;
+    Nous::Ref<Nous::Shader> m_FlatColorShader;
     Nous::Ref<Nous::VertexArray> m_SquareVA;
 
     Nous::Ref<Nous::Texture2D> m_Texture;
