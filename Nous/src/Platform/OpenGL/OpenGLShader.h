@@ -1,12 +1,18 @@
 #pragma once
 
 #include "Nous/Renderer/Shader.h"
+#include <glm/glm.hpp>
+
+// TODO 将来移除
+typedef unsigned int GLenum;
 
 namespace Nous {
 
     class OpenGLShader : public Shader
     {
     public:
+        OpenGLShader(const std::string& path);
+
         OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
 
         ~OpenGLShader();
@@ -28,6 +34,11 @@ namespace Nous {
         void UploadMat3(const std::string& name, const glm::mat3& matrix);
 
         void UploadMat4(const std::string& name, const glm::mat4& matrix);
+
+    private:
+        std::string ReadFile(const std::string& path);
+        std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
+        void Compile(std::unordered_map<GLenum, std::string>& shaderSources);
 
     private:
         uint32_t m_RendererID;

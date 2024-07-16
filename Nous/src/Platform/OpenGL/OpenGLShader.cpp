@@ -1,93 +1,133 @@
 ﻿#include "pch.h"
 #include "OpenGLShader.h"
 
+#include <fstream>
+
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Nous {
 
-    // https://www.khronos.org/opengl/wiki/Shader_Compilation#Example
-    OpenGLShader::OpenGLShader(const std::string &vertexSrc, const std::string &fragmentSrc)
+    static GLenum ShaderTypeFromString(const std::string& type)
     {
-        // Create an empty vertex shader handle
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        if (type == "vertex")
+            return GL_VERTEX_SHADER;
+        if (type == "fragment" || type == "pixel")
+            return GL_FRAGMENT_SHADER;
+        NS_CORE_ASSERT(false, "着色器类型未知！")
+        return 0;
+    }
 
-        // Send the vertex shader source code to GL
-        // Note that std::string's .c_str is NULL character terminated.
-        const GLchar* source = vertexSrc.c_str();
-        glShaderSource(vertexShader, 1, &source, 0);
+    OpenGLShader::OpenGLShader(const std::string& path)
+    {
+        std::string source = ReadFile(path);
+        auto shaderSrcs = PreProcess(source);
+        Compile(shaderSrcs);
+    }
 
-        // Compile the vertex shader
-        glCompileShader(vertexShader);
+    OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+    {
+        std::unordered_map<GLenum, std::string> sources;
+        sources[GL_VERTEX_SHADER] = vertexSrc;
+        sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+        Compile(sources);
+    }
 
-        GLint isCompiled = 0;
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
-        if(isCompiled == GL_FALSE) {
-            GLint maxLength = 0;
-            glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+    OpenGLShader::~OpenGLShader()
+    {
+        glDeleteProgram(m_RendererID);
+    }
 
-            // The maxLength includes the NULL character
-            std::vector<GLchar> infoLog(maxLength);
-            glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &infoLog[0]);
-
-            // We don't need the shader anymore.
-            glDeleteShader(vertexShader);
-
-            // Use the infoLog as you see fit.
-            NS_CORE_ASSERT_F(false, "顶点着色器编译失败！{0}", infoLog.data());
-
-            // In this simple m_RendererID, we'll just leave
-            return;
-        }
-
-        // Create an empty fragment shader handle
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-        // Send the fragment shader source code to GL
-        // Note that std::string's .c_str is NULL character terminated.
-        source = fragmentSrc.c_str();
-        glShaderSource(fragmentShader, 1, &source, 0);
-
-        // Compile the fragment shader
-        glCompileShader(fragmentShader);
-
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
-        if (isCompiled == GL_FALSE)
+    std::string OpenGLShader::ReadFile(const std::string& path)
+    {
+        std::string result;
+        std::ifstream in(path, std::ios::in, std::ios::binary);
+        if (in)
         {
-            GLint maxLength = 0;
-            glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
+            in.seekg(0, std::ios::end);
+            result.resize(in.tellg());
+            in.seekg(0, std::ios::beg);
+            in.read(&result[0], result.size());
+            in.close();
+        } else
+        {
+            NS_CORE_ERROR("无法打开文件 '{0}'", path);
+        }
+        return result;
+    }
 
-            // The maxLength includes the NULL character
-            std::vector<GLchar> infoLog(maxLength);
-            glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, &infoLog[0]);
+    std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
+    {
+        // 根据type分割两个着色器源码
+        std::unordered_map<GLenum, std::string> shaderSrc;
 
-            // We don't need the shader anymore.
-            glDeleteShader(fragmentShader);
-            // Either of them. Don't leak shaders.
-            glDeleteShader(vertexShader);
+        const char* typeToken = "#type";
+        size_t typeTokenLen = strlen(typeToken);
+        size_t pos = source.find(typeToken, 0);
+        while (pos != std::string::npos)
+        {
+            size_t eol = source.find_first_of("\r\n", pos);
+            NS_CORE_ASSERT(eol != std::string::npos, "着色器语法错误！")
+            size_t begin = pos + typeTokenLen + 1;
+            std::string type = source.substr(begin, eol - begin);
+            NS_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel", "无效的 #type 标记");
 
-            // Use the infoLog as you see fit.
-            NS_CORE_ASSERT_F(false, "片段着色器编译失败！{0}", infoLog.data());
+            size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+            pos = source.find(typeToken, nextLinePos);
+            shaderSrc[ShaderTypeFromString(type)] = source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ?
+                                                                                      source.size() - 1 : nextLinePos));
+        }
+        return shaderSrc;
+    }
 
-            // In this simple m_RendererID, we'll just leave
-            return;
+    // https://www.khronos.org/opengl/wiki/Shader_Compilation#Example
+    void OpenGLShader::Compile(std::unordered_map<GLenum, std::string>& shaderSources)
+    {
+        // 创建着色器程序
+        GLenum program = glCreateProgram();
+
+        std::vector<GLenum> glShaderIds(shaderSources.size());
+
+        // 编译各个着色器
+        for (auto& kv: shaderSources)
+        {
+            GLenum type = kv.first;
+            const std::string& src = kv.second;
+            GLuint shader = glCreateShader(type);
+
+            const GLchar* source = src.c_str();
+            glShaderSource(shader, 1, &source, 0);
+
+            glCompileShader(shader);
+
+            GLint isCompiled = 0;
+            glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+            if (isCompiled == GL_FALSE)
+            {
+                GLint maxLength = 0;
+                glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+                std::vector<GLchar> infoLog(maxLength);
+                glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+
+                glDeleteShader(shader);
+
+                NS_CORE_ERROR("{0}", infoLog.data());
+                NS_CORE_ASSERT(false, "着色器编译失败！");
+                return;
+            }
+            glAttachShader(program, shader);
+            glShaderIds.push_back(shader);
         }
 
-        // Vertex and fragment shaders are successfully compiled.
-        // Now time to link them together into a m_RendererID.
-        // Get a m_RendererID object.
-        m_RendererID = glCreateProgram();
-
-        // Attach our shaders to our m_RendererID
-        glAttachShader(m_RendererID, vertexShader);
-        glAttachShader(m_RendererID, fragmentShader);
+        m_RendererID = program;
 
         // Link our m_RendererID
         glLinkProgram(m_RendererID);
 
         // Note the different functions here: glGetProgram* instead of glGetShader*.
         GLint isLinked = 0;
-        glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int *)&isLinked);
+        glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int*) &isLinked);
         if (isLinked == GL_FALSE)
         {
             GLint maxLength = 0;
@@ -100,23 +140,19 @@ namespace Nous {
             // We don't need the m_RendererID anymore.
             glDeleteProgram(m_RendererID);
             // Don't leak shaders either.
-            glDeleteShader(vertexShader);
-            glDeleteShader(fragmentShader);
+            for (auto& id: glShaderIds)
+                glDeleteShader(id);
 
             // Use the infoLog as you see fit.
-
+            NS_CORE_ERROR("{0}", infoLog.data());
+            NS_CORE_ASSERT(false, "着色器连接失败！");
             // In this simple m_RendererID, we'll just leave
             return;
         }
 
         // Always detach shaders after a successful link.
-        glDetachShader(m_RendererID, vertexShader);
-        glDetachShader(m_RendererID, fragmentShader);
-    }
-
-    OpenGLShader::~OpenGLShader()
-    {
-        glDeleteProgram(m_RendererID);
+        for (auto& id: glShaderIds)
+            glDeleteShader(id);
     }
 
     void OpenGLShader::Bind() const
