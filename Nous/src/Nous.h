@@ -17,6 +17,7 @@
 
 // -----------------渲染器-----------------
 #include "Nous/Renderer/Renderer.h"
+#include "Nous/Renderer/Renderer2D.h"
 #include "Nous/Renderer/RenderCommand.h"
 
 #include "Nous/Renderer/Buffer.h"
