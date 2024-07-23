@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "pch.h"
-#include "Nous/Core.h"
+#include "Nous/Core/Core.h"
 
 #include "spdlog/fmt/ostr.h"
 

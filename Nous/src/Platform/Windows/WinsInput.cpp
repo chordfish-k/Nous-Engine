@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "WinsInput.h"
 
-#include "Nous/Application.h"
+#include "Nous/Core/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace Nous {

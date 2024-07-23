@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nous/Core.h"
+#include "Core.h"
 
 namespace Nous {
 

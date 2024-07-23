@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
 #include "Application.h"
 
-#include "Nous/Log.h"
-#include "Nous/Input.h"
+#include "Log.h"
+#include "Input.h"
 #include "Nous/Renderer/Renderer.h"
 
 namespace Nous {

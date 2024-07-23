@@ -2,7 +2,7 @@
 
 #include "pch.h"
 
-#include "Nous/Core.h"
+#include "Core.h"
 #include "Nous/Event/Event.h"
 
 namespace Nous {

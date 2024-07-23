@@ -2,16 +2,16 @@
 
 // 供Nous应用使用
 
-#include "Nous/Application.h"
-#include "Nous/Layer.h"
-#include "Nous/Log.h"
+#include "Nous/Core/Application.h"
+#include "Nous/Core/Layer.h"
+#include "Nous/Core/Log.h"
 
 #include "Nous/Core/Timestep.h"
 
-#include "Nous/Input.h"
-#include "Nous/KeyCodes.h"
-#include "Nous/MouseButtonCodes.h"
-#include "Nous/CameraController.h"
+#include "Nous/Core/Input.h"
+#include "Nous/Core/KeyCodes.h"
+#include "Nous/Core/MouseButtonCodes.h"
+#include "Nous/Renderer/CameraController.h"
 
 #include "Nous/ImGui/ImGuiLayer.h"
 
@@ -29,5 +29,5 @@
 // ---------------------------------------
 
 // -----------------入口点-----------------
-#include "Nous/EntryPoint.h"
+#include "Nous/Core/EntryPoint.h"
 // ---------------------------------------

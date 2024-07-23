@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "Nous/Core.h"
-#include "Nous/Layer.h"
+#include "Core.h"
+#include "Layer.h"
 
 namespace Nous {
 

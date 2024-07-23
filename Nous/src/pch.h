@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Nous/Log.h"
+#include "Nous/Core/Log.h"
 
 #ifdef NS_PLATFORM_WINDOWS
 #include <Windows.h>

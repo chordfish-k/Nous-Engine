@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Nous/Input.h"
+#include "Nous/Core/Input.h"
 
 namespace Nous {
 

@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
 #include "CameraController.h"
 
-#include "Nous/KeyCodes.h"
-#include "Nous/Input.h"
+#include "Nous/Core/KeyCodes.h"
+#include "Nous/Core/Input.h"
 
 namespace Nous {
 
