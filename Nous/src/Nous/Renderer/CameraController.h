@@ -11,7 +11,7 @@ namespace Nous {
     class CameraController
     {
     public:
-        CameraController(float aspectRatio, bool enableRotation = false);
+        CameraController(float aspectRatio, bool enableRotation = true);
 
         void OnUpdate(Timestep ts);
         void OnEvent(Event& e);
@@ -31,7 +31,7 @@ namespace Nous {
 
         bool m_EnableRotation;
         glm::vec3 m_CameraPosition = {0.0f, 0.0f, 0.0f};
-        float m_CameraRotation;
+        float m_CameraRotation = 0.0f; //角度制，逆时针
         float m_CameraTranslationSpeed = 5.0f, m_CameraRotationSpeed = 180.0f;
     };
 

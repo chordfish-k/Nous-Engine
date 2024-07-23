@@ -13,7 +13,11 @@ namespace Nous {
         int width, height, channels;
         stbi_set_flip_vertically_on_load(1);
         stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-        NS_CORE_ASSERT_F(data, "加载图像失败！{0}", path)
+        if (!data)
+        {
+            NS_CORE_ERROR("{}", path);
+            NS_CORE_ASSERT(false, "加载图像失败！")
+        }
         m_Width = width;
         m_Height = height;
 

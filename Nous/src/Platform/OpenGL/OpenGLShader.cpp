@@ -78,9 +78,9 @@ namespace Nous {
             NS_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel", "无效的 #type 标记");
 
             size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+            NS_CORE_ASSERT(nextLinePos != std::string::npos, "着色器语法错误！");
             pos = source.find(typeToken, nextLinePos);
-            shaderSrc[ShaderTypeFromString(type)] = source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ?
-                                                                                      source.size() - 1 : nextLinePos));
+            shaderSrc[ShaderTypeFromString(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
         }
         return shaderSrc;
     }

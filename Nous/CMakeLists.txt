@@ -43,11 +43,9 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 # 宏定义
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         _CRT_SECURE_NO_WARNINGS
-        NS_ENABLE_ASSERTS
 )
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
-            NS_PLATFORM_WINDOWS
             NS_BUILD_DLL
             GLFW_INCLUDE_NONE
     )
