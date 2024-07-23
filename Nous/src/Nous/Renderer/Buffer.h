@@ -144,7 +144,7 @@ namespace Nous {
 
         virtual void SetLayout(const BufferLayout& layout) = 0;
 
-        static VertexBuffer* Create(float* vertices, uint32_t size);
+        static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
     };
 
     class IndexBuffer
@@ -158,7 +158,7 @@ namespace Nous {
 
         virtual uint32_t GetCount() const = 0;
 
-        static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+        static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
     };
 
 }

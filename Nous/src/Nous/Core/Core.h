@@ -7,7 +7,9 @@
 // Windows x64/x86
     #ifdef _WIN64
 // Windows x64
-        #define NS_PLATFORM_WINDOWS
+        #ifndef NS_PLATFORM_WINDOWS
+            #define NS_PLATFORM_WINDOWS
+        #endif
     #else
 // Windows x86
         #error "x86 Builds are not supported!"

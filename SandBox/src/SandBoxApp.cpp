@@ -1,10 +1,13 @@
 ﻿#include "Nous.h"
+#include "Nous/Core/EntryPoint.h"
 
 #include "imgui/imgui.h"
 #include "ext/matrix_transform.hpp"
 
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "gtc/type_ptr.hpp"
+
+#include "SandBox2D.h"
 
 
 class ExampleLayer : public Nous::Layer
@@ -14,14 +17,14 @@ public:
         : Layer("Example"), m_CameraController(1280.0f / 720.0f)
     {
         // 三角形
-        m_VertexArray.reset(Nous::VertexArray::Create());
+        m_VertexArray = Nous::VertexArray::Create();
         float vertices[3 * 7] = {
             -0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
             0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
             0.0f, 0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
         };
         Nous::Ref<Nous::VertexBuffer> vertexBuffer;
-        vertexBuffer.reset(Nous::VertexBuffer::Create(vertices, sizeof(vertices)));
+        vertexBuffer = Nous::VertexBuffer::Create(vertices, sizeof(vertices));
         Nous::BufferLayout layout = {
             {Nous::ShaderDataType::Float3, "a_Position"},
             {Nous::ShaderDataType::Float4, "a_Color"}
@@ -31,11 +34,11 @@ public:
 
         uint32_t indices[3] = {0, 1, 2};
         Nous::Ref<Nous::IndexBuffer> indexBuffer;
-        indexBuffer.reset(Nous::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+        indexBuffer = Nous::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
         // 正方形
-        m_SquareVA.reset(Nous::VertexArray::Create());
+        m_SquareVA = Nous::VertexArray::Create();
         float squareVertices[5 * 4] = {
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
@@ -43,7 +46,7 @@ public:
             -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
         };
         Nous::Ref<Nous::VertexBuffer> squareVB;
-        squareVB.reset(Nous::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+        squareVB = Nous::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
         squareVB->SetLayout(
             {
                 {Nous::ShaderDataType::Float3, "a_Position"},
@@ -52,7 +55,7 @@ public:
         m_SquareVA->AddVertexBuffer(squareVB);
         uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
         Nous::Ref<Nous::IndexBuffer> squareIB;
-        squareIB.reset(Nous::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+        squareIB = Nous::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
         m_SquareVA->SetIndexBuffer(squareIB);
 
 
@@ -199,7 +202,8 @@ class Sandbox : public Nous::Application
 public:
     Sandbox()
     {
-        PushLayer(new ExampleLayer());
+//        PushLayer(new ExampleLayer());
+        PushLayer(new SandBox2D());
     }
 
     ~Sandbox()
