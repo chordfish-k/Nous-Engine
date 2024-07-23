@@ -5,8 +5,6 @@
 #include "Nous/Input.h"
 #include "Nous/Renderer/Renderer.h"
 
-#include <GLFW/glfw3.h>
-
 namespace Nous {
 
     Application* Application::s_Instance = nullptr;
@@ -38,6 +36,7 @@ namespace Nous {
         // 处理窗口关闭事件
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(NS_BIND_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(NS_BIND_EVENT_FN(Application::OnWindowResize));
 
         // 从后往前逐层处理事件，直到这个事件被处理完毕
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
@@ -64,18 +63,20 @@ namespace Nous {
     {
         while (m_Running)
         {
-            // TODO 解耦 Application 和 TimeStep
             float time = (float) Time::Now();
             Timestep timestep = time - m_lastFrameTime;
             m_lastFrameTime = time;
 
-            for (auto* layer: m_LayerStack)
-                layer->OnUpdate(timestep);
+            if (!m_Minimized)
+            {
+                for (auto* layer: m_LayerStack)
+                    layer->OnUpdate(timestep);
 
-            m_ImGuiLayer->Begin();
-            for (auto* layer: m_LayerStack)
-                layer->OnImGuiRender();
-            m_ImGuiLayer->End();
+                m_ImGuiLayer->Begin();
+                for (auto* layer: m_LayerStack)
+                    layer->OnImGuiRender();
+                m_ImGuiLayer->End();
+            }
 
             m_Window->OnUpdate();
         }
@@ -87,4 +88,17 @@ namespace Nous {
         return true;
     }
 
+    bool Application::OnWindowResize(WindowResizeEvent& e)
+    {
+        if (e.GetWidth() == 0 || e.GetHeight() == 0)
+        {
+            m_Minimized = true;
+            return false;
+        }
+
+        m_Minimized = false;
+        Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+        return false;
+    }
 }

@@ -11,11 +11,8 @@ class ExampleLayer : public Nous::Layer
 {
 public:
     ExampleLayer()
-        : Layer("Example"), m_CameraPosition(0.0f)
+        : Layer("Example"), m_CameraController(1280.0f / 720.0f)
     {
-        // 初始化相机
-        m_Camera.SetSize({1.6f, 0.9f});
-
         // 三角形
         m_VertexArray.reset(Nous::VertexArray::Create());
         float vertices[3 * 7] = {
@@ -137,28 +134,14 @@ public:
 
     void OnUpdate(Nous::Timestep dt) override
     {
-        if (Nous::Input::IsKeyPressed(NS_KEY_LEFT))
-            m_CameraPosition.x -= m_CameraMoveSpeed * dt;
-        else if (Nous::Input::IsKeyPressed(NS_KEY_RIGHT))
-            m_CameraPosition.x += m_CameraMoveSpeed * dt;
+        // Update
+        m_CameraController.OnUpdate(dt);
 
-        if (Nous::Input::IsKeyPressed(NS_KEY_UP))
-            m_CameraPosition.y += m_CameraMoveSpeed * dt;
-        else if (Nous::Input::IsKeyPressed(NS_KEY_DOWN))
-            m_CameraPosition.y -= m_CameraMoveSpeed * dt;
-
-        if (Nous::Input::IsKeyPressed(NS_KEY_A))
-            m_CameraRotation += m_CameraRotationSpeed * dt;
-        if (Nous::Input::IsKeyPressed(NS_KEY_D))
-            m_CameraRotation -= m_CameraRotationSpeed * dt;
-
+        // Render
         Nous::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
         Nous::RenderCommand::Clear();
 
-        m_Camera.SetPosition(m_CameraPosition);
-        m_Camera.SetRotation(m_CameraRotation);
-
-        Nous::Renderer::BeginScene(m_Camera);
+        Nous::Renderer::BeginScene(m_CameraController.GetCamera());
 
         glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -191,8 +174,9 @@ public:
         ImGui::End();
     }
 
-    void OnEvent(Nous::Event& event) override
+    void OnEvent(Nous::Event& e) override
     {
+        m_CameraController.OnEvent(e);
     }
 
 private:
@@ -206,12 +190,7 @@ private:
     Nous::Ref<Nous::Texture2D> m_Texture;
     Nous::Ref<Nous::Texture2D> m_MarioTexture;
 
-    Nous::Camera m_Camera;
-    glm::vec3 m_CameraPosition;
-    float m_CameraMoveSpeed = 5.0f;
-    float m_CameraRotation = 0.0f;
-    float m_CameraRotationSpeed = 180.0f;
-
+    Nous::CameraController m_CameraController;
     glm::vec3 m_SquareColor = {0.2f, 0.3f, 0.8f};
 };
 

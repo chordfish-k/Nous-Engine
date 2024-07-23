@@ -11,6 +11,7 @@
 #include "Nous/Input.h"
 #include "Nous/KeyCodes.h"
 #include "Nous/MouseButtonCodes.h"
+#include "Nous/CameraController.h"
 
 #include "Nous/ImGui/ImGuiLayer.h"
 

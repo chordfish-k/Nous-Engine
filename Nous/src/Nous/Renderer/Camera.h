@@ -4,19 +4,18 @@
 
 namespace Nous {
 
-     /* 相机(正交)
-     *
-     * 屏幕坐标 = P * V * M * Vec
-     *
-     */
+    /* 相机(正交)
+    *
+    * 屏幕坐标 = P * V * M * Vec
+    *
+    */
     class Camera
     {
     public:
         Camera();
-
         Camera(const glm::vec2& size, const glm::vec3& position);
-
         Camera(float left, float right, float bottom, float top);
+        void SetProjection(float left, float right, float bottom, float top);
 
         void SetSize(const glm::vec2& halfSize);
 
@@ -55,8 +54,6 @@ namespace Nous {
 
         glm::vec3 m_Position = {0.0f, 0.0f, 0.0f};
         float m_Rotation = 0.0f;
-
     };
-
 }
 
