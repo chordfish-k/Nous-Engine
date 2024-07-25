@@ -226,4 +226,9 @@ namespace Nous {
     {
         UploadMat4(name, value);
     }
+
+    void OpenGLShader::SetInt(const std::string& name, int value)
+    {
+        UploadInt(name, value);
+    }
 }

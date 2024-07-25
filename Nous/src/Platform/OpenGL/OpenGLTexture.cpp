@@ -7,6 +7,22 @@
 
 namespace Nous {
 
+    OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
+        : m_Width(width), m_Height(height)
+    {
+        m_InternalFormat = GL_RGBA8;
+        m_DataFormat = GL_RGBA;
+
+        glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
+        glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
+
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
+
     Nous::OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
         : m_Path(path)
     {
@@ -23,17 +39,20 @@ namespace Nous {
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 
-        GLenum internalFormat = channels == 4 ? GL_RGBA8 : (channels == 3 ? GL_RGB8 : 0);
-        GLenum dataFormat = channels == 4 ? GL_RGBA : (channels == 3 ? GL_RGB : 0);
+        m_InternalFormat = channels == 4 ? GL_RGBA8 : (channels == 3 ? GL_RGB8 : 0);
+        m_DataFormat = channels == 4 ? GL_RGBA : (channels == 3 ? GL_RGB : 0);
 
-        NS_CORE_ASSERT(internalFormat & dataFormat, "图像格式不支持！");
+        NS_CORE_ASSERT(m_InternalFormat & m_DataFormat, "图像格式不支持！");
 
-        glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
+        glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 
         stbi_image_free(data);
     }
@@ -43,10 +62,16 @@ namespace Nous {
         glDeleteTextures(1, &m_RendererID);
     }
 
+    void OpenGLTexture2D::SetData(void* data, uint32_t size)
+    {
+        uint32_t  bpc = m_DataFormat == GL_RGBA ? 4 : 3;
+        NS_CORE_ASSERT(size == m_Width * m_Height * bpc, "数据大小必须是整张纹理！");
+        glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
+    }
+
     void Nous::OpenGLTexture2D::Bind(uint32_t slot) const
     {
         glBindTextureUnit(slot, m_RendererID);
     }
-
 }
 

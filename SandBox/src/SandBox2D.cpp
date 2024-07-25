@@ -1,10 +1,7 @@
 #include "Sandbox2D.h"
 #include "imgui/imgui.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Platform/OpenGL/OpenGLShader.h"
 
 SandBox2D::SandBox2D()
     : Layer("SandBox2D"), m_CameraController(1280.0f / 720.0f)
@@ -34,6 +31,8 @@ void SandBox2D::OnAttached()
     m_SquareVA->SetIndexBuffer(squareIB);
 
     m_FlatColorShader = Nous::Shader::Create("assets/shaders/FlatColor.glsl");
+
+    m_MarioTexture = Nous::Texture2D::Create("assets/textures/Mario.png");
 }
 
 void SandBox2D::OnDetached()
@@ -53,6 +52,7 @@ void SandBox2D::OnUpdate(Nous::Timestep dt)
     Nous::Renderer2D::DrawQuad({0.0f, 0.0f}, {0.5f, 0.5f}, {0.8f, 0.2f, 0.3f, 1.0f});
     Nous::Renderer2D::DrawQuad({0.5f, 0.0f}, {0.5f, 0.5f}, {0.2f, 0.8f, 0.3f, 1.0f});
     Nous::Renderer2D::DrawQuad({0.5f, 0.5f}, {0.5f, 0.5f}, {0.2f, 0.3f, 0.8f, 1.0f});
+    Nous::Renderer2D::DrawQuad({0.0f, 0.5f}, {0.5f, 0.5f}, m_MarioTexture);
     Nous::Renderer2D::EndScene();
 }
 

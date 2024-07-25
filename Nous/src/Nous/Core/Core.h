@@ -65,8 +65,8 @@
 #endif
 
 #ifdef NS_ENABLE_ASSERTS
-    #define NS_ASSERT(x, fmt) { if(!(x)) { NS_ERROR(fmt); __debugbreak(); } }
-    #define NS_CORE_ASSERT(x, fmt) { if(!(x)) { NS_CORE_ERROR(fmt); __debugbreak(); } }
+    #define NS_ASSERT(x, msg) { if(!(x)) { NS_ERROR(msg); __debugbreak(); } }
+    #define NS_CORE_ASSERT(x, msg) { if(!(x)) { NS_CORE_ERROR(msg); __debugbreak(); } }
 #else
     #define NS_ASSERT(x, ...)
     #define NS_CORE_ASSERT(x, ...)
@@ -83,4 +83,10 @@ namespace Nous {
 
     template<typename T>
     using Ref = std::shared_ptr<T>;
+
+    template<typename T, typename ... Args>
+    constexpr Ref<T> CreateRef(Args&& ... args)
+    {
+        return std::make_shared<T>(std::forward<Args>(args)...);
+    }
 }

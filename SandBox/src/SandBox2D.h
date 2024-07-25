@@ -20,5 +20,7 @@ private:
     Nous::Ref<Nous::VertexArray> m_SquareVA;
     Nous::Ref<Nous::Shader> m_FlatColorShader;
 
+    Nous::Ref<Nous::Texture2D> m_MarioTexture;
+
     glm::vec4 m_SquareColor = {0.2f, 0.3f, 0.8f, 1.0f};
 };

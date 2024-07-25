@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "OpenGLRendererAPI.h"
 
 #include <glad/glad.h>
@@ -9,6 +9,8 @@ namespace Nous {
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // c1 * a1 + c2 * (1-a1)
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -30,5 +32,6 @@ namespace Nous {
     {
 
         glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0); // 清除纹理槽
     }
 }
