@@ -15,6 +15,7 @@
 #include <unordered_set>
 
 #include "Nous/Core/Log.h"
+#include "Nous/Debug/Instrument.h"
 
 #ifdef NS_PLATFORM_WINDOWS
 #include <Windows.h>

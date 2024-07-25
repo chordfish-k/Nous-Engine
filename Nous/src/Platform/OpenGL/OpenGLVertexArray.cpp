@@ -63,7 +63,7 @@ namespace Nous {
                                   ShaderDataTypeToOpenGLBaseType(element.Type),
                                   element.Normalized ? GL_TRUE : GL_FALSE,
                                   (int) layout.GetStride(),
-                                  (const void*)((uint64_t)element.Offset));
+                                  (const void*)element.Offset);
             index++;
         }
 
