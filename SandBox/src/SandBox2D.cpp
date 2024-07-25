@@ -50,12 +50,10 @@ void SandBox2D::OnUpdate(Nous::Timestep dt)
     Nous::RenderCommand::Clear();
 
     Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
-    Nous::Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f}, {0.8f, 0.2f, 0.3f, 1.0f});
-    Nous::Renderer2D::DrawQuad({1.0f, 0.0f}, {1.0f, 1.0f}, {0.2f, 0.3f, 0.8f, 1.0f});
+    Nous::Renderer2D::DrawQuad({0.0f, 0.0f}, {0.5f, 0.5f}, {0.8f, 0.2f, 0.3f, 1.0f});
+    Nous::Renderer2D::DrawQuad({0.5f, 0.0f}, {0.5f, 0.5f}, {0.2f, 0.8f, 0.3f, 1.0f});
+    Nous::Renderer2D::DrawQuad({0.5f, 0.5f}, {0.5f, 0.5f}, {0.2f, 0.3f, 0.8f, 1.0f});
     Nous::Renderer2D::EndScene();
-
-//    std::dynamic_pointer_cast<Nous::OpenGLShader>(m_FlatColorShader)->Bind();
-//    std::dynamic_pointer_cast<Nous::OpenGLShader>(m_FlatColorShader)->UploadFloat4("u_Color", m_SquareColor);
 }
 
 void SandBox2D::OnImGuiRender()
