@@ -1,18 +1,14 @@
 ﻿#pragma once
 
-#include "Core.h"
-#include "Window.h"
+#include "Nous/Core/Core.h"
+#include "Nous/Core/Window.h"
 
-#include "LayerStack.h"
+#include "Nous/Core/LayerStack.h"
 #include "Nous/Event/Event.h"
 #include "Nous/Event/ApplicationEvent.h"
 #include "Nous/ImGui/ImGuiLayer.h"
 
-#include "Nous/Renderer/Shader.h"
-
-#include "Nous/Renderer/Buffer.h"
-#include "Nous/Renderer/VertexArray.h"
-#include "Nous/Renderer/Camera.h"
+int main(int argc, char** argv);
 
 namespace Nous {
 
@@ -22,8 +18,6 @@ namespace Nous {
     public:
         Application();
         virtual ~Application();
-
-        void Run();
 
         void OnEvent(Event& e);
 
@@ -35,6 +29,7 @@ namespace Nous {
         inline Window& GetWindow() { return *m_Window; }
 
     private:
+        void Run();
         bool OnWindowClose(WindowCloseEvent& e);
         bool OnWindowResize(WindowResizeEvent& e);
 
@@ -47,6 +42,8 @@ namespace Nous {
         float m_lastFrameTime = 0.0f;
 
         static Application* s_Instance;
+
+        friend int ::main(int argc, char** argv);
     };
 
     // 需要在客户端中定义
