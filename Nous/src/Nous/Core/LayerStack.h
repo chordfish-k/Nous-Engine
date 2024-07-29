@@ -9,7 +9,7 @@ namespace Nous {
     class NOUS_API LayerStack
     {
     public:
-        LayerStack();
+        LayerStack() = default;
         ~LayerStack();
 
         void PushLayer(Layer* layer);

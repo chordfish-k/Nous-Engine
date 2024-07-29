@@ -12,12 +12,9 @@ namespace Nous {
     class Camera
     {
     public:
-        Camera();
-        Camera(const glm::vec2& size, const glm::vec3& position);
         Camera(float left, float right, float bottom, float top);
-        void SetProjection(float left, float right, float bottom, float top);
 
-        void SetSize(const glm::vec2& halfSize);
+        void SetProjection(float left, float right, float bottom, float top);
 
         inline const glm::vec3& GetPosition() const { return m_Position; }
 

@@ -11,6 +11,8 @@ namespace Nous {
 
     void OpenGLContext::Init()
     {
+        NS_PROFILE_FUNCTION();
+
         glfwMakeContextCurrent(windowHandle);
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
         NS_CORE_ASSERT(status, "Failed to initialze Glad!");
@@ -31,6 +33,8 @@ namespace Nous {
 
     void OpenGLContext::SwapBuffers()
     {
+        NS_PROFILE_FUNCTION();
+
         glfwSwapBuffers(windowHandle);
     }
 }

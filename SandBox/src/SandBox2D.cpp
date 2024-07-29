@@ -12,43 +12,22 @@ SandBox2D::SandBox2D()
 
 void SandBox2D::OnAttached()
 {
-    m_SquareVA = Nous::VertexArray::Create();
-    float squareVertices[5 * 4] = {
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
-    };
-    Nous::Ref<Nous::VertexBuffer> squareVB;
-    squareVB = Nous::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
-    squareVB->SetLayout(
-        {
-            {Nous::ShaderDataType::Float3, "a_Position"},
-            {Nous::ShaderDataType::Float2, "a_TexCoord"}
-        });
-    m_SquareVA->AddVertexBuffer(squareVB);
-    uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
-    Nous::Ref<Nous::IndexBuffer> squareIB;
-    squareIB = Nous::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
-    m_SquareVA->SetIndexBuffer(squareIB);
-
-    m_FlatColorShader = Nous::Shader::Create("assets/shaders/FlatColor.glsl");
+    NS_PROFILE_FUNCTION();
 
     m_MarioTexture = Nous::Texture2D::Create("assets/textures/Mario.png");
 }
 
 void SandBox2D::OnDetached()
 {
+    NS_PROFILE_FUNCTION();
 }
 
 void SandBox2D::OnUpdate(Nous::Timestep dt)
 {
     NS_PROFILE_FUNCTION();
     // Update
-    {
-        NS_PROFILE_SCOPE("CameraController::OnUpdate");
-        m_CameraController.OnUpdate(dt);
-    }
+
+    m_CameraController.OnUpdate(dt);
 
     // Render
     {
@@ -70,6 +49,8 @@ void SandBox2D::OnUpdate(Nous::Timestep dt)
 
 void SandBox2D::OnImGuiRender()
 {
+    NS_PROFILE_FUNCTION();
+
     ImGui::Begin("Settings");
     ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
     ImGui::End();

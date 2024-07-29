@@ -11,6 +11,8 @@ namespace Nous {
 
     Application::Application()
     {
+        NS_PROFILE_FUNCTION();
+
         NS_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
@@ -28,11 +30,15 @@ namespace Nous {
 
     Application::~Application()
     {
+        NS_PROFILE_FUNCTION();
 
+        Renderer::Shutdown();
     }
 
     void Application::OnEvent(Event& e)
     {
+        NS_PROFILE_FUNCTION();
+
         // 处理窗口关闭事件
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(NS_BIND_EVENT_FN(Application::OnWindowClose));
@@ -49,32 +55,49 @@ namespace Nous {
 
     void Application::PushLayer(Layer* layer)
     {
+        NS_PROFILE_FUNCTION();
+
         m_LayerStack.PushLayer(layer);
         layer->OnAttached();
     }
 
     void Application::PushOverlay(Layer* overlay)
     {
+        NS_PROFILE_FUNCTION();
+
         m_LayerStack.PushOverlay(overlay);
         overlay->OnAttached();
     }
 
     void Application::Run()
     {
+        NS_PROFILE_FUNCTION();
+
         while (m_Running)
         {
+            NS_PROFILE_SCOPE("RunLoop");
+
             float time = (float) Time::Now();
             Timestep timestep = time - m_lastFrameTime;
             m_lastFrameTime = time;
 
             if (!m_Minimized)
             {
-                for (auto* layer: m_LayerStack)
-                    layer->OnUpdate(timestep);
+                {
+                    NS_PROFILE_SCOPE("LayerStack OnUpdate");
+
+                    for (auto* layer: m_LayerStack)
+                        layer->OnUpdate(timestep);
+                }
 
                 m_ImGuiLayer->Begin();
-                for (auto* layer: m_LayerStack)
-                    layer->OnImGuiRender();
+
+                {
+                    NS_PROFILE_SCOPE("LayerStack OnImGuiRender");
+
+                    for (auto* layer: m_LayerStack)
+                        layer->OnImGuiRender();
+                }
                 m_ImGuiLayer->End();
             }
 
@@ -90,6 +113,8 @@ namespace Nous {
 
     bool Application::OnWindowResize(WindowResizeEvent& e)
     {
+        NS_PROFILE_FUNCTION();
+
         if (e.GetWidth() == 0 || e.GetHeight() == 0)
         {
             m_Minimized = true;

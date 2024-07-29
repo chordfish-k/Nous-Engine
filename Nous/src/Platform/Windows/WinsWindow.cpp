@@ -9,7 +9,7 @@
 namespace Nous {
 
     // 是否已经初始化GLFW
-    static bool s_GLFWInitialized = false;
+    static int s_GLFWWindowCount = 0;
 
     static void GLFWErrorCallback(int error, const char* desc)
     {
@@ -17,38 +17,48 @@ namespace Nous {
     }
 
     // 根据所属平台不同创建不同的实现类对象
-    Window* Window::Create(const WindowProps& props)
+    Scope<Window> Window::Create(const WindowProps& props)
     {
-        return new WinsWindow(props);
+        return CreateScope<WinsWindow>(props);
     }
 
     WinsWindow::WinsWindow(const WindowProps& props)
     {
+        NS_PROFILE_FUNCTION();
+
         Init(props);
     }
 
     WinsWindow::~WinsWindow()
     {
+        NS_PROFILE_FUNCTION();
+
         Shutdown();
     }
 
     void WinsWindow::Init(const WindowProps& props)
     {
+        NS_PROFILE_FUNCTION();
+
         m_Data.Title = props.Title;
         m_Data.Width = props.Width;
         m_Data.Height = props.Height;
 
         NS_CORE_INFO("创建窗口: {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
-        if (!s_GLFWInitialized)
+        if (s_GLFWWindowCount == 0)
         {
+            NS_PROFILE_SCOPE("glfwInit");
             int success = glfwInit();
             NS_CORE_ASSERT(success, "Could not intialize GLFW!");
             glfwSetErrorCallback(GLFWErrorCallback);
-            s_GLFWInitialized = true;
         }
 
-        m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), NULL, NULL);
+        {
+            NS_PROFILE_SCOPE("glfwCreateWindow");
+            m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), NULL, NULL);
+            ++s_GLFWWindowCount;
+        }
         // 初始化上下文
         m_Context = new OpenGLContext(m_Window);
         m_Context->Init();
@@ -141,6 +151,8 @@ namespace Nous {
 
     void WinsWindow::SetVSync(bool enabled)
     {
+        NS_PROFILE_FUNCTION();
+
         if (enabled)
             glfwSwapInterval(1);
         else
@@ -154,12 +166,20 @@ namespace Nous {
 
     void WinsWindow::OnUpdate()
     {
+        NS_PROFILE_FUNCTION();
+
         glfwPollEvents();
         m_Context->SwapBuffers();
     }
 
     void WinsWindow::Shutdown()
     {
+        NS_PROFILE_FUNCTION();
         glfwDestroyWindow(m_Window);
+
+        if (--s_GLFWWindowCount == 0)
+        {
+            glfwTerminate();
+        }
     }
 }

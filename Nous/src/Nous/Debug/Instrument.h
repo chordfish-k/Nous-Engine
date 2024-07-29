@@ -130,7 +130,7 @@ namespace Nous {
 #if NS_PROFILE
     #define NS_PROFILE_BEGIN_SESSION(name, filepath) ::Nous::Instrument::Get().BeginSession(name, filepath)
     #define NS_PROFILE_END_SESSION() ::Nous::Instrument::Get().EndSession()
-    #define NS_PROFILE_SCOPE(name) ::Nous::InstrumentationTimer timer##__LINE__(name);
+    #define NS_PROFILE_SCOPE(name) ::Nous::InstrumentationTimer timer##__LINE__(name)
     #define NS_PROFILE_FUNCTION() NS_PROFILE_SCOPE(__FUNCSIG__)
 #else
 #define NS_PROFILE_BEGIN_SESSION(name, filepath)
