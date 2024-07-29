@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include <string>
-#include <chrono>
 #include <algorithm>
+#include <chrono>
 #include <fstream>
-
+#include <string>
 #include <thread>
 
 namespace Nous {
@@ -12,7 +11,7 @@ namespace Nous {
     {
         std::string Name;
         long long Start, End;
-        uint32_t ThreadID;
+        std::thread::id ThreadID;
     };
 
     struct InstrumentationSession
@@ -26,55 +25,83 @@ namespace Nous {
     class Instrument
     {
     private:
+        std::mutex m_Mutex;
         InstrumentationSession* m_CurrentSession;
         std::ofstream m_OutputStream;
         int m_ProfileCount;
     public:
         Instrument()
-            : m_CurrentSession(nullptr), m_ProfileCount(0)
+            : m_CurrentSession(nullptr)
         {
         }
 
         void BeginSession(const std::string& name, const std::string& filepath = "results.json")
         {
+//            m_OutputStream.open(filepath);
+//            WriteHeader();
+//            m_CurrentSession = new InstrumentationSession{ name };
+
+            std::lock_guard lock(m_Mutex);
+            if (m_CurrentSession) {
+                // 如果已经有一个 session, 先关闭它再创建新的
+                // 用于原始会话的后续分析输出将最终出现在新打开的会话中。这比格式错误的分析输出要好。
+                if (Log::GetCoreLogger()) { // Edge case: BeginSession() might be before Log::Init()
+                    NS_CORE_ERROR("Instrument::BeginSession('{0}') 但 '{1}' 已开启.", name, m_CurrentSession->Name);
+                }
+                InternalEndSession();
+            }
             m_OutputStream.open(filepath);
-            WriteHeader();
-            m_CurrentSession = new InstrumentationSession{ name };
+            if (m_OutputStream.is_open()) {
+                m_CurrentSession = new InstrumentationSession({name});
+                WriteHeader();
+            } else {
+                if (Log::GetCoreLogger()) { // Edge case: BeginSession() might be before Log::Init()
+                    NS_CORE_ERROR("Instrument 无法打开结果文件 '{0}'.", filepath);
+                }
+            }
         }
 
         void EndSession()
         {
-            WriteFooter();
-            m_OutputStream.close();
-            delete m_CurrentSession;
-            m_CurrentSession = nullptr;
-            m_ProfileCount = 0;
+            std::lock_guard lock(m_Mutex);
+            InternalEndSession();
         }
 
         void WriteProfile(const ProfileResult& result)
         {
-            if (m_ProfileCount++ > 0)
-                m_OutputStream << ",";
+            std::stringstream  json;
 
             std::string name = result.Name;
             std::replace(name.begin(), name.end(), '"', '\'');
 
-            m_OutputStream << "{";
-            m_OutputStream << "\"cat\":\"function\",";
-            m_OutputStream << "\"dur\":" << (result.End - result.Start) << ',';
-            m_OutputStream << "\"name\":\"" << name << "\",";
-            m_OutputStream << "\"ph\":\"X\",";
-            m_OutputStream << "\"pid\":0,";
-            m_OutputStream << "\"tid\":" << result.ThreadID << ",";
-            m_OutputStream << "\"ts\":" << result.Start;
-            m_OutputStream << "}";
+            json << ",{";
+            json << "\"cat\":\"function\",";
+            json << "\"dur\":" << (result.End - result.Start) << ',';
+            json << "\"name\":\"" << name << "\",";
+            json << "\"ph\":\"X\",";
+            json << "\"pid\":0,";
+            json << "\"tid\":" << result.ThreadID << ",";
+            json << "\"ts\":" << result.Start;
+            json << "}";
 
-            m_OutputStream.flush();
+            std::lock_guard lock(m_Mutex);
+
+            if (m_CurrentSession)
+            {
+                m_OutputStream << json.str();
+                m_OutputStream.flush();
+            }
+        }
+
+        // 单例
+        static Instrument& Get() {
+            static Instrument instance;
+            return instance;
         }
 
         void WriteHeader()
         {
-            m_OutputStream << "{\"otherData\": {},\"traceEvents\":[";
+            m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
             m_OutputStream.flush();
         }
 
@@ -84,11 +111,14 @@ namespace Nous {
             m_OutputStream.flush();
         }
 
-        // 单例模式
-        static Instrument& Get()
-        {
-            static Instrument instance;
-            return instance;
+        // 调用前必须持有锁m_Mutex
+        void InternalEndSession() {
+            if (m_CurrentSession) {
+                WriteFooter();
+                m_OutputStream.close();
+                delete m_CurrentSession;
+                m_CurrentSession = nullptr;
+            }
         }
     };
 
@@ -114,8 +144,7 @@ namespace Nous {
             long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimePoint).time_since_epoch().count();
             long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint).time_since_epoch().count();
 
-            uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-            Instrument::Get().WriteProfile({ m_Name, start, end, threadID });
+            Instrument::Get().WriteProfile({ m_Name, start, end, std::this_thread::get_id() });
 
             m_Stopped = true;
         }
