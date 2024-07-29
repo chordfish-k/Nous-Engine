@@ -43,6 +43,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 # 宏定义
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         _CRT_SECURE_NO_WARNINGS
+        NS_DEBUG_LOG_FILE
 )
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE

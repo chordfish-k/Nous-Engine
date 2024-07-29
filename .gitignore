@@ -1,3 +1,5 @@
 cmake-build-**
 CMakeBuild
 Profile-**.json
+
+log.txt
