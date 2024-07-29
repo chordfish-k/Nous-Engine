@@ -45,9 +45,9 @@ namespace Nous {
         dispatcher.Dispatch<WindowResizeEvent>(NS_BIND_EVENT_FN(Application::OnWindowResize));
 
         // 从后往前逐层处理事件，直到这个事件被处理完毕
-        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
+        for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
         {
-            (*--it)->OnEvent(e);
+            (*it)->OnEvent(e);
             if (e.Handled)
                 break;
         }
