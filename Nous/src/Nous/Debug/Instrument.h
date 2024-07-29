@@ -3,14 +3,20 @@
 #include <algorithm>
 #include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <string>
 #include <thread>
 
 namespace Nous {
+
+    using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
+
     struct ProfileResult
     {
         std::string Name;
-        long long Start, End;
+
+        FloatingPointMicroseconds Start;
+        std::chrono::microseconds ElapsedTime;
         std::thread::id ThreadID;
     };
 
@@ -28,7 +34,7 @@ namespace Nous {
         std::mutex m_Mutex;
         InstrumentationSession* m_CurrentSession;
         std::ofstream m_OutputStream;
-        int m_ProfileCount;
+
     public:
         Instrument()
             : m_CurrentSession(nullptr)
@@ -37,15 +43,11 @@ namespace Nous {
 
         void BeginSession(const std::string& name, const std::string& filepath = "results.json")
         {
-//            m_OutputStream.open(filepath);
-//            WriteHeader();
-//            m_CurrentSession = new InstrumentationSession{ name };
-
             std::lock_guard lock(m_Mutex);
             if (m_CurrentSession) {
                 // 如果已经有一个 session, 先关闭它再创建新的
                 // 用于原始会话的后续分析输出将最终出现在新打开的会话中。这比格式错误的分析输出要好。
-                if (Log::GetCoreLogger()) { // Edge case: BeginSession() might be before Log::Init()
+                if (Log::GetCoreLogger()) { // BeginSession() 可能在 Log::Init() 之前执行
                     NS_CORE_ERROR("Instrument::BeginSession('{0}') 但 '{1}' 已开启.", name, m_CurrentSession->Name);
                 }
                 InternalEndSession();
@@ -55,7 +57,7 @@ namespace Nous {
                 m_CurrentSession = new InstrumentationSession({name});
                 WriteHeader();
             } else {
-                if (Log::GetCoreLogger()) { // Edge case: BeginSession() might be before Log::Init()
+                if (Log::GetCoreLogger()) { // BeginSession() 可能在 Log::Init() 之前执行
                     NS_CORE_ERROR("Instrument 无法打开结果文件 '{0}'.", filepath);
                 }
             }
@@ -69,19 +71,20 @@ namespace Nous {
 
         void WriteProfile(const ProfileResult& result)
         {
-            std::stringstream  json;
+            std::stringstream json;
 
             std::string name = result.Name;
             std::replace(name.begin(), name.end(), '"', '\'');
 
+            json << std::setprecision(3) << std::fixed;
             json << ",{";
             json << "\"cat\":\"function\",";
-            json << "\"dur\":" << (result.End - result.Start) << ',';
+            json << "\"dur\":" << (result.ElapsedTime.count()) << ',';
             json << "\"name\":\"" << name << "\",";
             json << "\"ph\":\"X\",";
             json << "\"pid\":0,";
             json << "\"tid\":" << result.ThreadID << ",";
-            json << "\"ts\":" << result.Start;
+            json << "\"ts\":" << result.Start.count();
             json << "}";
 
             std::lock_guard lock(m_Mutex);
@@ -128,7 +131,9 @@ namespace Nous {
         InstrumentationTimer(const char* name)
             : m_Name(name), m_Stopped(false)
         {
-            m_StartTimePoint = std::chrono::high_resolution_clock::now();
+            // high_resolution_clock:高精度时钟，受系统时间变化影响
+            // steady_clock:不受系统时间变化影响的时间点，用于测量时间间隔或确保时间序列的一致性
+            m_StartTimepoint = std::chrono::steady_clock::now();
         }
 
         ~InstrumentationTimer()
@@ -139,18 +144,16 @@ namespace Nous {
 
         void Stop()
         {
-            auto endTimePoint = std::chrono::high_resolution_clock::now();
+            auto endTimepoint = std::chrono::steady_clock::now();
+            auto highResStart = FloatingPointMicroseconds{ m_StartTimepoint.time_since_epoch() };
+            auto elapsedTime = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch() - std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch();
 
-            long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimePoint).time_since_epoch().count();
-            long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint).time_since_epoch().count();
-
-            Instrument::Get().WriteProfile({ m_Name, start, end, std::this_thread::get_id() });
-
+            Instrument::Get().WriteProfile({ m_Name, highResStart, elapsedTime, std::this_thread::get_id() });
             m_Stopped = true;
         }
     private:
         const char* m_Name;
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimePoint;
+        std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
         bool m_Stopped;
     };
 }

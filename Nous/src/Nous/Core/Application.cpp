@@ -13,7 +13,7 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        NS_CORE_ASSERT(!s_Instance, "Application already exists!");
+        NS_CORE_ASSERT(!s_Instance, "Application 已经存在!");
         s_Instance = this;
 
         // 唯一指针，当Application销毁时一并销毁
