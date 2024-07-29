@@ -6,8 +6,6 @@
 
 namespace Nous {
 
-    Input* Input::s_Instance = new WinsInput();
-
     bool WinsInput::IsKeyPressedImpl(KeyCode keyCode)
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
