@@ -228,6 +228,13 @@ namespace Nous {
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
+    void OpenGLShader::SetFloat(const std::string& name, float value)
+    {
+        NS_PROFILE_FUNCTION();
+
+        UploadFloat(name, value);
+    }
+
     void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
     {
         NS_PROFILE_FUNCTION();

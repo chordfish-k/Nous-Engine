@@ -38,10 +38,10 @@ void SandBox2D::OnUpdate(Nous::Timestep dt)
     {
         NS_PROFILE_SCOPE("Render Draw");
         Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
-        Nous::Renderer2D::DrawQuad({0.0f, 0.0f}, {0.5f, 0.5f}, {0.8f, 0.2f, 0.3f, 1.0f});
+        Nous::Renderer2D::DrawRotatedQuad({0.0f, 0.0f}, {0.5f, 0.5f}, glm::radians(-45.0f), {0.8f, 0.2f, 0.3f, 1.0f});
         Nous::Renderer2D::DrawQuad({0.5f, 0.0f}, {0.5f, 0.5f}, {0.2f, 0.8f, 0.3f, 1.0f});
         Nous::Renderer2D::DrawQuad({0.5f, 0.5f}, {0.5f, 0.5f}, {0.2f, 0.3f, 0.8f, 1.0f});
-        Nous::Renderer2D::DrawQuad({0.0f, 0.5f}, {0.5f, 0.5f}, m_MarioTexture);
+        Nous::Renderer2D::DrawRotatedQuad({0.0f, 0.5f}, {0.5f, 0.5f}, glm::radians(-45.0f), m_MarioTexture,{1.0f,1.0f,1.0f,1.0f},10.f);
         Nous::Renderer2D::EndScene();
     }
 
