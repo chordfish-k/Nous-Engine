@@ -4,6 +4,8 @@
 #include "Nous/Event/ApplicationEvent.h"
 #include "Nous/Event/KeyEvent.h"
 #include "Nous/Event/MouseButtonEvent.h"
+#include "Nous/Renderer/Renderer.h"
+
 #include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Nous {
@@ -56,6 +58,10 @@ namespace Nous {
 
         {
             NS_PROFILE_SCOPE("glfwCreateWindow");
+#if defined(NS_DEBUG)
+            if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
             m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), NULL, NULL);
             ++s_GLFWWindowCount;
         }

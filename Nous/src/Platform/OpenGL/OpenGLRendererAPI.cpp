@@ -5,9 +5,37 @@
 
 namespace Nous {
 
+    void OpenGLMessageCallback(
+        unsigned source,
+        unsigned type,
+        unsigned id,
+        unsigned severity,
+        int length,
+        const char* message,
+        const void* userParam)
+    {
+        switch (severity)
+        {
+            case GL_DEBUG_SEVERITY_HIGH:         NS_CORE_CRITICAL(message); return;
+            case GL_DEBUG_SEVERITY_MEDIUM:       NS_CORE_ERROR(message); return;
+            case GL_DEBUG_SEVERITY_LOW:          NS_CORE_WARN(message); return;
+            case GL_DEBUG_SEVERITY_NOTIFICATION: NS_CORE_TRACE(message); return;
+        }
+
+        NS_CORE_ASSERT(false, "未知的信息等级!");
+    }
+
     void OpenGLRendererAPI::Init()
     {
         NS_PROFILE_FUNCTION();
+
+#ifdef NS_DEBUG
+        glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(OpenGLMessageCallback, nullptr);
+
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+#endif
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // c1 * a1 + c2 * (1-a1)

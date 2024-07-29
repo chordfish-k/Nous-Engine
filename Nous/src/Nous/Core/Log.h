@@ -24,7 +24,7 @@ namespace Nous {
 #define NS_CORE_INFO(...)		::Nous::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define NS_CORE_WARN(...)		::Nous::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define NS_CORE_ERROR(...)		::Nous::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define NS_CORE_FATAL(...)		::Nous::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define NS_CORE_CRITICAL(...)		::Nous::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 
 // client log 的宏
@@ -32,5 +32,5 @@ namespace Nous {
 #define NS_INFO(...)		::Nous::Log::GetClientLogger()->info(__VA_ARGS__)
 #define NS_WARN(...)		::Nous::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define NS_ERROR(...)	::Nous::Log::GetClientLogger()->error(__VA_ARGS__)
-#define NS_FATAL(...)	::Nous::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define NS_CRITICAL(...)	::Nous::Log::GetClientLogger()->critical(__VA_ARGS__)
 
