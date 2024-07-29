@@ -2,7 +2,7 @@
 
 #include "Nous/Core/Layer.h"
 #include "Nous/Event/ApplicationEvent.h"
-#include "Nous/Event/MouseButtonEvent.h"
+#include "Nous/Event/MouseEvent.h"
 #include "Nous/Event/KeyEvent.h"
 
 namespace Nous {

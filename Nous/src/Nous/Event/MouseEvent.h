@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Event.h"
+#include "Nous/Event/Event.h"
+#include "Nous/Core/Input.h"
 
 #include <sstream>
 
@@ -50,24 +51,24 @@ namespace Nous {
         float m_XOffset, m_YOffset;
     };
 
-    class NOUS_API MouseButtonEvent : public Event
+    class NOUS_API MouseEvent : public Event
     {
     public:
-        inline int GetMouseButton() const { return m_Button; }
+        inline MouseCode GetMouseButton() const { return m_Button; }
 
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
     protected:
-        MouseButtonEvent(int button)
+        MouseEvent(MouseCode button)
                 : m_Button(button) {}
 
-        int m_Button;
+        MouseCode m_Button;
     };
 
-    class NOUS_API MouseButtonPressedEvent : public MouseButtonEvent
+    class NOUS_API MouseButtonPressedEvent : public MouseEvent
     {
     public:
-        MouseButtonPressedEvent(int button)
-                : MouseButtonEvent(button) {}
+        MouseButtonPressedEvent(MouseCode button)
+                : MouseEvent(button) {}
 
         std::string ToString() const override
         {
@@ -79,11 +80,11 @@ namespace Nous {
         EVENT_CLASS_TYPE(MouseButtonPressed)
     };
 
-    class NOUS_API MouseButtonReleasedEvent : public MouseButtonEvent
+    class NOUS_API MouseButtonReleasedEvent : public MouseEvent
     {
     public:
-        MouseButtonReleasedEvent(int button)
-                : MouseButtonEvent(button) {}
+        MouseButtonReleasedEvent(MouseCode button)
+                : MouseEvent(button) {}
 
         std::string ToString() const override
         {

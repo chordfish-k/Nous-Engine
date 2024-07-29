@@ -4,7 +4,7 @@
 #include "Nous/Core/Timestep.h"
 
 #include "Nous/Event/ApplicationEvent.h"
-#include "Nous/Event/MouseButtonEvent.h"
+#include "Nous/Event/MouseEvent.h"
 
 namespace Nous {
 

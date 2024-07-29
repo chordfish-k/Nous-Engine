@@ -8,17 +8,17 @@ namespace Nous {
 
     Input* Input::s_Instance = new WinsInput();
 
-    bool WinsInput::IsKeyPressedImpl(int keyCode)
+    bool WinsInput::IsKeyPressedImpl(KeyCode keyCode)
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
-        auto state = glfwGetKey(window, keyCode);
+        auto state = glfwGetKey(window, static_cast<uint32_t>(keyCode));
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 
-    bool WinsInput::IsMouseButtonPressedImpl(int button)
+    bool WinsInput::IsMouseButtonPressedImpl(MouseCode button)
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
-        auto state = glfwGetMouseButton(window, button);
+        auto state = glfwGetMouseButton(window, static_cast<uint32_t>(button));
         return state == GLFW_PRESS;
     }
 

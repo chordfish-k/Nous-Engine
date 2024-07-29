@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Event.h"
+#include "Nous/Event/Event.h"
 
 #include <sstream>
 
