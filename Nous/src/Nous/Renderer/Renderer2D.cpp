@@ -225,6 +225,10 @@ namespace Nous {
         // 如果是新纹理，则添加到纹理槽
         if (textureIndex == 0.0f)
         {
+            // TODO 待优化，可能应该同一张纹理一批
+            if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+                FlushAndReset();
+
             textureIndex = (float) s_Data.TextureSlotIndex;
             s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
             s_Data.TextureSlotIndex++;
@@ -314,6 +318,9 @@ namespace Nous {
         // 如果是新纹理，则添加到纹理槽
         if (textureIndex == 0.0f)
         {
+            if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+                FlushAndReset();
+
             textureIndex = (float) s_Data.TextureSlotIndex;
             s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
             s_Data.TextureSlotIndex++;

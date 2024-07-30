@@ -48,9 +48,9 @@ void SandBox2D::OnUpdate(Nous::Timestep dt)
         Nous::Renderer2D::DrawQuad({ 4.8f, -0.5f, -0.1f }, { 0.5f, 0.75f }, { 0.2f, 0.3f, 0.8f, 1.0f });
         Nous::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.0f, 10.0f }, m_MarioTexture, 10.0f);
         Nous::Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.1f }, { 1.0f, 1.0f }, 30.0, m_MarioTexture, 20.0f);
-//        Nous::Renderer2D::EndScene();
-//
-//        Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
+        Nous::Renderer2D::EndScene();
+
+        Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
         const float width = 0.5f;
         for (float y = -5.0f; y < 5.0f; y += width)
         {
