@@ -21,12 +21,16 @@ void SandBox2D::OnDetached()
 {
     NS_PROFILE_FUNCTION();
 }
+
 static float fps = 0.0f;
+
 void SandBox2D::OnUpdate(Nous::Timestep dt)
 {
     NS_PROFILE_FUNCTION();
-    // Update
+
     fps = 1.0f / dt;
+
+    // Update
     m_CameraController.OnUpdate(dt);
 
     // Render

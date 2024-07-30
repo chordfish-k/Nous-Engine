@@ -61,12 +61,22 @@
 #endif
 
 #ifdef NS_DEBUG
+    #if defined(NS_PLATFORM_WINDOWS)
+        #define NS_DEBUG_BREAK() __debugbreak()
+    #elif defined(NS_PLATFORM_LINUX)
+        #include <signal.h>
+        #define NS_DEBUGBREAK() raise(SIGTRAP)
+    #else
+        #error "Platform doesn't support debugbreak yet!"
+    #endif
     #define NS_ENABLE_ASSERTS
+#else
+    #define NS_DEBUGBREAK()
 #endif
 
 #ifdef NS_ENABLE_ASSERTS
-    #define NS_ASSERT(x, msg) { if(!(x)) { NS_ERROR(msg); __debugbreak(); } }
-    #define NS_CORE_ASSERT(x, msg) { if(!(x)) { NS_CORE_ERROR(msg); __debugbreak(); } }
+    #define NS_ASSERT(x, msg) { if(!(x)) { NS_ERROR(msg); NS_DEBUG_BREAK(); } }
+    #define NS_CORE_ASSERT(x, msg) { if(!(x)) { NS_CORE_ERROR(msg); NS_DEBUG_BREAK(); } }
 #else
     #define NS_ASSERT(x, ...)
     #define NS_CORE_ASSERT(x, ...)

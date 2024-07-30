@@ -44,11 +44,11 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         _CRT_SECURE_NO_WARNINGS
         NS_DEBUG_LOG_FILE
+        GLFW_INCLUDE_NONE
 )
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
-            NS_BUILD_DLL
-            GLFW_INCLUDE_NONE
+
     )
 endif ()
 
