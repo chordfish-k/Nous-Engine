@@ -15,8 +15,9 @@ namespace Nous {
 
         void OnAttached() override;
         void OnDetached() override;
-        void OnImGuiRender() override;
+        void OnEvent(Event& e) override;
 
+        void OnImGuiRender() override;
         void Begin();
         void End();
     private:

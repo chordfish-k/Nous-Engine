@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Nous/Core/Core.h"
+#include "Nous/Core/Base.h"
 
 #ifdef NS_PLATFORM_WINDOWS
 
