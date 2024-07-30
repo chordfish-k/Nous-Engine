@@ -16,18 +16,18 @@ namespace Nous {
 
         void OnUpdate() override;
 
-        inline unsigned int GetWidth() const override { return m_Data.Width; }
+        unsigned int GetWidth() const override { return m_Data.Width; }
 
-        inline unsigned int GetHeight() const override { return m_Data.Height; }
+        unsigned int GetHeight() const override { return m_Data.Height; }
 
         // Window 属性
-        inline void SetEventCallback(const EventCallbackFn &callback) override { m_Data.EventCallback = callback; }
+        void SetEventCallback(const EventCallbackFn &callback) override { m_Data.EventCallback = callback; }
 
         void SetVSync(bool enabled) override;
 
         bool IsVSync() const override;
 
-        inline virtual void *GetNativeWindow() const override { return m_Window; };
+        virtual void *GetNativeWindow() const override { return m_Window; };
 
     private:
         virtual void Init(const WindowProps &props);

@@ -16,7 +16,7 @@ namespace Nous {
 
         void SetProjection(float left, float right, float bottom, float top);
 
-        inline const glm::vec3& GetPosition() const { return m_Position; }
+        const glm::vec3& GetPosition() const { return m_Position; }
 
         void SetPosition(const glm::vec3& position)
         {
@@ -24,7 +24,7 @@ namespace Nous {
             RecalculateViewMatrix();
         }
 
-        inline float GetRotation() const { return m_Rotation; }
+        float GetRotation() const { return m_Rotation; }
 
         void SetRotation(float rotation)
         {
@@ -32,11 +32,11 @@ namespace Nous {
             RecalculateViewMatrix();
         }
 
-        inline const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+        const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 
-        inline const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+        const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
-        inline const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
+        const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 
     protected:
         void RecalculateViewMatrix();

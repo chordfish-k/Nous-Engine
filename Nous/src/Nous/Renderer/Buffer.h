@@ -80,9 +80,9 @@ namespace Nous {
             CalculateOffsetsAndStride();
         };
 
-        inline uint32_t GetStride() const { return m_Stride; }
+        uint32_t GetStride() const { return m_Stride; }
 
-        inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
+        const std::vector<BufferElement>& GetElements() const { return m_Elements; }
 
         std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
 
