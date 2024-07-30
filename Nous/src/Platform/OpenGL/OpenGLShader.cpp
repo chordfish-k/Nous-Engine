@@ -192,6 +192,12 @@ namespace Nous {
         glUniform1i(location, value);
     }
 
+    void OpenGLShader::UploadIntArray(const std::string& name, int* values, uint32_t count)
+    {
+        GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+        glUniform1iv(location, count, values);
+    }
+
     void OpenGLShader::UploadFloat(const std::string& name, float value)
     {
         GLint location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -261,5 +267,12 @@ namespace Nous {
         NS_PROFILE_FUNCTION();
 
         UploadInt(name, value);
+    }
+
+    void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count)
+    {
+        NS_PROFILE_FUNCTION();
+
+        UploadIntArray(name, values, count);
     }
 }
