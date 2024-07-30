@@ -20,9 +20,9 @@ namespace Nous {
 
     struct Renderer2DData
     {
-        const uint32_t MaxQuads = 10000; // 批次渲染的最大四边形数量
-        const uint32_t MaxVertices = MaxQuads * 4; // 四边形的顶点个数
-        const uint32_t MaxIndices = MaxQuads * 6; // 四边形的索引个数 (0 1 2 2 3 0)
+        static const uint32_t MaxQuads = 20000; // 批次渲染的最大四边形数量
+        static const uint32_t MaxVertices = MaxQuads * 4; // 四边形的顶点个数
+        static const uint32_t MaxIndices = MaxQuads * 6; // 四边形的索引个数 (0 1 2 2 3 0)
         static const uint32_t MaxTextureSlots = 32; // TODO 应该获取渲染器的上限
 
         Ref <VertexArray> QuadVertexArray;
@@ -37,7 +37,9 @@ namespace Nous {
         std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
         uint32_t TextureSlotIndex = 1; // 0 = 白色纹理
 
-        glm::vec4 QuadVertexPositions[4]{};
+        glm::vec4 QuadVertexPositions[4];
+
+        Renderer2D::Statistics Stats;
     };
 
     static Renderer2DData s_Data;
@@ -107,6 +109,8 @@ namespace Nous {
     void Renderer2D::Shutdown()
     {
         NS_PROFILE_FUNCTION();
+
+        delete[] s_Data.QuadVertexBufferBase;
     }
 
     void Renderer2D::BeginScene(const Camera& camera)
@@ -137,11 +141,22 @@ namespace Nous {
     {
         // 绑定纹理
         for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-        {
             s_Data.TextureSlots[i]->Bind(i);
-        }
 
         RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+
+        s_Data.Stats.DrawCalls++;
+    }
+
+    // 将顶点缓冲全部绘制，然后清空
+    void Renderer2D::FlushAndReset()
+    {
+        EndScene();
+
+        s_Data.QuadIndexCount = 0;
+        s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+        s_Data.TextureSlotIndex = 1;
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -152,6 +167,9 @@ namespace Nous {
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
         NS_PROFILE_FUNCTION();
+
+        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+            FlushAndReset();
 
         const float textureIndex = 0.0f;
         const float tilingFactor = 1.0f;
@@ -189,6 +207,8 @@ namespace Nous {
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
+
+        s_Data.Stats.QuadCount++;
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref <Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
@@ -199,6 +219,9 @@ namespace Nous {
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref <Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
     {
         NS_PROFILE_FUNCTION();
+
+        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+            FlushAndReset();
 
         float textureIndex = 0.0f;
         // 找出当前纹理的id
@@ -251,6 +274,8 @@ namespace Nous {
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
+
+        s_Data.Stats.QuadCount++;
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& tintColor)
@@ -261,6 +286,9 @@ namespace Nous {
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& tintColor)
     {
         NS_PROFILE_FUNCTION();
+
+        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+            FlushAndReset();
 
         const float textureIndex = 0.0f;
         const float tilingFactor = 1.0f;
@@ -298,6 +326,8 @@ namespace Nous {
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
+
+        s_Data.Stats.QuadCount++;
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref <Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
@@ -308,6 +338,9 @@ namespace Nous {
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref <Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
     {
         NS_PROFILE_FUNCTION();
+
+        if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+            FlushAndReset();
 
         float textureIndex = 0.0f;
         // 找出当前纹理的id
@@ -361,5 +394,17 @@ namespace Nous {
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
+
+        s_Data.Stats.QuadCount++;
+    }
+
+    void Renderer2D::ResetStats()
+    {
+        memset(&s_Data.Stats, 0, sizeof(Statistics));
+    }
+
+    Renderer2D::Statistics Renderer2D::GetStats()
+    {
+        return s_Data.Stats;
     }
 }
