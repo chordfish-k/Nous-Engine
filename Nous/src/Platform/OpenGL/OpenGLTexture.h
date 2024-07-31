@@ -17,6 +17,8 @@ namespace Nous {
 
         virtual uint32_t GetHeight() const override { return m_Height; };
 
+        virtual uint32_t GetRendererID() const override { return m_RendererID; }
+
         virtual void Bind(uint32_t slot) const override;
 
         virtual void SetData(void* data, uint32_t size) override;

@@ -69,6 +69,11 @@ namespace Nous {
         overlay->OnAttached();
     }
 
+    void Application::Close()
+    {
+        m_Running = false;
+    }
+
     void Application::Run()
     {
         NS_PROFILE_FUNCTION();
