@@ -9,7 +9,7 @@ namespace Nous {
 
     Application* Application::s_Instance = nullptr;
 
-    Application::Application()
+    Application::Application(const std::string& name)
     {
         NS_PROFILE_FUNCTION();
 
@@ -17,7 +17,7 @@ namespace Nous {
         s_Instance = this;
 
         // 唯一指针，当Application销毁时一并销毁
-        m_Window = Scope<Window>(Window::Create());
+        m_Window = Scope<Window>(Window::Create(WindowProps(name)));
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
 
         Renderer::Init();

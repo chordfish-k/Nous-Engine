@@ -34,4 +34,5 @@ endif()
 set(OUTPUT_DIR "${SYSTEM_NAME}-${ARCHITECTURE}")
 
 add_subdirectory(Nous)
+add_subdirectory(Nous-Editor)
 add_subdirectory(SandBox)

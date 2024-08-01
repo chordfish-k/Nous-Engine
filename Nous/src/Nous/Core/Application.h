@@ -16,7 +16,7 @@ namespace Nous {
     class NOUS_API Application
     {
     public:
-        Application();
+        Application(const std::string& name = "Nous App");
         virtual ~Application();
 
         void OnEvent(Event& e);

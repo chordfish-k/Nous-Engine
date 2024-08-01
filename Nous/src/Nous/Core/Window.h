@@ -10,8 +10,8 @@ namespace Nous {
     struct WindowProps
     {
         std::string Title;
-        unsigned int Width;
-        unsigned int Height;
+        uint32_t Width;
+        uint32_t Height;
 
         WindowProps(const std::string& title = "Nous",
                     unsigned int width = 1280,
