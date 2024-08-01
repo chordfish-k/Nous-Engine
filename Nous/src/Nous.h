@@ -22,9 +22,11 @@
 
 #include "Nous/Renderer/Buffer.h"
 #include "Nous/Renderer/Shader.h"
+#include "Nous/Renderer/Framebuffer.h"
+#include "Nous/Renderer/Texture.h"
 #include "Nous/Renderer/VertexArray.h"
 
 #include "Nous/Renderer/Camera.h"
 
-#include "Nous/Renderer/Texture.h"
+
 // ---------------------------------------

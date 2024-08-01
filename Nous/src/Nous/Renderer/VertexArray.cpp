@@ -13,7 +13,7 @@ namespace Nous {
                 NS_CORE_ASSERT(false, "RendererAPI::None 不支持");
                 return nullptr;
             case RendererAPI::API::OpenGL:
-                return std::make_shared<OpenGLVertexArray>();
+                return CreateRef<OpenGLVertexArray>();
         }
         NS_CORE_ASSERT(false, "RendererAPI 未知");
         return nullptr;

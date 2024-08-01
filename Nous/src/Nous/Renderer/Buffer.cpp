@@ -14,7 +14,7 @@ namespace Nous {
         {
             case RendererAPI::API::None: NS_CORE_ASSERT(false, "RendererAPI 未选择");
                 return nullptr;
-            case RendererAPI::API::OpenGL:return std::make_shared<OpenGLVertexBuffer>(size);
+            case RendererAPI::API::OpenGL:return CreateRef<OpenGLVertexBuffer>(size);
         }
 
         NS_CORE_ASSERT(false, "RendererAPI 未知")

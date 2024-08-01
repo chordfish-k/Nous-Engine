@@ -19,6 +19,7 @@ private:
 
     Nous::Ref<Nous::VertexArray> m_SquareVA;
     Nous::Ref<Nous::Shader> m_FlatColorShader;
+    Nous::Ref<Nous::Framebuffer> m_Framebuffer;
 
     Nous::Ref<Nous::Texture2D> m_MarioTexture, m_CheckerboardTexture;
 
