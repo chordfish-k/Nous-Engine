@@ -65,13 +65,13 @@
         #define NS_DEBUG_BREAK() __debugbreak()
     #elif defined(NS_PLATFORM_LINUX)
         #include <signal.h>
-        #define NS_DEBUGBREAK() raise(SIGTRAP)
+        #define NS_DEBUG_BREAK() raise(SIGTRAP)
     #else
         #error "Platform doesn't support debugbreak yet!"
     #endif
     #define NS_ENABLE_ASSERTS
 #else
-    #define NS_DEBUGBREAK()
+    #define NS_DEBUG_BREAK()
 #endif
 
 #ifdef NS_ENABLE_ASSERTS
