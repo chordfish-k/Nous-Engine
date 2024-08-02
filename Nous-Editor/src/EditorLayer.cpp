@@ -34,6 +34,16 @@ namespace Nous {
 
         fps = 1.0f / dt;
 
+        // Resize
+        auto spec = m_Framebuffer->GetSpecification();
+        if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+            (spec.Width != (uint32_t) m_ViewportSize.x ||
+             spec.Height != (uint32_t) m_ViewportSize.y))
+        {
+            m_Framebuffer->Resize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
+            m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+        }
+
         // Update
         if (m_ViewportFocused)
             m_CameraController.OnUpdate(dt);
@@ -166,13 +176,8 @@ namespace Nous {
             Application::Get().GetImGuiLayer()->SetBlockEvent(!m_ViewportFocused || !m_ViewportHovered);
 
             ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize))
-            {
-                m_Framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
-                m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
+            m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 
-                m_CameraController.OnResize(viewportPanelSize.x, viewportPanelSize.y);
-            }
             uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
             ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
 
