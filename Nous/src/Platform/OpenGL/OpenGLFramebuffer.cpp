@@ -5,6 +5,8 @@
 
 namespace Nous {
 
+    static const uint32_t s_MaxFramebufferSize = 8192;
+
     OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
         : m_Specification(spec)
     {
@@ -69,6 +71,13 @@ namespace Nous {
 
     void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
     {
+        // 防止申请缓冲过大
+        if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
+        {
+            NS_CORE_WARN("尝试将帧缓冲大小重设为 {0}, {1}", width, height);
+            return;
+        }
+
         m_Specification.Width = width;
         m_Specification.Height = height;
         Invalidate();
