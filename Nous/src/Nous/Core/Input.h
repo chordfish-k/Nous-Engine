@@ -8,8 +8,11 @@ namespace Nous {
 
     class NOUS_API Input
     {
-        // 这里巧妙地解决了静态函数无法重载的问题
+    protected:
+        Input() = default;
     public:
+        virtual ~Input() = default;
+        // 这里巧妙地解决了静态函数无法重载的问题
         static bool IsKeyPressed(KeyCode keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
         static bool IsMouseButtonPressed(MouseCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }
         static std::pair<float, float> GetMousePos() { return s_Instance->GetMousePosImpl(); }

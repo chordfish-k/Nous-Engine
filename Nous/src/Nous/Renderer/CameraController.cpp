@@ -83,8 +83,13 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        m_AspectRatio = (float) e.GetWidth() / (float) e.GetHeight();
-        m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+        OnResize(e.GetWidth(), e.GetHeight());
         return false;
+    }
+
+    void CameraController::OnResize(float width, float height)
+    {
+        m_AspectRatio = (float) width / (float) height;
+        m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
     }
 }

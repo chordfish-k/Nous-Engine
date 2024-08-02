@@ -8,6 +8,8 @@ namespace Nous {
     class GraphicsContext
     {
     public:
+        virtual ~GraphicsContext() = default;
+
         /**
          * 图形API初始化
          */
