@@ -26,9 +26,10 @@ namespace Nous {
 
         void Close();
 
-        static Application& Get() { return *s_Instance; }
-
         Window& GetWindow() { return *m_Window; }
+
+        ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+        static Application& Get() { return *s_Instance; }
 
     private:
         void Run();

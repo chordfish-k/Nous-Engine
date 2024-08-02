@@ -35,7 +35,8 @@ namespace Nous {
         fps = 1.0f / dt;
 
         // Update
-        m_CameraController.OnUpdate(dt);
+        if (m_ViewportFocused)
+            m_CameraController.OnUpdate(dt);
 
         // Render
         Nous::Renderer2D::ResetStats();
@@ -159,6 +160,11 @@ namespace Nous {
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
             ImGui::Begin("Viewport");
+
+            m_ViewportFocused = ImGui::IsWindowFocused();
+            m_ViewportHovered = ImGui::IsWindowHovered();
+            Application::Get().GetImGuiLayer()->SetBlockEvent(!m_ViewportFocused || !m_ViewportHovered);
+
             ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
             if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize))
             {
@@ -169,6 +175,7 @@ namespace Nous {
             }
             uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
             ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
+
             ImGui::End();
             ImGui::PopStyleVar();
 

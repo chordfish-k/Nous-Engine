@@ -12,7 +12,7 @@
 namespace Nous {
 
     ImGuiLayer::ImGuiLayer()
-            : Layer("ImgGuiLayer")
+        : Layer("ImgGuiLayer")
     {
     }
 
@@ -27,7 +27,8 @@ namespace Nous {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGuiIO& io = ImGui::GetIO();
+        (void) io;
         io.IniFilename = "imgui.ini";
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -42,7 +43,7 @@ namespace Nous {
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        if (io.ConfigFlags&ImGuiConfigFlags_ViewportsEnable)
         {
             style.WindowRounding = 0.0f;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
@@ -67,9 +68,12 @@ namespace Nous {
 
     void ImGuiLayer::OnEvent(Event& e)
     {
-        ImGuiIO& io = ImGui::GetIO();
-        e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-        e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        if (m_BlockEvent)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            e.Handled |= e.IsInCategory(EventCategoryMouse)&io.WantCaptureMouse;
+            e.Handled |= e.IsInCategory(EventCategoryKeyboard)&io.WantCaptureKeyboard;
+        }
     }
 
     void ImGuiLayer::Begin()
@@ -93,7 +97,7 @@ namespace Nous {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        if (io.ConfigFlags&ImGuiConfigFlags_ViewportsEnable)
         {
             GLFWwindow* backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
@@ -101,8 +105,4 @@ namespace Nous {
             glfwMakeContextCurrent(backup_current_context);
         }
     };
-
-    void ImGuiLayer::OnImGuiRender()
-    {
-    }
 }
