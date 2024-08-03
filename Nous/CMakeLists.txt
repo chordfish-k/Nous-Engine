@@ -68,6 +68,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/imgui
         vendor/glm
         vendor/stb_image
+        vendor/entt
 )
 
 # 链接依赖库

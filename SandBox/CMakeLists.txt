@@ -38,6 +38,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ../Nous/vendor/spdlog/include
         ../Nous/vendor
         ../Nous/vendor/glm/glm
+        ../Nous/vendor/entt
 )
 
 
