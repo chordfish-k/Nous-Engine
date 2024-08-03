@@ -167,6 +167,35 @@ namespace Nous {
         std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
         bool m_Stopped;
     };
+
+    namespace InstrumentUtils {
+
+        template <size_t N>
+        struct ChangeResult
+        {
+            char Data[N];
+        };
+
+        template <size_t N, size_t K>
+        constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K])
+        {
+            ChangeResult<N> result = {};
+
+            size_t srcIndex = 0;
+            size_t dstIndex = 0;
+            while (srcIndex < N)
+            {
+                size_t matchIndex = 0;
+                while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 && expr[srcIndex + matchIndex] == remove[matchIndex])
+                    matchIndex++;
+                if (matchIndex == K - 1)
+                    srcIndex += matchIndex;
+                result.Data[dstIndex++] = expr[srcIndex] == '"' ? '\'' : expr[srcIndex];
+                srcIndex++;
+            }
+            return result;
+        }
+    }
 }
 
 #ifndef NS_PROFILE
@@ -196,7 +225,10 @@ namespace Nous {
 
     #define NS_PROFILE_BEGIN_SESSION(name, filepath) ::Nous::Instrument::Get().BeginSession(name, filepath)
     #define NS_PROFILE_END_SESSION() ::Nous::Instrument::Get().EndSession()
-    #define NS_PROFILE_SCOPE(name) ::Nous::InstrumentationTimer timer##__LINE__(name)
+    #define NS_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Nous::InstrumentUtils::CleanupOutputString(name, "__cdecl ");\
+											   ::Nous::InstrumentationTimer timer##line(fixedName##line.Data)
+	#define NS_PROFILE_SCOPE_LINE(name, line) NS_PROFILE_SCOPE_LINE2(name, line)
+	#define NS_PROFILE_SCOPE(name) NS_PROFILE_SCOPE_LINE(name, __LINE__)
     #define NS_PROFILE_FUNCTION() NS_PROFILE_SCOPE(NS_FUNC_SIG)
 #else
 #define NS_PROFILE_BEGIN_SESSION(name, filepath)
