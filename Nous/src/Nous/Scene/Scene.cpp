@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Scene.h"
 
+#include "Entity.h"
 #include "Nous/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
@@ -59,9 +60,13 @@ namespace Nous {
     {
     }
 
-    entt::entity Scene::CreateEntity()
+    Entity Scene::CreateEntity(const std::string& name)
     {
-        return m_Registry.create();
+        Entity entity = { m_Registry.create(), this };
+        entity.AddComponent<CTransform>();
+        auto& tag = entity.AddComponent<CTag>();
+        tag.Tag = name.empty() ? "Entity" : name;
+        return entity;
     }
 
     void Scene::OnUpdate(Timestep dt)

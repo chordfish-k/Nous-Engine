@@ -22,9 +22,9 @@ namespace Nous {
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
         m_ActiveScene = CreateRef<Scene>();
-        m_SquareEntity = m_ActiveScene->CreateEntity();
-        m_ActiveScene->Reg().emplace<CTransform>(m_SquareEntity);
-        m_ActiveScene->Reg().emplace<CSpriteRenderer>(m_SquareEntity, glm::vec4{0.3f, 0.7f, 0.2f, 1.0f });
+        // Entity
+        m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+        m_SquareEntity.AddComponent<CSpriteRenderer>(glm::vec4{0.3f, 0.7f, 0.2f, 1.0f});
     }
 
     void EditorLayer::OnDetached()
@@ -156,8 +156,16 @@ namespace Nous {
             ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
             ImGui::Text("FPS: %.2f", fps);
 
-            auto &squareColor = m_ActiveScene->Reg().get<CSpriteRenderer>(m_SquareEntity).Color;
-            ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+            if (m_SquareEntity)
+            {
+                ImGui::Separator();
+                ImGui::Text("%s", m_SquareEntity.GetComponent<CTag>().Tag.c_str());
+
+                auto& squareColor = m_SquareEntity.GetComponent<CSpriteRenderer>().Color;
+                ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+                ImGui::Separator();
+            }
+
 
             ImGui::End();
 

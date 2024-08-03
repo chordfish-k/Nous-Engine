@@ -4,6 +4,15 @@
 
 namespace Nous {
 
+    struct CTag
+    {
+        std::string Tag;
+        CTag() = default;
+        CTag(const CTag&) = default;
+        CTag(const std::string& tag)
+            : Tag(tag) {}
+    };
+
     struct CTransform
     {
         glm::mat4 Transform{ 1.0f };

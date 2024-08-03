@@ -17,6 +17,7 @@
 
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Component.h"
+#include "Nous/Scene/Entity.h"
 
 // -----------------渲染器-----------------
 #include "Nous/Renderer/Renderer.h"
