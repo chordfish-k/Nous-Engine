@@ -1,5 +1,6 @@
 #include "EditorLayer.h"
 #include "imgui/imgui.h"
+#include "gtc/type_ptr.hpp"
 
 namespace Nous {
 
@@ -12,13 +13,18 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        m_MarioTexture = Nous::Texture2D::Create("assets/textures/Mario.png");
-        m_CheckerboardTexture = Nous::Texture2D::Create("assets/textures/Checkerboard.png");
+        m_MarioTexture = Texture2D::Create("assets/textures/Mario.png");
+        m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
-        Nous::FramebufferSpecification fbSpec = {};
+        FramebufferSpecification fbSpec = {};
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
-        m_Framebuffer = Nous::Framebuffer::Create(fbSpec);
+        m_Framebuffer = Framebuffer::Create(fbSpec);
+
+        m_ActiveScene = CreateRef<Scene>();
+        m_SquareEntity = m_ActiveScene->CreateEntity();
+        m_ActiveScene->Reg().emplace<CTransform>(m_SquareEntity);
+        m_ActiveScene->Reg().emplace<CSpriteRenderer>(m_SquareEntity, glm::vec4{0.3f, 0.7f, 0.2f, 1.0f });
     }
 
     void EditorLayer::OnDetached()
@@ -28,7 +34,7 @@ namespace Nous {
 
     static float fps = 0.0f;
 
-    void EditorLayer::OnUpdate(Nous::Timestep dt)
+    void EditorLayer::OnUpdate(Timestep dt)
     {
         NS_PROFILE_FUNCTION();
 
@@ -49,36 +55,20 @@ namespace Nous {
             m_CameraController.OnUpdate(dt);
 
         // Render
-        Nous::Renderer2D::ResetStats();
-        {
-            NS_PROFILE_SCOPE("Render Prepare");
-            m_Framebuffer->Bind();
-            Nous::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
-            Nous::RenderCommand::Clear();
-        }
-        {
-            NS_PROFILE_SCOPE("Render Draw");
+        Renderer2D::ResetStats();
+        m_Framebuffer->Bind();
+        RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
+        RenderCommand::Clear();
 
-            Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
-            Nous::Renderer2D::DrawQuad({-1.0f, 0.0f}, {0.8f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
-            Nous::Renderer2D::DrawQuad({4.8f, -0.5f, -0.1f}, {0.5f, 0.75f}, {0.2f, 0.3f, 0.8f, 1.0f});
-            Nous::Renderer2D::DrawQuad({0.0f, 0.0f, -0.1f}, {10.0f, 10.0f}, m_MarioTexture, 10.0f);
-            Nous::Renderer2D::DrawRotatedQuad({0.0f, 0.0f, 0.1f}, {1.0f, 1.0f}, 30.0, m_MarioTexture, 20.0f);
-            Nous::Renderer2D::EndScene();
 
-            Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
-            const float width = 0.5f;
-            for (float y = -5.0f; y < 5.0f; y += width)
-            {
-                for (float x = -5.0f; x < 5.0f; x += width)
-                {
-                    glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.5f};
-                    Nous::Renderer2D::DrawQuad({x, y}, {width, width}, color);
-                }
-            }
-            Nous::Renderer2D::EndScene();
-            m_Framebuffer->Unbind();
-        }
+        Renderer2D::BeginScene(m_CameraController.GetCamera());
+
+        // Update Scene
+        m_ActiveScene->OnUpdate(dt);
+
+        Renderer2D::EndScene();
+
+        m_Framebuffer->Unbind();
     }
 
     void EditorLayer::OnImGuiRender()
@@ -146,7 +136,7 @@ namespace Nous {
                     // Disabling fullscreen would allow the window to be moved to the front of other windows,
                     // which we can't undo at the moment without finer window depth/z control.
                     if (ImGui::MenuItem("Exit", "", (dockspace_flags&ImGuiDockNodeFlags_NoSplit) != 0))
-                        Nous::Application::Get().Close();
+                        Application::Get().Close();
 
                     ImGui::Separator();
 
@@ -158,13 +148,16 @@ namespace Nous {
 
             ImGui::Begin("Settings");
 
-            auto stats = Nous::Renderer2D::GetStats();
+            auto stats = Renderer2D::GetStats();
             ImGui::Text("Renderer2D Stats:");
             ImGui::Text("Draw Calls: %d", stats.DrawCalls);
             ImGui::Text("Quads: %d", stats.QuadCount);
             ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
             ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
             ImGui::Text("FPS: %.2f", fps);
+
+            auto &squareColor = m_ActiveScene->Reg().get<CSpriteRenderer>(m_SquareEntity).Color;
+            ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
 
             ImGui::End();
 
@@ -188,7 +181,7 @@ namespace Nous {
         }
     }
 
-    void EditorLayer::OnEvent(Nous::Event& e)
+    void EditorLayer::OnEvent(Event& e)
     {
         m_CameraController.OnEvent(e);
     }

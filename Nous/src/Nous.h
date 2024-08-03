@@ -15,6 +15,9 @@
 
 #include "Nous/ImGui/ImGuiLayer.h"
 
+#include "Nous/Scene/Scene.h"
+#include "Nous/Scene/Component.h"
+
 // -----------------渲染器-----------------
 #include "Nous/Renderer/Renderer.h"
 #include "Nous/Renderer/Renderer2D.h"
