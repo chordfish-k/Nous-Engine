@@ -14,7 +14,8 @@ namespace Nous {
     {
         struct MeshComponent
         {
-            int a;
+            float Value;
+            MeshComponent() = default;
         };
 
         struct TransformComponent

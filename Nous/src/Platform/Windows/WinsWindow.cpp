@@ -10,18 +10,12 @@
 
 namespace Nous {
 
-    // 是否已经初始化GLFW
+    // 窗口数量
     static int s_GLFWWindowCount = 0;
 
     static void GLFWErrorCallback(int error, const char* desc)
     {
         NS_CORE_ERROR("GLFW Error ({0}): {1}", error, desc);
-    }
-
-    // 根据所属平台不同创建不同的实现类对象
-    Scope<Window> Window::Create(const WindowProps& props)
-    {
-        return CreateScope<WinsWindow>(props);
     }
 
     WinsWindow::WinsWindow(const WindowProps& props)
