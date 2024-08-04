@@ -74,7 +74,7 @@ namespace Nous {
     public:
         BufferLayout() = default;
 
-        BufferLayout(const std::initializer_list<BufferElement>& element)
+        BufferLayout(std::initializer_list<BufferElement> element)
             : m_Elements(element)
         {
             CalculateOffsetsAndStride();
