@@ -49,9 +49,8 @@ namespace Nous {
 
             virtual void OnUpdate(Timestep dt) override
             {
-                auto& transform = GetComponent<CTransform>().Transform;
+                auto& pos = GetComponent<CTransform>().Translation;
                 float speed = 5.0f;
-                auto& pos = transform[3];
                 if (Input::IsKeyPressed(KeyCode::A))
                     pos.x -= speed * dt;
                 if (Input::IsKeyPressed(KeyCode::D))

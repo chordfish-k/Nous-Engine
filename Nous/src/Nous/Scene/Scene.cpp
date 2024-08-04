@@ -36,9 +36,9 @@ namespace Nous {
     {
         Entity entity = {m_Registry.create(), this};
         auto& transform = entity.AddComponent<CTransform>();
-        transform.Transform[3].x = position.x;
-        transform.Transform[3].y = position.y;
-        transform.Transform[3].z = position.z;
+        transform.Translation.x = position.x;
+        transform.Translation.y = position.y;
+        transform.Translation.z = position.z;
 
         auto& tag = entity.AddComponent<CTag>();
         tag.Tag = name.empty() ? "Entity" : name;
@@ -64,7 +64,7 @@ namespace Nous {
 
         // 2D渲染
         Camera* mainCamera = nullptr;
-        glm::mat4* cameraTransform = nullptr;
+        glm::mat4 cameraTransform;
         {
             auto view = m_Registry.view<CTransform, CCamera>();
             for (auto ent: view)
@@ -73,15 +73,15 @@ namespace Nous {
                 if (camera.Primary)
                 {
                     mainCamera = &camera.Camera;
-                    cameraTransform = &transform.Transform;
+                    cameraTransform = transform.GetTransform();
                     break;
                 }
             }
         }
 
-        if (mainCamera && cameraTransform)
+        if (mainCamera)
         {
-            Renderer2D::BeginScene(*mainCamera, *cameraTransform);
+            Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
             auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
             for (auto ent: group)
