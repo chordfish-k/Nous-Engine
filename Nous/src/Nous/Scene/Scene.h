@@ -2,8 +2,6 @@
 
 #include "entt.hpp"
 
-#include "Component.h"
-
 #include "Nous/Core/Timestep.h"
 
 namespace Nous {

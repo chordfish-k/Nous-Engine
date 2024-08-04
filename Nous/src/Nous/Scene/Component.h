@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "Nous/Scene/SceneCamera.h"
+#include "ScriptableEntity.h"
 
 namespace Nous {
 
@@ -49,5 +50,20 @@ namespace Nous {
 
         CCamera() = default;
         CCamera(const CCamera&) = default;
+    };
+
+    struct CNativeScript
+    {
+        ScriptableEntity* Instance = nullptr;
+
+        ScriptableEntity* (*InitScript)();
+        void (*DestroyScript)(CNativeScript*);
+
+        template<typename T>
+        void Bind()
+        {
+            InitScript = []() { return static_cast<ScriptableEntity*>(new T());};
+            DestroyScript = [](CNativeScript* script) { delete script->Instance; script->Instance = nullptr;};
+        }
     };
 }

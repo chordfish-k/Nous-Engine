@@ -33,6 +33,36 @@ namespace Nous {
         m_CameraEntity2 = m_ActiveScene->CreateEntity("Clip-Space Entity");
         auto& cc = m_CameraEntity2.AddComponent<CCamera>();
         cc.Primary = false;
+
+        class CameraController : public ScriptableEntity
+        {
+        public:
+            void OnCreate()
+            {
+                NS_TRACE("Script Created");
+            }
+
+            void OnDestroy()
+            {
+                NS_TRACE("Script Destroy");
+            }
+
+            void OnUpdate(Timestep dt)
+            {
+                auto& transform = GetComponent<CTransform>().Transform;
+                float speed = 5.0f;
+                auto& pos = transform[3];
+                if (Input::IsKeyPressed(KeyCode::A))
+                    pos.x -= speed * dt;
+                if (Input::IsKeyPressed(KeyCode::D))
+                    pos.x += speed * dt;
+                if (Input::IsKeyPressed(KeyCode::W))
+                    pos.y += speed * dt;
+                if (Input::IsKeyPressed(KeyCode::S))
+                    pos.y -= speed * dt;
+            }
+        };
+        m_CameraEntity2.AddComponent<CNativeScript>().Bind<CameraController>();
     }
 
     void EditorLayer::OnDetached()
