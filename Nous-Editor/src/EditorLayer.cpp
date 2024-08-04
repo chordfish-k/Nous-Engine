@@ -116,7 +116,6 @@ namespace Nous {
 
         // Properties
         ImGui::Begin("Settings");
-
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -124,17 +123,6 @@ namespace Nous {
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
         ImGui::Text("FPS: %.2f", fps);
-
-        if (m_SquareEntity)
-        {
-            ImGui::Separator();
-            ImGui::Text("%s", m_SquareEntity.GetComponent<CTag>().Tag.c_str());
-
-            auto& squareColor = m_SquareEntity.GetComponent<CSpriteRenderer>().Color;
-            ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
-            ImGui::Separator();
-        }
-
         ImGui::End();
 
         // Hierarchy

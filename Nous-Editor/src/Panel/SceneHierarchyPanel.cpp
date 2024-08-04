@@ -151,5 +151,15 @@ namespace Nous {
                 ImGui::TreePop();
             }
         }
+
+        if (entity.HasComponent<CSpriteRenderer>())
+        {
+            if (ImGui::TreeNodeEx((void*)typeid(CSpriteRenderer).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer"))
+            {
+                auto& src = entity.GetComponent<CSpriteRenderer>();
+                ImGui::ColorEdit4("Color", glm::value_ptr(src.Color));
+                ImGui::TreePop();
+            }
+        }
     }
 }
