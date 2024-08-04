@@ -33,24 +33,22 @@ namespace Nous {
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
         m_CameraEntity.AddComponent<CCamera>();
 
-        m_CameraEntity2 = m_ActiveScene->CreateEntity("Clip-Space Entity");
+        m_CameraEntity2 = m_ActiveScene->CreateEntity("Camera2");
         auto& cc = m_CameraEntity2.AddComponent<CCamera>();
         cc.Primary = false;
 
         class CameraController : public ScriptableEntity
         {
         public:
-            void OnCreate()
+            virtual void OnCreate() override
             {
-                NS_TRACE("Script Created");
             }
 
-            void OnDestroy()
+            virtual void OnDestroy() override
             {
-                NS_TRACE("Script Destroy");
             }
 
-            void OnUpdate(Timestep dt)
+            virtual void OnUpdate(Timestep dt) override
             {
                 auto& transform = GetComponent<CTransform>().Transform;
                 float speed = 5.0f;
@@ -65,7 +63,9 @@ namespace Nous {
                     pos.y -= speed * dt;
             }
         };
-        m_CameraEntity2.AddComponent<CNativeScript>().Bind<CameraController>();
+        m_CameraEntity.AddComponent<CNativeScript>().Bind<CameraController>();
+
+        m_SceneHierarchyPanel.SetContent(m_ActiveScene);
     }
 
     void EditorLayer::OnDetached()
@@ -153,6 +153,9 @@ namespace Nous {
         }
 
         ImGui::End();
+
+        // Hierarchy
+        m_SceneHierarchyPanel.OnImGuiRender();
 
         // Viewport
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
