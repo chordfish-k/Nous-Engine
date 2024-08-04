@@ -23,20 +23,21 @@ namespace Nous {
         template<typename T>
         T& GetComponent()
         {
+            NS_CORE_ASSERT(HasComponent<T>(), "实体没有此组件！");
             return m_Scene->m_Registry.get<T>(m_EntityHandle);
         }
 
-        template<class T>
+        template<typename T>
         bool HasComponent()
         {
-            return m_Scene->m_Registry.any_of<T>(m_EntityHandle);
+            return m_Scene->m_Registry.has<T>(m_EntityHandle);
         }
 
         template<typename T>
         void RemoveComponent()
         {
             NS_CORE_ASSERT(HasComponent<T>(), "实体没有此组件！");
-            m_Scene->m_Registry.remove<T>(m_EntityHandle);
+            m_Scene->m_Registry.remove<T>(m_EntityHandle); // 只在实体拥有该组件时触发
         }
 
         operator bool() const { return m_EntityHandle != entt::null; }
@@ -48,7 +49,7 @@ namespace Nous {
             return !(*this == other);
         }
     private:
-        entt::entity m_EntityHandle{ 0 };
+        entt::entity m_EntityHandle{ entt::null };
         // 暂时用原生指针
         Scene* m_Scene = nullptr;
     };
