@@ -39,7 +39,7 @@ namespace Nous {
             m_Scene->m_Registry.remove<T>(m_EntityHandle);
         }
 
-        operator bool() const { return m_Scene != nullptr; }
+        operator bool() const { return m_EntityHandle != entt::null; }
     private:
         entt::entity m_EntityHandle{ 0 };
         // 暂时用原生指针
