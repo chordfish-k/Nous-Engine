@@ -18,7 +18,7 @@ namespace Nous {
         virtual void OnImGuiRender() override;
         virtual void OnEvent(Event& event) override;
     private:
-        CameraController m_CameraController;
+        OrthoCameraController m_CameraController;
 
         Ref<VertexArray> m_SquareVA;
         Ref<Shader> m_FlatColorShader;
@@ -26,6 +26,10 @@ namespace Nous {
 
         Ref<Scene> m_ActiveScene;
         Entity m_SquareEntity;
+        Entity m_CameraEntity;
+        Entity m_CameraEntity2;
+
+        bool m_PrimaryCamera = true;
 
         Ref<Texture2D> m_MarioTexture, m_CheckerboardTexture;
 

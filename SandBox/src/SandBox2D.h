@@ -15,7 +15,7 @@ public:
     virtual void OnImGuiRender() override;
     virtual void OnEvent(Nous::Event& event) override;
 private:
-    Nous::CameraController m_CameraController;
+    Nous::OrthoCameraController m_CameraController;
 
     Nous::Ref<Nous::VertexArray> m_SquareVA;
     Nous::Ref<Nous::Shader> m_FlatColorShader;

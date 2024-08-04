@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Scene.h"
 
 #include "Entity.h"
@@ -15,45 +15,6 @@ namespace Nous {
 
     Scene::Scene()
     {
-//        struct MeshComponent
-//        {
-//            float Value;
-//            MeshComponent() = default;
-//        };
-//
-//        struct TransformComponent
-//        {
-//            glm::mat4 Transform;
-//
-//            TransformComponent() = default;
-//            TransformComponent(const TransformComponent&) = default;
-//            TransformComponent(const glm::mat4& transform)
-//                : Transform(transform) {};
-//
-//            operator glm::mat4&() { return Transform; }
-//            operator const glm::mat4&() const { return Transform; }
-//        };
-//
-//        entt::entity entity = m_Registry.create();
-//        m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f));
-//
-//        m_Registry.on_construct<TransformComponent>().connect<&OnTransformConstruct>();
-//
-//        if (m_Registry.any_of<TransformComponent>(entity))
-//            TransformComponent& transform = m_Registry.get<TransformComponent>(entity);
-//
-//        // view:找出所有包含某个组件的实体
-//        auto view = m_Registry.view<TransformComponent>();
-//        for (auto ent : view)
-//        {
-//            TransformComponent& transform = m_Registry.get<TransformComponent>(ent);
-//        }
-//
-//        auto group = m_Registry.group<TransformComponent>(entt::get<MeshComponent>);
-//        for (auto ent : group)
-//        {
-//            auto[transform, mesh] = group.get<TransformComponent, MeshComponent>(ent);
-//        }
     }
 
     Scene::~Scene()
@@ -71,13 +32,37 @@ namespace Nous {
 
     void Scene::OnUpdate(Timestep dt)
     {
-        //取出同时有多个组件的实体
-        auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
-        for (auto ent : group)
+        // 渲染精灵图
+        Camera* mainCamera = nullptr;
+        glm::mat4* cameraTransform = nullptr;
         {
-            auto[transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
-
-            Renderer2D::DrawQuad(transform, sprite.Color);
+            auto view = m_Registry.view<CTransform, CCamera>();
+            for (auto ent : view)
+            {
+                auto[transform, camera] = view.get<CTransform, CCamera>(ent);
+                if (camera.Primary)
+                {
+                    mainCamera = &camera.Camera;
+                    cameraTransform = &transform.Transform;
+                    break;
+                }
+            }
         }
+
+        if (mainCamera && cameraTransform)
+        {
+            Renderer2D::BeginScene(*mainCamera, *cameraTransform);
+
+            auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
+            for (auto ent : group)
+            {
+                auto[transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
+
+                Renderer2D::DrawQuad(transform, sprite.Color);
+            }
+
+            Renderer2D::EndScene();
+        }
+
     }
 }

@@ -1,6 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include <glm/glm.hpp>
+
+#include "Nous/Renderer/Camera.h"
 
 namespace Nous {
 
@@ -37,5 +39,16 @@ namespace Nous {
 
         operator glm::vec4&() { return Color; }
         operator const glm::vec4&() const { return Color; }
+    };
+
+    struct CCamera
+    {
+        Nous::Camera Camera;
+        bool Primary = true; // 是否为主摄像机
+
+        CCamera() = default;
+        CCamera(const CCamera&) = default;
+        CCamera(const glm::mat4& projection)
+            : Camera(projection) {};
     };
 }

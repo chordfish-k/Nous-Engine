@@ -24,6 +24,6 @@ private:
     Nous::Ref<Nous::Texture2D> m_Texture;
     Nous::Ref<Nous::Texture2D> m_MarioTexture;
 
-    Nous::CameraController m_CameraController;
+    Nous::OrthoCameraController m_CameraController;
     glm::vec3 m_SquareColor = {0.2f, 0.3f, 0.8f};
 };

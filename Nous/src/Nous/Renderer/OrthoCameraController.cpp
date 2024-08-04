@@ -1,19 +1,19 @@
 ﻿#include "pch.h"
-#include "CameraController.h"
+#include "OrthoCameraController.h"
 
 #include "Nous/Core/KeyCodes.h"
 #include "Nous/Core/Input.h"
 
 namespace Nous {
 
-    CameraController::CameraController(float aspectRatio, bool enableRotation)
+    OrthoCameraController::OrthoCameraController(float aspectRatio, bool enableRotation)
         : m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel),
           m_AspectRatio(aspectRatio), m_EnableRotation(enableRotation)
     {
 
     }
 
-    void CameraController::OnUpdate(Timestep ts)
+    void OrthoCameraController::OnUpdate(Timestep ts)
     {
         NS_PROFILE_FUNCTION();
 
@@ -60,16 +60,16 @@ namespace Nous {
         m_CameraTranslationSpeed = m_ZoomLevel;
     }
 
-    void CameraController::OnEvent(Event& e)
+    void OrthoCameraController::OnEvent(Event& e)
     {
         NS_PROFILE_FUNCTION();
 
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<MouseScrolledEvent>(NS_BIND_EVENT_FN(CameraController::OnMouseScrolled));
-        dispatcher.Dispatch<WindowResizeEvent>(NS_BIND_EVENT_FN(CameraController::OnWindowResized));
+        dispatcher.Dispatch<MouseScrolledEvent>(NS_BIND_EVENT_FN(OrthoCameraController::OnMouseScrolled));
+        dispatcher.Dispatch<WindowResizeEvent>(NS_BIND_EVENT_FN(OrthoCameraController::OnWindowResized));
     }
 
-    bool CameraController::OnMouseScrolled(MouseScrolledEvent& e)
+    bool OrthoCameraController::OnMouseScrolled(MouseScrolledEvent& e)
     {
         NS_PROFILE_FUNCTION();
 
@@ -79,7 +79,7 @@ namespace Nous {
         return false;
     }
 
-    bool CameraController::OnWindowResized(WindowResizeEvent& e)
+    bool OrthoCameraController::OnWindowResized(WindowResizeEvent& e)
     {
         NS_PROFILE_FUNCTION();
 
@@ -87,7 +87,7 @@ namespace Nous {
         return false;
     }
 
-    void CameraController::OnResize(float width, float height)
+    void OrthoCameraController::OnResize(float width, float height)
     {
         m_AspectRatio = (float) width / (float) height;
         m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);

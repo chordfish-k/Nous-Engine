@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Nous/Renderer/Camera.h"
+#include "Nous/Renderer/OrthoCamera.h"
 #include "Nous/Core/Timestep.h"
 
 #include "Nous/Event/ApplicationEvent.h"
@@ -8,18 +8,18 @@
 
 namespace Nous {
 
-    class CameraController
+    class OrthoCameraController
     {
     public:
-        CameraController(float aspectRatio, bool enableRotation = true);
+        OrthoCameraController(float aspectRatio, bool enableRotation = true);
 
         void OnUpdate(Timestep ts);
         void OnEvent(Event& e);
 
         void OnResize(float width, float height);
 
-        Camera& GetCamera() { return m_Camera; };
-        const Camera& GetCamera() const { return m_Camera; };
+        OrthoCamera& GetCamera() { return m_Camera; };
+        const OrthoCamera& GetCamera() const { return m_Camera; };
 
         float GetZoomLevel() const { return m_ZoomLevel; }
         void SetZoomLevel(float level) { m_ZoomLevel = level; }
@@ -29,7 +29,7 @@ namespace Nous {
     private:
         float m_AspectRatio;
         float m_ZoomLevel = 1.0f;
-        Camera m_Camera;
+        OrthoCamera m_Camera;
 
         bool m_EnableRotation;
         glm::vec3 m_CameraPosition = {0.0f, 0.0f, 0.0f};

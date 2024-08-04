@@ -1,11 +1,11 @@
 ﻿#include "pch.h"
-#include "Camera.h"
+#include "OrthoCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Nous {
 
-    Camera::Camera(float left, float right, float bottom, float top)
+    OrthoCamera::OrthoCamera(float left, float right, float bottom, float top)
         : m_ProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), m_ViewMatrix(1.0f)
     {
         NS_PROFILE_FUNCTION();
@@ -13,7 +13,7 @@ namespace Nous {
         m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
     }
 
-    void Camera::RecalculateViewMatrix()
+    void OrthoCamera::RecalculateViewMatrix()
     {
         NS_PROFILE_FUNCTION();
 
@@ -27,7 +27,7 @@ namespace Nous {
         m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
     }
 
-    void Camera::SetProjection(float left, float right, float bottom, float top)
+    void OrthoCamera::SetProjection(float left, float right, float bottom, float top)
     {
         NS_PROFILE_FUNCTION();
 

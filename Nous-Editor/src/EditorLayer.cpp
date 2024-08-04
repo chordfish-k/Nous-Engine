@@ -22,9 +22,20 @@ namespace Nous {
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
         m_ActiveScene = CreateRef<Scene>();
+
         // Entity
         m_SquareEntity = m_ActiveScene->CreateEntity("Square");
         m_SquareEntity.AddComponent<CSpriteRenderer>(glm::vec4{0.3f, 0.7f, 0.2f, 1.0f});
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
+        m_CameraEntity.AddComponent<CCamera>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity.AddComponent<CCamera>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+
+        m_CameraEntity2 = m_ActiveScene->CreateEntity("Clip-Space Entity");
+        auto& cc = m_CameraEntity2.AddComponent<CCamera>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+        cc.Primary = false;
     }
 
     void EditorLayer::OnDetached()
@@ -60,13 +71,8 @@ namespace Nous {
         RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
         RenderCommand::Clear();
 
-
-        Renderer2D::BeginScene(m_CameraController.GetCamera());
-
         // Update Scene
         m_ActiveScene->OnUpdate(dt);
-
-        Renderer2D::EndScene();
 
         m_Framebuffer->Unbind();
     }
@@ -166,6 +172,14 @@ namespace Nous {
                 ImGui::Separator();
             }
 
+            ImGui::DragFloat3("Camera Transform",
+                              glm::value_ptr(m_CameraEntity.GetComponent<CTransform>().Transform[3]));
+
+            if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
+            {
+                m_CameraEntity.GetComponent<CCamera>().Primary = m_PrimaryCamera;
+                m_CameraEntity2.GetComponent<CCamera>().Primary = !m_PrimaryCamera;
+            }
 
             ImGui::End();
 

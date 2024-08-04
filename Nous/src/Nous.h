@@ -11,7 +11,7 @@
 #include "Nous/Core/Input.h"
 #include "Nous/Core/KeyCodes.h"
 #include "Nous/Core/MouseCodes.h"
-#include "Nous/Renderer/CameraController.h"
+#include "Nous/Renderer/OrthoCameraController.h"
 
 #include "Nous/ImGui/ImGuiLayer.h"
 
@@ -30,7 +30,7 @@
 #include "Nous/Renderer/Texture.h"
 #include "Nous/Renderer/VertexArray.h"
 
-#include "Nous/Renderer/Camera.h"
+#include "Nous/Renderer/OrthoCamera.h"
 
 
 // ---------------------------------------
