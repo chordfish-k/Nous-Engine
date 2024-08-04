@@ -14,7 +14,6 @@
 #include "Nous/Renderer/OrthoCameraController.h"
 
 #include "Nous/ImGui/ImGuiLayer.h"
-#include "Nous/ImGui/ImGuiDockingSpace.h"
 
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Component.h"

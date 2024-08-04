@@ -1,6 +1,9 @@
 #include "EditorLayer.h"
+
 #include "imgui/imgui.h"
 #include "gtc/type_ptr.hpp"
+
+#include "Panel/DockingSpace.h"
 
 namespace Nous {
 
@@ -110,7 +113,7 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        ImGuiDockingSpace::BeginDocking();
+        DockingSpace::BeginDocking();
 
         // Properties
         ImGui::Begin("Settings");
@@ -168,7 +171,7 @@ namespace Nous {
         ImGui::End();
         ImGui::PopStyleVar();
 
-        ImGuiDockingSpace::EndDocking();
+        DockingSpace::EndDocking();
     }
 
     void EditorLayer::OnEvent(Event& e)

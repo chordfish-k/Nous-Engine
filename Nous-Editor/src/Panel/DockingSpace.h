@@ -2,7 +2,7 @@
 
 namespace Nous {
 
-    class ImGuiDockingSpace
+    class DockingSpace
     {
     public:
         static void BeginDocking();

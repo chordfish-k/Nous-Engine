@@ -1,12 +1,12 @@
 ﻿#include "pch.h"
-#include "ImGuiDockingSpace.h"
+#include "DockingSpace.h"
 
 #include "Nous/Core/Application.h"
 #include <imgui.h>
 
 namespace Nous {
 
-    void ImGuiDockingSpace::BeginDocking()
+    void DockingSpace::BeginDocking()
     {
         static bool p_open = true;
         static bool opt_fullscreen = true;
@@ -77,7 +77,7 @@ namespace Nous {
         }
     }
 
-    void ImGuiDockingSpace::EndDocking()
+    void DockingSpace::EndDocking()
     {
         ImGui::End();
     }
