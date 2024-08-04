@@ -27,15 +27,14 @@ namespace Nous {
         m_ActiveScene = CreateRef<Scene>();
 
         // Entity
-        m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+        m_SquareEntity = m_ActiveScene->CreateEntity("Green Square");
         m_SquareEntity.AddComponent<CSpriteRenderer>(glm::vec4{0.3f, 0.7f, 0.2f, 1.0f});
 
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-        m_CameraEntity.AddComponent<CCamera>();
+        auto redSquare = m_ActiveScene->CreateEntity("Red Square");
+        redSquare.AddComponent<CSpriteRenderer>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
 
-        m_CameraEntity2 = m_ActiveScene->CreateEntity("Camera2");
-        auto& cc = m_CameraEntity2.AddComponent<CCamera>();
-        cc.Primary = false;
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera", {0.0f, 0.0f, 1.0f});
+        m_CameraEntity.AddComponent<CCamera>();
 
         class CameraController : public ScriptableEntity
         {
@@ -134,22 +133,6 @@ namespace Nous {
             auto& squareColor = m_SquareEntity.GetComponent<CSpriteRenderer>().Color;
             ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
             ImGui::Separator();
-        }
-
-        ImGui::DragFloat3("Camera Transform",
-                          glm::value_ptr(m_CameraEntity.GetComponent<CTransform>().Transform[3]));
-
-        if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
-        {
-            m_CameraEntity.GetComponent<CCamera>().Primary = m_PrimaryCamera;
-            m_CameraEntity2.GetComponent<CCamera>().Primary = !m_PrimaryCamera;
-        }
-
-        {
-            auto& camera = m_CameraEntity2.GetComponent<CCamera>().Camera;
-            float orthoSize = camera.GetOrthoSize();
-            if (ImGui::DragFloat("Camera2 Ortho Size", &orthoSize))
-                camera.SetOrthoSize(orthoSize);
         }
 
         ImGui::End();

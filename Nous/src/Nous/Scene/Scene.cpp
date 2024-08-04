@@ -32,10 +32,14 @@ namespace Nous {
         }
     }
 
-    Entity Scene::CreateEntity(const std::string& name)
+    Entity Scene::CreateEntity(const std::string& name, const glm::vec3& position)
     {
         Entity entity = {m_Registry.create(), this};
-        entity.AddComponent<CTransform>();
+        auto& transform = entity.AddComponent<CTransform>();
+        transform.Transform[3].x = position.x;
+        transform.Transform[3].y = position.y;
+        transform.Transform[3].z = position.z;
+
         auto& tag = entity.AddComponent<CTag>();
         tag.Tag = name.empty() ? "Entity" : name;
         return entity;

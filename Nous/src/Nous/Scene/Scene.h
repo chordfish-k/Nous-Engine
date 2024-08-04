@@ -4,6 +4,8 @@
 
 #include "Nous/Core/Timestep.h"
 
+#include <glm/glm.hpp>
+
 namespace Nous {
 
     class Entity;
@@ -14,7 +16,7 @@ namespace Nous {
         Scene();
         ~Scene();
 
-        Entity CreateEntity(const std::string& name = std::string());
+        Entity CreateEntity(const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
 
         // 暂时
         entt::registry& Reg() { return m_Registry; }
