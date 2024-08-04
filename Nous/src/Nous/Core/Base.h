@@ -62,25 +62,20 @@
 
 #ifdef NS_DEBUG
     #if defined(NS_PLATFORM_WINDOWS)
-        #define NS_DEBUG_BREAK() __debugbreak()
+        #define NS_DEBUGBREAK() __debugbreak()
     #elif defined(NS_PLATFORM_LINUX)
         #include <signal.h>
-        #define NS_DEBUG_BREAK() raise(SIGTRAP)
+        #define NS_DEBUGBREAK() raise(SIGTRAP)
     #else
         #error "Platform doesn't support debugbreak yet!"
     #endif
     #define NS_ENABLE_ASSERTS
 #else
-    #define NS_DEBUG_BREAK()
+    #define NS_DEBUGBREAK()
 #endif
 
-#ifdef NS_ENABLE_ASSERTS
-    #define NS_ASSERT(x, msg) { if(!(x)) { NS_ERROR(msg); NS_DEBUG_BREAK(); } }
-    #define NS_CORE_ASSERT(x, msg) { if(!(x)) { NS_CORE_ERROR(msg); NS_DEBUG_BREAK(); } }
-#else
-    #define NS_ASSERT(x, ...)
-    #define NS_CORE_ASSERT(x, ...)
-#endif
+#define NS_EXPAND_MACRO(x) x
+#define NS_STRINGIFY_MACRO(x) #x
 
 #define BIT(x) (1 << x)
 
@@ -106,3 +101,6 @@ namespace Nous {
         return std::make_unique<T>(std::forward<Args>(args)...);
     }
 }
+
+#include "Nous/Core/Log.h"
+#include "Nous/Core/Assert.h"
