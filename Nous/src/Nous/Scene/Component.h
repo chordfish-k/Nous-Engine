@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Nous/Renderer/Camera.h"
+#include "Nous/Scene/SceneCamera.h"
 
 namespace Nous {
 
@@ -43,12 +43,11 @@ namespace Nous {
 
     struct CCamera
     {
-        Nous::Camera Camera;
+        SceneCamera Camera;
         bool Primary = true; // 是否为主摄像机
+        bool FixedAspectRatio = false; // 是否需要固定视窗高宽比
 
         CCamera() = default;
         CCamera(const CCamera&) = default;
-        CCamera(const glm::mat4& projection)
-            : Camera(projection) {};
     };
 }

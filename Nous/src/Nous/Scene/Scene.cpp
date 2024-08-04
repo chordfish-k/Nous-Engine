@@ -65,4 +65,21 @@ namespace Nous {
         }
 
     }
+
+    void Scene::OnViewportResize(uint32_t width, uint32_t height)
+    {
+        m_ViewportWidth = width;
+        m_ViewportHeight = height;
+
+        // 重设不固定高宽比的摄像机
+        auto view = m_Registry.view<CCamera>();
+        for (auto ent : view)
+        {
+            auto& cameraComponent = view.get<CCamera>(ent);
+            if (!cameraComponent.FixedAspectRatio)
+            {
+                cameraComponent.Camera.SetViewportSize(width, height);
+            }
+        }
+    }
 }
