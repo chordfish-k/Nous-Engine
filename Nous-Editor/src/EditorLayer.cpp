@@ -8,7 +8,7 @@
 namespace Nous {
 
     EditorLayer::EditorLayer()
-        : Layer("SandBox2D"), m_CameraController(1280.0f / 720.0f)
+        : Layer("SandBox2D")
     {
     }
 
@@ -65,6 +65,7 @@ namespace Nous {
         m_CameraEntity.AddComponent<CNativeScript>().Bind<CameraController>();
 
         m_SceneHierarchyPanel.SetContent(m_ActiveScene);
+        m_ViewportPanel.SetFramebuffer(m_Framebuffer);
     }
 
     void EditorLayer::OnDetached()
@@ -82,19 +83,14 @@ namespace Nous {
 
         // Resize
         auto spec = m_Framebuffer->GetSpecification();
-        if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
-            (spec.Width != (uint32_t) m_ViewportSize.x ||
-             spec.Height != (uint32_t) m_ViewportSize.y))
+        auto viewportSize = m_ViewportPanel.GetSize();
+        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
+            (spec.Width != (uint32_t) viewportSize.x ||
+             spec.Height != (uint32_t) viewportSize.y))
         {
-            m_Framebuffer->Resize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
-            m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
-
-            m_ActiveScene->OnViewportResize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
+            m_Framebuffer->Resize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
         }
-
-        // Update
-        if (m_ViewportFocused)
-            m_CameraController.OnUpdate(dt);
 
         // Render
         Renderer2D::ResetStats();
@@ -129,27 +125,12 @@ namespace Nous {
         m_SceneHierarchyPanel.OnImGuiRender();
 
         // Viewport
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
-        ImGui::Begin("Viewport");
-
-        m_ViewportFocused = ImGui::IsWindowFocused();
-        m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->SetBlockEvent(!m_ViewportFocused || !m_ViewportHovered);
-
-        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-        m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
-
-        uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-        ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
-
-        ImGui::End();
-        ImGui::PopStyleVar();
+        m_ViewportPanel.OnImGuiRender();
 
         DockingSpace::EndDocking();
     }
 
     void EditorLayer::OnEvent(Event& e)
     {
-        m_CameraController.OnEvent(e);
     }
 }

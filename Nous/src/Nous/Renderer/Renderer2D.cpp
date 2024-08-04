@@ -315,11 +315,13 @@ namespace Nous {
         s_Data.Stats.QuadCount++;
     }
 
+    // 重置统计数据
     void Renderer2D::ResetStats()
     {
         memset(&s_Data.Stats, 0, sizeof(Statistics));
     }
 
+    // 获取统计数据
     Renderer2D::Statistics Renderer2D::GetStats()
     {
         return s_Data.Stats;
