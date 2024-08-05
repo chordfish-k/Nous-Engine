@@ -1,0 +1,47 @@
+Scene: Untitled
+Entities:
+  - Entity: 123456
+    CTag:
+      Tag: Right
+    CTransform:
+      Translation: [0.5, -0.5, 0]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [0.367586523, 0.800711751, 0.56363225, 1]
+  - Entity: 123456
+    CTag:
+      Tag: Front
+    CTransform:
+      Translation: [0, -0.5, 0.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [0.526082516, 0.953736663, 0.719652116, 1]
+  - Entity: 123456
+    CTag:
+      Tag: Camera
+    CTransform:
+      Translation: [4.69999981, 1.70000005, 5.19999981]
+      Rotation: [-0.171042264, 0.666715801, 0.122173049]
+      Scale: [1, 1, 1]
+    CCamera:
+      Camera:
+        ProjectionType: 0
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 10
+        OrthoNear: -10
+        OrthoFar: 10
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 123456
+    CTag:
+      Tag: Top
+    CTransform:
+      Translation: [0, 0, 0]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [0.428034097, 0.918149471, 0.651289403, 1]

@@ -2,22 +2,22 @@ Scene: Untitled
 Entities:
   - Entity: 123456
     CTag:
-      Tag: Persp Camera
+      Tag: Green Square
     CTransform:
-      Translation: [-0.899999976, 0, 6.80000019]
+      Translation: [-1.10000002, 0, -7.30000019]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CCamera:
-      Camera:
-        ProjectionType: 0
-        PerspFOV: 0.785398185
-        PerspNear: 0.00999999978
-        PerspFar: 1000
-        OrthoSize: 10
-        OrthoNear: -10
-        OrthoFar: 10
-      Primary: true
-      FixedAspectRatio: false
+    CSpriteRenderer:
+      Color: [0.300000012, 0.699999988, 0.200000003, 1]
+  - Entity: 123456
+    CTag:
+      Tag: Red Square
+    CTransform:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [1, 0, 0, 1]
   - Entity: 123456
     CTag:
       Tag: Ortho Camera
@@ -38,19 +38,19 @@ Entities:
       FixedAspectRatio: false
   - Entity: 123456
     CTag:
-      Tag: Red Square
+      Tag: Persp Camera
     CTransform:
-      Translation: [0, 0, 0]
+      Translation: [-0.899999976, 0, 6.80000019]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CSpriteRenderer:
-      Color: [1, 0, 0, 1]
-  - Entity: 123456
-    CTag:
-      Tag: Green Square
-    CTransform:
-      Translation: [-0.699999988, 0, 2.20000005]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CSpriteRenderer:
-      Color: [0.300000012, 0.699999988, 0.200000003, 1]
+    CCamera:
+      Camera:
+        ProjectionType: 0
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 10
+        OrthoNear: -10
+        OrthoFar: 10
+      Primary: true
+      FixedAspectRatio: false

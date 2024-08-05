@@ -5,6 +5,8 @@
 
 #include "Panel/DockingSpace.h"
 
+#include "Nous/Utils/PlatformUtils.h"
+
 namespace Nous {
 
     EditorLayer::EditorLayer()
@@ -119,24 +121,24 @@ namespace Nous {
         {
             if (ImGui::BeginMenu("File"))
             {
-                // Disabling fullscreen would allow the window to be moved to the front of other windows,
-                // which we can't undo at the moment without finer window depth/z control.
-                if (ImGui::MenuItem("Save"))
-                {
-                    SceneSerializer serializer(m_ActiveScene);
-                    serializer.Serialize("assets/scenes/Example.scn");
-                }
+                if (ImGui::MenuItem("New", "Ctrl+N"))
+                    NewScene();
 
-                if (ImGui::MenuItem("Load"))
-                {
-                    SceneSerializer serializer(m_ActiveScene);
-                    serializer.Deserialize("assets/scenes/Example.scn");
-                }
+                if (ImGui::MenuItem("Open...", "Ctrl+O"))
+                    OpenScene();
+
+                // 保存
+                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                    SaveScene();
+
+                // 另存为
+                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+                    SaveSceneAs();
+
+                ImGui::Separator();
 
                 if (ImGui::MenuItem("Exit", ""))
                     Application::Get().Close();
-
-                ImGui::Separator();
 
                 ImGui::EndMenu();
             }
@@ -166,5 +168,91 @@ namespace Nous {
 
     void EditorLayer::OnEvent(Event& e)
     {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+    }
+
+    bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+    {
+        NS_CORE_WARN("YEs");
+        // 快捷键
+        if (e.GetRepeatCount() > 0)
+            return false;
+
+        bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+        bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+        switch (e.GetKeyCode())
+        {
+            case Key::N:
+            {
+                if (control)
+                    NewScene();
+                break;
+            }
+            case Key::O:
+            {
+                if (control)
+                    OpenScene();
+                break;
+            }
+            case Key::S:
+            {
+                if (control)
+                {
+                    if ( shift || m_EditorScenePath.empty())
+                        SaveSceneAs();
+                    else
+                        SaveScene();
+                }
+                break;
+            }
+            default:
+                return false;
+        }
+        return false;
+    }
+
+    void EditorLayer::NewScene()
+    {
+        m_ActiveScene = CreateRef<Scene>();
+        auto viewportSize = m_ViewportPanel.GetSize();
+        m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        m_SceneHierarchyPanel.SetContent(m_ActiveScene);
+    }
+
+    void EditorLayer::OpenScene()
+    {
+        std::string filepath = FileDialogs::OpenFile("Scene File (*scn)\0*.scn\0");
+        if (!filepath.empty())
+        {
+            m_ActiveScene = CreateRef<Scene>();
+            auto viewportSize = m_ViewportPanel.GetSize();
+            m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+            m_SceneHierarchyPanel.SetContent(m_ActiveScene);
+
+            SceneSerializer serializer(m_ActiveScene);
+            serializer.Deserialize(filepath);
+
+            m_EditorScenePath = filepath;
+        }
+    }
+
+    void EditorLayer::SaveScene()
+    {
+        SceneSerializer serializer(m_ActiveScene);
+        serializer.Serialize(m_EditorScenePath.string());
+    }
+
+    void EditorLayer::SaveSceneAs()
+    {
+        std::string filepath = FileDialogs::SaveFile("Scene File (*scn)\0*.scn\0");
+
+        if (!filepath.empty())
+        {
+            SceneSerializer serializer(m_ActiveScene);
+            serializer.Serialize(filepath);
+
+            m_EditorScenePath = filepath;
+        }
     }
 }

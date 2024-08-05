@@ -23,6 +23,7 @@ namespace Nous {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
         ImGui::Begin("Viewport");
 
+        // TODO 修复焦点不在Viewport不能用快捷键的bug
         Application::Get().GetImGuiLayer()->SetBlockEvent(!ImGui::IsWindowFocused() || !ImGui::IsWindowHovered());
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();

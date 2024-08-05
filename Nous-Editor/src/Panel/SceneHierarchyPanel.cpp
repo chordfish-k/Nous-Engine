@@ -16,6 +16,7 @@ namespace Nous {
     void SceneHierarchyPanel::SetContent(const Ref<Scene>& scene)
     {
         m_Context = scene;
+        m_SelectedEntity = {};
     }
 
     void SceneHierarchyPanel::OnImGuiRender()
