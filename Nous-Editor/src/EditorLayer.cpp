@@ -27,6 +27,7 @@ namespace Nous {
         m_ActiveScene = CreateRef<Scene>();
 
         // Entity
+/*
         m_SquareEntity = m_ActiveScene->CreateEntity("Green Square");
         m_SquareEntity.AddComponent<CSpriteRenderer>(glm::vec4{0.3f, 0.7f, 0.2f, 1.0f});
 
@@ -67,7 +68,7 @@ namespace Nous {
             }
         };
         m_CameraEntity.AddComponent<CNativeScript>().Bind<CameraController>();
-
+*/
         m_SceneHierarchyPanel.SetContent(m_ActiveScene);
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
     }
@@ -113,6 +114,35 @@ namespace Nous {
         NS_PROFILE_FUNCTION();
 
         DockingSpace::BeginDocking();
+
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                // Disabling fullscreen would allow the window to be moved to the front of other windows,
+                // which we can't undo at the moment without finer window depth/z control.
+                if (ImGui::MenuItem("Save"))
+                {
+                    SceneSerializer serializer(m_ActiveScene);
+                    serializer.Serialize("assets/scenes/Example.scn");
+                }
+
+                if (ImGui::MenuItem("Load"))
+                {
+                    SceneSerializer serializer(m_ActiveScene);
+                    serializer.Deserialize("assets/scenes/Example.scn");
+                }
+
+                if (ImGui::MenuItem("Exit", ""))
+                    Application::Get().Close();
+
+                ImGui::Separator();
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenuBar();
+        }
 
         // Properties
         ImGui::Begin("Stats");

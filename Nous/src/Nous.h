@@ -20,6 +20,7 @@
 #include "Nous/Scene/Component.h"
 #include "Nous/Scene/Entity.h"
 #include "Nous/Scene/ScriptableEntity.h"
+#include "Nous/Scene/SceneSerializer.h"
 
 // -----------------渲染器-----------------
 #include "Nous/Renderer/Renderer.h"

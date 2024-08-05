@@ -16,7 +16,12 @@ namespace Nous {
         template<class T, typename ... Args>
         T& AddComponent(Args&&... args)
         {
-            NS_CORE_ASSERT(!HasComponent<T>(), "实体已有此组件！");
+            if (HasComponent<T>())
+            {
+                NS_CORE_WARN("实体已存在组此件");
+                return GetComponent<T>();
+            }
+
             T& component = m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
             m_Scene->OnComponentAdded<T>(*this, component);
             return component;

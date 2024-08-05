@@ -63,22 +63,7 @@ namespace Nous {
         }
         style.WindowMinSize.x = minWinSize;
 
-        if (ImGui::BeginMenuBar())
-        {
-            if (ImGui::BeginMenu("File"))
-            {
-                // Disabling fullscreen would allow the window to be moved to the front of other windows,
-                // which we can't undo at the moment without finer window depth/z control.
-                if (ImGui::MenuItem("Exit", "", (dockspace_flags&ImGuiDockNodeFlags_NoSplit) != 0))
-                    Application::Get().Close();
 
-                ImGui::Separator();
-
-                ImGui::EndMenu();
-            }
-
-            ImGui::EndMenuBar();
-        }
     }
 
     void DockingSpace::EndDocking()

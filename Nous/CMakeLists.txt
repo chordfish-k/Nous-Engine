@@ -10,6 +10,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/${PROJ
 add_subdirectory(vendor/GLFW)
 add_subdirectory(vendor/glad)
 add_subdirectory(vendor/imgui)
+add_subdirectory(vendor/yaml-cpp)
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES
@@ -69,6 +70,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/glm
         vendor/stb_image
         vendor/entt
+        vendor/yaml-cpp/include
 )
 
 # 链接依赖库
@@ -76,6 +78,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         glfw
         glad
         ImGui
+        yaml-cpp
         opengl32.lib
 )
 

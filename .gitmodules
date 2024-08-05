@@ -10,3 +10,6 @@
 [submodule "Nous/vendor/glm"]
 	path = Nous/vendor/glm
 	url = https://github.com/icaven/glm
+[submodule "Nous/vendor/yaml-cpp"]
+	path = Nous/vendor/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
