@@ -33,8 +33,13 @@ namespace Nous {
         auto redSquare = m_ActiveScene->CreateEntity("Red Square");
         redSquare.AddComponent<CSpriteRenderer>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
 
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera", {0.0f, 0.0f, 1.0f});
+        m_CameraEntity = m_ActiveScene->CreateEntity("Ortho Camera", {0.0f, 0.0f, 1.0f});
         m_CameraEntity.AddComponent<CCamera>();
+
+        auto cameraEntity2 = m_ActiveScene->CreateEntity("Persp Camera", {0.0f, 0.0f, 1.0f});
+        auto&cc = cameraEntity2.AddComponent<CCamera>();
+        cc.Primary = false;
+        cc.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
 
         class CameraController : public ScriptableEntity
         {

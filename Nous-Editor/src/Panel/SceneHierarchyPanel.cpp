@@ -30,12 +30,42 @@ namespace Nous {
         if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
             m_SelectedEntity = {};
 
+        if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
+        {
+            if (ImGui::MenuItem("Create Empty Entity"))
+                m_Context->CreateEntity("Empty Entity");
+
+            ImGui::EndPopup();
+        }
+
         ImGui::End();
 
         // TODO 分离到新的类
         ImGui::Begin("Properties");
         if (m_SelectedEntity)
+        {
             DrawComponents(m_SelectedEntity);
+
+            if (ImGui::Button("Add Component"))
+                ImGui::OpenPopup("AddComponent");
+
+            if (ImGui::BeginPopup("AddComponent"))
+            {
+                if (ImGui::MenuItem("Camera"))
+                {
+                    m_SelectedEntity.AddComponent<CCamera>();
+                    ImGui::CloseCurrentPopup();
+                }
+
+                if (ImGui::MenuItem("Sprite Renderer"))
+                {
+                    m_SelectedEntity.AddComponent<CSpriteRenderer>();
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
+        }
         ImGui::End();
     }
 
@@ -49,6 +79,17 @@ namespace Nous {
         {
             m_SelectedEntity = entity;
         }
+
+        // 右键 标记删除
+        bool entityDeleted = false;
+        if (ImGui::BeginPopupContextItem())
+        {
+            if (ImGui::MenuItem("Delete Entity"))
+                entityDeleted = true;
+
+            ImGui::EndPopup();
+        }
+
         if (opened)
         {
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -59,6 +100,14 @@ namespace Nous {
                 ImGui::TreePop();
             }
             ImGui::TreePop();
+        }
+
+        // 处理删除
+        if (entityDeleted)
+        {
+            m_Context->DestroyEntity(entity);
+            if (m_SelectedEntity == entity)
+                m_SelectedEntity = {};
         }
     }
 
@@ -135,10 +184,12 @@ namespace Nous {
             }
         }
 
+        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+
         if (entity.HasComponent<CTransform>())
         {
-            if (ImGui::TreeNodeEx((void*)typeid(CTransform).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
-            {
+            bool open = ImGui::TreeNodeEx((void*)typeid(CTransform).hash_code(), treeNodeFlags, "Transform");
+            if (open){
                 auto& transform = entity.GetComponent<CTransform>();
 
                 DrawVec3Control("Position", transform.Translation);
@@ -153,7 +204,7 @@ namespace Nous {
 
         if (entity.HasComponent<CCamera>())
         {
-            if (ImGui::TreeNodeEx((void*)typeid(CCamera).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
+            if (ImGui::TreeNodeEx((void*)typeid(CCamera).hash_code(), treeNodeFlags, "Camera"))
             {
                 auto& cameraComponent = entity.GetComponent<CCamera>();
                 auto& camera = cameraComponent.Camera;
@@ -217,12 +268,32 @@ namespace Nous {
 
         if (entity.HasComponent<CSpriteRenderer>())
         {
-            if (ImGui::TreeNodeEx((void*)typeid(CSpriteRenderer).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer"))
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {4, 4});
+            bool open = ImGui::TreeNodeEx((void*)typeid(CSpriteRenderer).hash_code(), treeNodeFlags, "Sprite Renderer");
+            ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+            if (ImGui::Button("x", {20, 20}))
             {
+                ImGui::OpenPopup("ComponentSettings");
+            }
+            ImGui::PopStyleVar();
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("ComponentSettings"))
+            {
+                if (ImGui::MenuItem("Remove Component"))
+                    removeComponent = true;
+
+                ImGui::EndPopup();
+            }
+
+            if (open){
                 auto& src = entity.GetComponent<CSpriteRenderer>();
                 ImGui::ColorEdit4("Color", glm::value_ptr(src.Color));
                 ImGui::TreePop();
             }
+
+            if (removeComponent)
+                entity.RemoveComponent<CSpriteRenderer>();
         }
     }
 }

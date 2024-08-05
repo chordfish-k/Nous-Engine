@@ -21,6 +21,7 @@ namespace Nous {
         void End();
 
         void SetBlockEvent(bool block) { m_BlockEvent = block; }
+        bool IsBlockEvent() const { return m_BlockEvent; }
     private:
         bool m_BlockEvent = true; // 阻止ImGui的事件
         float m_Time = 0.0f;

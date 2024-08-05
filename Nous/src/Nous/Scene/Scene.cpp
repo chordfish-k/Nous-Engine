@@ -10,10 +10,6 @@
 
 namespace Nous {
 
-    static void OnTransformConstruct()
-    {
-    }
-
     Scene::Scene()
     {
     }
@@ -45,6 +41,11 @@ namespace Nous {
         return entity;
     }
 
+    void Scene::DestroyEntity(Entity entity)
+    {
+        m_Registry.destroy(entity);
+    }
+
     void Scene::OnUpdate(Timestep dt)
     {
         // 执行脚本更新
@@ -58,6 +59,7 @@ namespace Nous {
 
                    script.Instance->OnCreate();
                 }
+
                 script.Instance->OnUpdate(dt);
             });
         }
@@ -70,6 +72,7 @@ namespace Nous {
             for (auto ent: view)
             {
                 auto [transform, camera] = view.get<CTransform, CCamera>(ent);
+
                 if (camera.Primary)
                 {
                     mainCamera = &camera.Camera;
@@ -93,6 +96,7 @@ namespace Nous {
 
             Renderer2D::EndScene();
         }
+
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -106,9 +110,41 @@ namespace Nous {
         {
             auto& cameraComponent = view.get<CCamera>(ent);
             if (!cameraComponent.FixedAspectRatio)
-            {
                 cameraComponent.Camera.SetViewportSize(width, height);
-            }
         }
+
+    }
+
+    template<typename T>
+    void Scene::OnComponentAdded(Entity entity, T& component)
+    {
+        static_assert(false);
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CTransform>(Entity entity, CTransform& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CCamera>(Entity entity, CCamera& component)
+    {
+        if (m_ViewportWidth && m_ViewportHeight)
+            component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CTag>(Entity entity, CTag& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CSpriteRenderer>(Entity entity, CSpriteRenderer& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CNativeScript>(Entity entity, CNativeScript& component)
+    {
     }
 }

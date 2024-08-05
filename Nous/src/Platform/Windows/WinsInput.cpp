@@ -9,15 +9,17 @@ namespace Nous {
     bool Input::IsKeyPressed(KeyCode keyCode)
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
+        bool block = Application::Get().GetImGuiLayer()->IsBlockEvent(); // 如果焦点不在Viewport，则不处理
         auto state = glfwGetKey(window, static_cast<uint32_t>(keyCode));
-        return state == GLFW_PRESS || state == GLFW_REPEAT;
+        return !block && (state == GLFW_PRESS || state == GLFW_REPEAT);
     }
 
     bool Input::IsMouseButtonPressed(MouseCode button)
     {
         auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
+        bool block = Application::Get().GetImGuiLayer()->IsBlockEvent();
         auto state = glfwGetMouseButton(window, static_cast<uint32_t>(button));
-        return state == GLFW_PRESS;
+        return !block && (state == GLFW_PRESS);
     }
 
     std::pair<float, float> Input::GetMousePos()
