@@ -5,7 +5,7 @@ Entities:
       Tag: Right
     CTransform:
       Translation: [0.5, -0.5, 0]
-      Rotation: [0, 1.57079637, 0]
+      Rotation: [0, 1.57074249, 0]
       Scale: [1, 1, 1]
     CSpriteRenderer:
       Color: [0.367586523, 0.800711751, 0.56363225, 1]
@@ -22,13 +22,13 @@ Entities:
     CTag:
       Tag: Camera
     CTransform:
-      Translation: [4.69999981, 1.70000005, 5.19999981]
-      Rotation: [-0.171042264, 0.666715801, 0.122173049]
+      Translation: [5, 1.39999998, 5]
+      Rotation: [-0.272271365, 0.785398185, 0]
       Scale: [1, 1, 1]
     CCamera:
       Camera:
         ProjectionType: 0
-        PerspFOV: 0.785398185
+        PerspFOV: 0.34906584
         PerspNear: 0.00999999978
         PerspFar: 1000
         OrthoSize: 10
@@ -41,7 +41,7 @@ Entities:
       Tag: Top
     CTransform:
       Translation: [0, 0, 0]
-      Rotation: [1.57079637, 0, 0]
+      Rotation: [1.57079422, 0, -3.74491993e-09]
       Scale: [1, 1, 1]
     CSpriteRenderer:
       Color: [0.428034097, 0.918149471, 0.651289403, 1]

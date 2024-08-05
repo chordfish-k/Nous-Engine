@@ -20,6 +20,9 @@ file(GLOB_RECURSE SOURCES
         vendor/stb_image/*.cpp
         vendor/glm/glm/*.hpp
         vendor/glm/glm/*.inl
+
+        vendor/imGuizmo/ImGuizmo.h
+        vendor/imGuizmo/ImGuizmo.cpp
 )
 
 if (WIN32)
@@ -71,6 +74,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/stb_image
         vendor/entt
         vendor/yaml-cpp/include
+        vendor/imGuizmo
 )
 
 # 链接依赖库
@@ -81,6 +85,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         yaml-cpp
         opengl32.lib
 )
+
+# 获取所有imGuizmo匹配的文件
+file(GLOB_RECURSE IMGUIZMO_SOURCES "vendor/imGuizmo/*.cpp")
+# 为匹配的文件禁用预编译头
+foreach(SOURCE_FILE ${IMGUIZMO_SOURCES})
+    set_source_files_properties(${SOURCE_FILE} PROPERTIES COMPILE_FLAGS "-NoPCH")
+endforeach()
 
 # 针对不同的构建类型设置编译选项
 if (MSVC)

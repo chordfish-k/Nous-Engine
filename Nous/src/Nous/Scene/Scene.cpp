@@ -115,6 +115,28 @@ namespace Nous {
 
     }
 
+    Entity Scene::GetPrimaryCameraEntity()
+    {
+        auto view = m_Registry.view<CCamera>();
+        for (auto entity : view)
+        {
+            const auto& camera = view.get<CCamera>(entity);
+            if (camera.Primary)
+                return Entity{entity, this};
+        }
+        return {};
+    }
+
+    Entity Scene::GetSelectedEntity()
+    {
+        return Entity{m_SelectedEntityID, this};
+    }
+
+    void Scene::SetSelectedEntity(Entity entity)
+    {
+        m_SelectedEntityID = entity;
+    }
+
     template<typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
     {

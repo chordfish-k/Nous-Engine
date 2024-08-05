@@ -24,12 +24,18 @@ namespace Nous {
 
         void OnUpdate(Timestep dt);
         void OnViewportResize(uint32_t width, uint32_t height);
+
+        Entity GetPrimaryCameraEntity();
+        Entity GetSelectedEntity();
+        void SetSelectedEntity(Entity entity);
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
     private:
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+        entt::entity m_SelectedEntityID = {};
 
         friend class Entity;
         friend class SceneSerializer;

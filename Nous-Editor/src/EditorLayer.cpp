@@ -1,11 +1,10 @@
 ﻿#include "EditorLayer.h"
 
-#include "imgui/imgui.h"
-#include <glm/gtc/type_ptr.hpp>
-
+#include "Nous/Utils/PlatformUtils.h"
 #include "Panel/DockingSpace.h"
 
-#include "Nous/Utils/PlatformUtils.h"
+#include <imgui/imgui.h>
+#include <ImGuizmo.h>
 
 namespace Nous {
 
@@ -28,51 +27,10 @@ namespace Nous {
 
         m_ActiveScene = CreateRef<Scene>();
 
-        // Entity
-/*
-        m_SquareEntity = m_ActiveScene->CreateEntity("Green Square");
-        m_SquareEntity.AddComponent<CSpriteRenderer>(glm::vec4{0.3f, 0.7f, 0.2f, 1.0f});
-
-        auto redSquare = m_ActiveScene->CreateEntity("Red Square");
-        redSquare.AddComponent<CSpriteRenderer>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
-
-        m_CameraEntity = m_ActiveScene->CreateEntity("Ortho Camera", {0.0f, 0.0f, 1.0f});
-        m_CameraEntity.AddComponent<CCamera>();
-
-        auto cameraEntity2 = m_ActiveScene->CreateEntity("Persp Camera", {0.0f, 0.0f, 1.0f});
-        auto&cc = cameraEntity2.AddComponent<CCamera>();
-        cc.Primary = false;
-        cc.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            virtual void OnCreate() override
-            {
-            }
-
-            virtual void OnDestroy() override
-            {
-            }
-
-            virtual void OnUpdate(Timestep dt) override
-            {
-                auto& pos = GetComponent<CTransform>().Translation;
-                float speed = 5.0f;
-                if (Input::IsKeyPressed(KeyCode::A))
-                    pos.x -= speed * dt;
-                if (Input::IsKeyPressed(KeyCode::D))
-                    pos.x += speed * dt;
-                if (Input::IsKeyPressed(KeyCode::W))
-                    pos.y += speed * dt;
-                if (Input::IsKeyPressed(KeyCode::S))
-                    pos.y -= speed * dt;
-            }
-        };
-        m_CameraEntity.AddComponent<CNativeScript>().Bind<CameraController>();
-*/
-        m_SceneHierarchyPanel.SetContent(m_ActiveScene);
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
+
+        m_SceneHierarchyPanel.SetContent(m_ActiveScene);
+        m_ViewportPanel.SetContent(m_ActiveScene);
     }
 
     void EditorLayer::OnDetached()
@@ -205,6 +163,18 @@ namespace Nous {
                 }
                 break;
             }
+            case Key::Q:
+                m_ViewportPanel.SetGizmoType(-1);
+                break;
+            case Key::W:
+                m_ViewportPanel.SetGizmoType(ImGuizmo::OPERATION::TRANSLATE);
+                break;
+            case Key::E:
+                m_ViewportPanel.SetGizmoType(ImGuizmo::OPERATION::ROTATE);
+                break;
+            case Key::R:
+                m_ViewportPanel.SetGizmoType(ImGuizmo::OPERATION::SCALE);
+                break;
             default:
                 return false;
         }
@@ -217,6 +187,7 @@ namespace Nous {
         auto viewportSize = m_ViewportPanel.GetSize();
         m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_SceneHierarchyPanel.SetContent(m_ActiveScene);
+        m_ViewportPanel.SetContent(m_ActiveScene);
     }
 
     void EditorLayer::OpenScene()
@@ -228,6 +199,7 @@ namespace Nous {
             auto viewportSize = m_ViewportPanel.GetSize();
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_SceneHierarchyPanel.SetContent(m_ActiveScene);
+            m_ViewportPanel.SetContent(m_ActiveScene);
 
             SceneSerializer serializer(m_ActiveScene);
             serializer.Deserialize(filepath);

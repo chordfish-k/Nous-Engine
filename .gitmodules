@@ -13,3 +13,6 @@
 [submodule "Nous/vendor/yaml-cpp"]
 	path = Nous/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "Nous/vendor/imguizmo"]
+	path = Nous/vendor/imguizmo
+	url = https://github.com/thecherno/imguizmo

@@ -20,7 +20,7 @@ namespace Nous {
     void SceneHierarchyPanel::SetContent(const Ref<Scene>& scene)
     {
         m_Context = scene;
-        m_SelectedEntity = {};
+        m_Context->SetSelectedEntity({});
     }
 
     void SceneHierarchyPanel::OnImGuiRender()
@@ -33,7 +33,7 @@ namespace Nous {
         });
 
         if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-            m_SelectedEntity = {};
+            m_Context->SetSelectedEntity({});
 
         if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
         {
@@ -47,8 +47,8 @@ namespace Nous {
 
         // TODO 分离到新的类
         ImGui::Begin("Properties");
-        if (m_SelectedEntity)
-            DrawComponents(m_SelectedEntity);
+        if (m_Context->GetSelectedEntity())
+            DrawComponents(m_Context->GetSelectedEntity());
 
         ImGui::End();
     }
@@ -57,12 +57,12 @@ namespace Nous {
     {
         auto& tag = entity.GetComponent<CTag>();
 
-        ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0)|ImGuiTreeNodeFlags_OpenOnArrow;
+        ImGuiTreeNodeFlags flags = ((m_Context->GetSelectedEntity() == entity) ? ImGuiTreeNodeFlags_Selected : 0)|ImGuiTreeNodeFlags_OpenOnArrow;
         flags |= ImGuiTreeNodeFlags_SpanAvailWidth; // 让一整行TreeNode都能够被点击
         bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
         if (ImGui::IsItemClicked())
         {
-            m_SelectedEntity = entity;
+            m_Context->SetSelectedEntity(entity);
         }
 
         // 右键 标记删除
@@ -91,8 +91,8 @@ namespace Nous {
         if (entityDeleted)
         {
             m_Context->DestroyEntity(entity);
-            if (m_SelectedEntity == entity)
-                m_SelectedEntity = {};
+            if (m_Context->GetSelectedEntity() == entity)
+                m_Context->SetSelectedEntity({});
         }
     }
 
@@ -225,13 +225,13 @@ namespace Nous {
         {
             if (ImGui::MenuItem("Camera"))
             {
-                m_SelectedEntity.AddComponent<CCamera>();
+                m_Context->GetSelectedEntity().AddComponent<CCamera>();
                 ImGui::CloseCurrentPopup();
             }
 
             if (ImGui::MenuItem("Sprite Renderer"))
             {
-                m_SelectedEntity.AddComponent<CSpriteRenderer>();
+                m_Context->GetSelectedEntity().AddComponent<CSpriteRenderer>();
                 ImGui::CloseCurrentPopup();
             }
 
