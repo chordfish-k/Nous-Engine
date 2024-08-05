@@ -6,6 +6,10 @@
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#ifdef _MSVC_LANG
+    #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 namespace Nous {
 
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
@@ -207,7 +211,7 @@ namespace Nous {
             auto& tag = entity.GetComponent<CTag>();
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
-            strcpy_s(buffer, tag.Tag.c_str());
+            strncpy(buffer, tag.Tag.c_str(), sizeof(buffer));
             if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
                 tag.Tag = std::string(buffer);
         }
