@@ -174,7 +174,6 @@ namespace Nous {
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
     {
-        NS_CORE_WARN("YEs");
         // 快捷键
         if (e.GetRepeatCount() > 0)
             return false;
