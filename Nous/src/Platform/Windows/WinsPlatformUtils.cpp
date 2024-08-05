@@ -43,6 +43,7 @@ namespace Nous {
         ofn.lpstrFilter = filter;
         ofn.nFilterIndex = 1;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+        ofn.lpstrDefExt = strchr(filter, '\0') + 1; // 默认选中的扩展名
         if (GetSaveFileNameA(&ofn) == TRUE)
         {
             return ofn.lpstrFile;
