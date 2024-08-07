@@ -96,7 +96,9 @@ namespace Nous {
                 snapValue = 45.0f;
 
             float snapValues[3] = {snapValue, snapValue, snapValue};
-            ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+
+            if (m_ShowGizmo)
+                ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                                  (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
                                  nullptr, snap ? snapValues : nullptr);
 
@@ -134,6 +136,8 @@ namespace Nous {
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(ViewportPanel::OnKeyPressed));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(NS_BIND_EVENT_FN(ViewportPanel::OnMouseButtonPressed));
+
     }
 
     bool ViewportPanel::OnKeyPressed(KeyPressedEvent& e)
@@ -147,25 +151,25 @@ namespace Nous {
             // Gizmos
             case Key::Q:
             {
-                if (!ImGuizmo::IsUsing())
+                if (!ImGuizmo::IsUsing() && m_ShowGizmo)
                     m_GizmoType = -1;
                 break;
             }
             case Key::W:
             {
-                if (!ImGuizmo::IsUsing())
+                if (!ImGuizmo::IsUsing() && m_ShowGizmo)
                     m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
                 break;
             }
             case Key::E:
             {
-                if (!ImGuizmo::IsUsing())
+                if (!ImGuizmo::IsUsing() && m_ShowGizmo)
                     m_GizmoType = ImGuizmo::OPERATION::ROTATE;
                 break;
             }
             case Key::R:
             {
-                if (!ImGuizmo::IsUsing())
+                if (!ImGuizmo::IsUsing() && m_ShowGizmo)
                     m_GizmoType = ImGuizmo::OPERATION::SCALE;
                 break;
             }
@@ -173,5 +177,51 @@ namespace Nous {
                 return false;
         }
         return false;
+    }
+
+    bool ViewportPanel::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+    {
+        if (e.GetMouseButton() == Mouse::ButtonLeft)
+        {
+            if (IsHovered() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+            {
+                m_Context->SetSelectedEntity(m_HoveredEntity);
+                if (m_GizmoType == -1)
+                    m_GizmoType = 0;
+                m_ShowGizmo = (bool) m_HoveredEntity;
+            }
+        }
+        return false;
+    }
+
+    void ViewportPanel::CheckAndResize()
+    {
+        auto spec = m_Framebuffer->GetSpecification();
+        auto viewportSize = GetSize();
+        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
+            (spec.Width != (uint32_t) viewportSize.x ||
+             spec.Height != (uint32_t) viewportSize.y))
+        {
+            m_Framebuffer->Resize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
+            m_Context->OnViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
+        }
+    }
+
+    void ViewportPanel::CheckHoveredEntity()
+    {
+        auto [mx, my] = ImGui::GetMousePos();
+        mx -= GetMinBound().x;
+        my -= GetMinBound().y;
+        // 不包含标签栏
+        auto viewportContentSize = GetContentSize();
+        my = viewportContentSize.y - my;
+        int mouseX = (int) mx;
+        int mouseY = (int) my;
+
+        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportContentSize.x && mouseY < (int)viewportContentSize.y)
+        {
+            int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+            m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_Context.get());
+        }
     }
 }

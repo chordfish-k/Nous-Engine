@@ -9,7 +9,7 @@
 namespace Nous {
 
     EditorLayer::EditorLayer()
-        : Layer("SandBox2D")
+        : Layer("EditorLayer")
     {
     }
 
@@ -21,7 +21,11 @@ namespace Nous {
         m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
         FramebufferSpecification fbSpec = {};
-        fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
+        fbSpec.Attachments = {
+            FramebufferTextureFormat::RGBA8,            // 颜色缓冲
+            FramebufferTextureFormat::RED_INTEGER,      // 实体ID
+            FramebufferTextureFormat::Depth           // 深度缓冲
+        };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
         m_Framebuffer = Framebuffer::Create(fbSpec);
@@ -50,46 +54,24 @@ namespace Nous {
         fps = 1.0f / dt;
 
         // Resize
-        auto spec = m_Framebuffer->GetSpecification();
-        auto viewportSize = m_ViewportPanel.GetSize();
-        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
-            (spec.Width != (uint32_t) viewportSize.x ||
-             spec.Height != (uint32_t) viewportSize.y))
-        {
-            m_Framebuffer->Resize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
-            m_ActiveScene->OnViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
-        }
+        m_ViewportPanel.CheckAndResize();
 
         // Update
         m_EditorCamera->OnUpdate(dt);
 
-        // Render
-        Renderer2D::ResetStats();
         m_Framebuffer->Bind();
+
+        // Clear
+        Renderer2D::ResetStats();
         RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
         RenderCommand::Clear(); // 会把entity ID 附件也统一设置成这个值
+        m_Framebuffer->ClearAttachment(1, -1); // 设置 entity ID 附件的值为 -1
 
-        // 设置 entity ID 附件的值为 -1
-        m_Framebuffer->ClearAttachment(1, -1);
-
-        // Update Scene
+        // Render
         m_ActiveScene->OnUpdateEditor(dt, *m_EditorCamera);
 
-        auto [mx, my] = ImGui::GetMousePos();
-        mx -= m_ViewportPanel.GetMinBound().x;
-        my -= m_ViewportPanel.GetMinBound().y;
-        // 不包含标签栏
-        auto viewportContentSize = m_ViewportPanel.GetContentSize();
-        my = viewportContentSize.y - my;
-        int mouseX = (int) mx;
-        int mouseY = (int) my;
-
-        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportContentSize.x && mouseY < (int)viewportContentSize.y)
-        {
-            int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-            m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
-        }
-
+        // Postprocess
+        m_ViewportPanel.CheckHoveredEntity();
 
         m_Framebuffer->Unbind();
     }
@@ -100,6 +82,7 @@ namespace Nous {
 
         DockingSpace::BeginDocking();
 
+        // Menu
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("File"))
@@ -132,8 +115,8 @@ namespace Nous {
         // Properties
         ImGui::Begin("Stats");
         std::string name = "None";
-        if (m_HoveredEntity)
-            name = m_HoveredEntity.GetComponent<CTag>().Tag;
+        if (m_ViewportPanel.GetHoveredEntity())
+            name = m_ViewportPanel.GetHoveredEntity().GetComponent<CTag>().Tag;
         ImGui::Text("Hovered Entity: %s", name.c_str());
 
         auto stats = Renderer2D::GetStats();
@@ -158,7 +141,6 @@ namespace Nous {
     {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
-        dispatcher.Dispatch<MouseButtonPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 
         m_EditorCamera->OnEvent(e);
         m_ViewportPanel.OnEvent(e);
@@ -172,6 +154,8 @@ namespace Nous {
 
         bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
         bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+        // Save & Load & Open
         switch (e.GetKeyCode())
         {
             case Key::N:
@@ -200,16 +184,7 @@ namespace Nous {
             default:
                 return false;
         }
-        return false;
-    }
 
-    bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
-    {
-        if (e.GetMouseButton() == Mouse::ButtonLeft)
-        {
-            if (m_ViewportPanel.IsHovered() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
-                m_ActiveScene->SetSelectedEntity(m_HoveredEntity);
-        }
         return false;
     }
 
