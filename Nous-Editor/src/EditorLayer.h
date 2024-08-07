@@ -3,6 +3,7 @@
 #include "Nous.h"
 #include "Panel/SceneHierarchyPanel.h"
 #include "Panel/ViewportPanel.h"
+
 #include "Nous/Renderer/EditorCamera.h"
 
 namespace Nous {
@@ -21,19 +22,18 @@ namespace Nous {
         virtual void OnEvent(Event& event) override;
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
+        bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
         void NewScene();
         void OpenScene();
         void SaveScene();
         void SaveSceneAs();
     private:
-        Ref<VertexArray> m_SquareVA;
-        Ref<Shader> m_FlatColorShader;
         Ref<Framebuffer> m_Framebuffer;
-
         Ref<Scene> m_ActiveScene;
         fs::path m_EditorScenePath;
         Ref<EditorCamera> m_EditorCamera;
+        Entity m_HoveredEntity;
 
         Ref<Texture2D> m_MarioTexture, m_CheckerboardTexture;
 

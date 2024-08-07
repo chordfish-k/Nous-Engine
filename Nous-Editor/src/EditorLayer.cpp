@@ -67,7 +67,10 @@ namespace Nous {
         Renderer2D::ResetStats();
         m_Framebuffer->Bind();
         RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
-        RenderCommand::Clear();
+        RenderCommand::Clear(); // 会把entity ID 附件也统一设置成这个值
+
+        // 设置 entity ID 附件的值为 -1
+        m_Framebuffer->ClearAttachment(1, -1);
 
         // Update Scene
         m_ActiveScene->OnUpdateEditor(dt, *m_EditorCamera);
@@ -77,14 +80,14 @@ namespace Nous {
         my -= m_ViewportPanel.GetMinBound().y;
         // 不包含标签栏
         auto viewportContentSize = m_ViewportPanel.GetContentSize();
-
+        my = viewportContentSize.y - my;
         int mouseX = (int) mx;
         int mouseY = (int) my;
 
         if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportContentSize.x && mouseY < (int)viewportContentSize.y)
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-            NS_CORE_WARN("Pixel Data = {0}", pixelData);
+            m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
         }
 
 
@@ -128,6 +131,11 @@ namespace Nous {
 
         // Properties
         ImGui::Begin("Stats");
+        std::string name = "None";
+        if (m_HoveredEntity)
+            name = m_HoveredEntity.GetComponent<CTag>().Tag;
+        ImGui::Text("Hovered Entity: %s", name.c_str());
+
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -150,8 +158,10 @@ namespace Nous {
     {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 
         m_EditorCamera->OnEvent(e);
+        m_ViewportPanel.OnEvent(e);
     }
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -187,20 +197,18 @@ namespace Nous {
                 }
                 break;
             }
-            case Key::Q:
-                m_ViewportPanel.SetGizmoType(-1);
-                break;
-            case Key::W:
-                m_ViewportPanel.SetGizmoType(ImGuizmo::OPERATION::TRANSLATE);
-                break;
-            case Key::E:
-                m_ViewportPanel.SetGizmoType(ImGuizmo::OPERATION::ROTATE);
-                break;
-            case Key::R:
-                m_ViewportPanel.SetGizmoType(ImGuizmo::OPERATION::SCALE);
-                break;
             default:
                 return false;
+        }
+        return false;
+    }
+
+    bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+    {
+        if (e.GetMouseButton() == Mouse::ButtonLeft)
+        {
+            if (m_ViewportPanel.IsHovered() && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+                m_ActiveScene->SetSelectedEntity(m_HoveredEntity);
         }
         return false;
     }

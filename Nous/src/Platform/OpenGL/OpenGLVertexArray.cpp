@@ -22,7 +22,7 @@ namespace Nous {
             case ShaderDataType::Bool:      return GL_BOOL;
         }
 
-        NS_CORE_ASSERT(false, "ShaderDataType 未知");
+        NS_CORE_ASSERT(false, "未知的 ShaderDataType!");
         return 0;
     }
 
@@ -63,18 +63,62 @@ namespace Nous {
         glBindVertexArray(m_RendererID);
         vertexBuffer->Bind();
 
-        uint32_t index = 0;
-        const BufferLayout& layout = vertexBuffer->GetLayout();
+        const auto& layout = vertexBuffer->GetLayout();
         for (const auto& element : layout)
         {
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index,
-                                  (int) element.GetComponentCount(),
-                                  ShaderDataTypeToOpenGLBaseType(element.Type),
-                                  element.Normalized ? GL_TRUE : GL_FALSE,
-                                  (int) layout.GetStride(),
-                                  (const void*)element.Offset);
-            index++;
+            switch (element.Type)
+            {
+                case ShaderDataType::Float:
+                case ShaderDataType::Float2:
+                case ShaderDataType::Float3:
+                case ShaderDataType::Float4:
+                {
+                    glEnableVertexAttribArray(m_VertexBufferIndex);
+                    glVertexAttribPointer(m_VertexBufferIndex,
+                                          element.GetComponentCount(),
+                                          ShaderDataTypeToOpenGLBaseType(element.Type),
+                                          element.Normalized ? GL_TRUE : GL_FALSE,
+                                          layout.GetStride(),
+                                          (const void*)element.Offset);
+                    m_VertexBufferIndex++;
+                    break;
+                }
+                case ShaderDataType::Int:
+                case ShaderDataType::Int2:
+                case ShaderDataType::Int3:
+                case ShaderDataType::Int4:
+                case ShaderDataType::Bool:
+                {
+                    glEnableVertexAttribArray(m_VertexBufferIndex);
+                    glVertexAttribIPointer(m_VertexBufferIndex,
+                                           element.GetComponentCount(),
+                                           ShaderDataTypeToOpenGLBaseType(element.Type),
+                                           layout.GetStride(),
+                                           (const void*)element.Offset);
+                    m_VertexBufferIndex++;
+                    break;
+                }
+                case ShaderDataType::Mat3:
+                case ShaderDataType::Mat4:
+                {
+                    uint8_t count = element.GetComponentCount();
+                    for (uint8_t i = 0; i < count; i++)
+                    {
+                        glEnableVertexAttribArray(m_VertexBufferIndex);
+                        glVertexAttribPointer(m_VertexBufferIndex,
+                                              count,
+                                              ShaderDataTypeToOpenGLBaseType(element.Type),
+                                              element.Normalized ? GL_TRUE : GL_FALSE,
+                                              layout.GetStride(),
+                                              (const void*)(element.Offset + sizeof(float) * count * i));
+                        glVertexAttribDivisor(m_VertexBufferIndex, 1);
+                        m_VertexBufferIndex++;
+                    }
+                    break;
+                }
+                default:
+                    NS_CORE_ASSERT(false, "未知的 ShaderDataType!");
+            }
         }
 
         m_VertexBuffers.push_back(vertexBuffer);

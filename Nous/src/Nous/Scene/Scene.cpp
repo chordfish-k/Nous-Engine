@@ -55,7 +55,7 @@ namespace Nous {
         {
             auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
 
-            Renderer2D::DrawQuad(transform, sprite.Color);
+            Renderer2D::DrawSprite(transform, sprite, (int)ent);
         }
 
         Renderer2D::EndScene();
@@ -106,7 +106,7 @@ namespace Nous {
             {
                 auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
 
-                Renderer2D::DrawQuad(transform, sprite.Color);
+                Renderer2D::DrawSprite(transform, sprite, (int)ent);
             }
 
             Renderer2D::EndScene();

@@ -39,12 +39,19 @@ namespace Nous {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
         ImGui::Begin("Viewport");
 
-        auto viewportOffset = ImGui::GetCursorPos(); // 包含标签栏
+        auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+        auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+        auto viewportOffset = ImGui::GetWindowPos(); // 包含标签栏
+        m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+        m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+        m_ViewportContentSize = m_ViewportBounds[1] - m_ViewportBounds[0];
 
         // TODO 修复焦点不在Viewport不能用快捷键的bug
+        m_ViewportHovered = ImGui::IsWindowHovered();
+        m_ViewportFocused = ImGui::IsWindowFocused();
         bool flag = ImGui::IsAnyItemActive() ?
-            (!ImGui::IsWindowFocused() || !ImGui::IsWindowHovered()) :
-            (!ImGui::IsWindowFocused() && !ImGui::IsWindowHovered());
+            (!m_ViewportFocused || !m_ViewportHovered) :
+            (!m_ViewportFocused && !m_ViewportHovered);
         Application::Get().GetImGuiLayer()->SetBlockEvent(flag);
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
@@ -55,25 +62,17 @@ namespace Nous {
         uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
         ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
 
-        auto windowSize = ImGui::GetWindowSize();
-        auto minBound = ImGui::GetWindowPos();
-        minBound.x += viewportOffset.x;
-        minBound.y += viewportOffset.y;
-
-        ImVec2 maxBound = {minBound.x + windowSize.x, minBound.y + windowSize.y };
-        m_ViewportBounds[0] = { minBound.x, minBound.y }; // 左上角
-        m_ViewportBounds[1] = { maxBound.x, maxBound.y }; // 右下角
-        m_ViewportContentSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-
         // Gizmos
         Entity selectedEntity = m_Context->GetSelectedEntity();
         if (selectedEntity && m_GizmoType >= 0 && m_GizmoType <= 3)
         {
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
-            float windowWidth = (float) ImGui::GetWindowWidth();
-            float windowHeight = (float) ImGui::GetWindowHeight();
-            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+            ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y,
+                              m_ViewportBounds[1].x - m_ViewportBounds[0].x,
+                              m_ViewportBounds[1].y - m_ViewportBounds[0].y);
+
 
             // Runtime camera
 //            auto cameraEntity = m_Context->GetPrimaryCameraEntity();
@@ -129,5 +128,50 @@ namespace Nous {
 
         ImGui::End();
         ImGui::PopStyleVar();
+    }
+
+    void ViewportPanel::OnEvent(Event& event)
+    {
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(ViewportPanel::OnKeyPressed));
+    }
+
+    bool ViewportPanel::OnKeyPressed(KeyPressedEvent& e)
+    {
+        // 快捷键
+        if (e.GetRepeatCount() > 0)
+            return false;
+
+        switch (e.GetKeyCode())
+        {
+            // Gizmos
+            case Key::Q:
+            {
+                if (!ImGuizmo::IsUsing())
+                    m_GizmoType = -1;
+                break;
+            }
+            case Key::W:
+            {
+                if (!ImGuizmo::IsUsing())
+                    m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                break;
+            }
+            case Key::E:
+            {
+                if (!ImGuizmo::IsUsing())
+                    m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+                break;
+            }
+            case Key::R:
+            {
+                if (!ImGuizmo::IsUsing())
+                    m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                break;
+            }
+            default:
+                return false;
+        }
+        return false;
     }
 }

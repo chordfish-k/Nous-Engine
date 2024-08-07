@@ -3,6 +3,7 @@
 #include "Nous/Renderer/Framebuffer.h"
 #include "Nous/Renderer/EditorCamera.h"
 #include "Nous/Scene/Scene.h"
+#include "Nous/Event/KeyEvent.h"
 
 #include <glm/glm.hpp>
 
@@ -29,7 +30,13 @@ namespace Nous
         const Ref<EditorCamera>& GetEditorCamera() const { return m_EditorCamera; }
 
         void OnImGuiRender();
-        void SetGizmoType(int type) { m_GizmoType = type;};
+        void OnEvent(Event& event);
+        void SetGizmoType(int type) { m_GizmoType = type;}
+
+        bool IsHovered() const { return m_ViewportHovered; };
+        bool IsFocused() const { return m_ViewportFocused; };
+    private:
+        bool OnKeyPressed(KeyPressedEvent& e);
     private:
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_Context;
@@ -39,6 +46,9 @@ namespace Nous
         glm::vec2 m_ViewportSize = {0.0f, 0.0f};
         glm::vec2 m_ViewportContentSize = {0.0f, 0.0f};
         glm::vec2 m_ViewportBounds[2];
+
+        bool m_ViewportHovered = false;
+        bool m_ViewportFocused = false;
     };
 
 }
