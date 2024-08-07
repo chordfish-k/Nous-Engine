@@ -12,11 +12,23 @@ int main(int argc, char** argv);
 
 namespace Nous {
 
+    struct ApplicationCommandLineArgs
+    {
+        int Count = 0;
+        char** Args = nullptr;
+
+        const char* operator[](int index) const
+        {
+            NS_CORE_ASSERT(index < Count);
+            return Args[index];
+        }
+    };
+
     // 用于管理游戏主循环
-    class NOUS_API Application
+    class Application
     {
     public:
-        Application(const std::string& name = "Nous App");
+        Application(const std::string& name = "Nous App", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
         virtual ~Application();
 
         void OnEvent(Event& e);
@@ -31,12 +43,14 @@ namespace Nous {
         ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
         static Application& Get() { return *s_Instance; }
 
+        ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
     private:
         void Run();
         bool OnWindowClose(WindowCloseEvent& e);
         bool OnWindowResize(WindowResizeEvent& e);
 
     private:
+        ApplicationCommandLineArgs m_CommandLineArgs;
         Scope<Window> m_Window;
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
@@ -50,6 +64,6 @@ namespace Nous {
     };
 
     // 需要在客户端中定义
-    Application* CreateApplication();
+    Application* CreateApplication(ApplicationCommandLineArgs args);
 
 }

@@ -7,7 +7,7 @@
 
 namespace Nous {
 
-    class NOUS_API KeyEvent : public Event
+    class KeyEvent : public Event
     {
     public:
         KeyCode GetKeyCode() const { return m_KeyCode; }
@@ -20,7 +20,7 @@ namespace Nous {
         KeyCode m_KeyCode;
     };
 
-    class NOUS_API KeyPressedEvent : public KeyEvent
+    class KeyPressedEvent : public KeyEvent
     {
     public:
         KeyPressedEvent(KeyCode keycode, int repeatCount)
@@ -40,7 +40,7 @@ namespace Nous {
         int m_RepeatCount;
     };
 
-    class NOUS_API KeyReleasedEvent : public KeyEvent
+    class KeyReleasedEvent : public KeyEvent
     {
     public:
         KeyReleasedEvent(KeyCode keycode)

@@ -90,7 +90,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 file(GLOB_RECURSE IMGUIZMO_SOURCES "vendor/imGuizmo/*.cpp")
 # 为匹配的文件禁用预编译头
 foreach(SOURCE_FILE ${IMGUIZMO_SOURCES})
-    set_source_files_properties(${SOURCE_FILE} PROPERTIES COMPILE_FLAGS "-NoPCH")
+    set_source_files_properties(${SOURCE_FILE} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endforeach()
 
 # 针对不同的构建类型设置编译选项

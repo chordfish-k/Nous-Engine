@@ -6,7 +6,7 @@
 
 namespace Nous {
 
-    class NOUS_API Log
+    class Log
     {
     public:
         static void Init();

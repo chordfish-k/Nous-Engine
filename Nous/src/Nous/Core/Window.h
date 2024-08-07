@@ -22,7 +22,7 @@ namespace Nous {
     };
 
     // 桌面窗口接口，给不同操作系统实现
-    class NOUS_API Window
+    class Window
     {
     public:
         using EventCallbackFn = std::function<void(Event&)>;

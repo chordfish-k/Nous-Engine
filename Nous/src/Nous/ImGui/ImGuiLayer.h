@@ -7,7 +7,7 @@
 
 namespace Nous {
 
-    class NOUS_API ImGuiLayer : public Layer
+    class ImGuiLayer : public Layer
     {
     public:
         ImGuiLayer();

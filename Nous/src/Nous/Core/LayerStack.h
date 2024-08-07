@@ -6,7 +6,7 @@
 namespace Nous {
 
     // 用于管理各个层
-    class NOUS_API LayerStack
+    class LayerStack
     {
     public:
         LayerStack() = default;

@@ -6,7 +6,7 @@
 
 namespace Nous {
 
-    class NOUS_API Input
+    class Input
     {
     protected:
         Input() = default;

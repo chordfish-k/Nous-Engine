@@ -7,7 +7,7 @@
 
 namespace Nous {
 
-    class NOUS_API MouseMovedEvent : public Event
+    class MouseMovedEvent : public Event
     {
     public:
         MouseMovedEvent(float x, float y)
@@ -29,7 +29,7 @@ namespace Nous {
         float m_MouseX, m_MouseY;
     };
 
-    class NOUS_API MouseScrolledEvent : public Event
+    class MouseScrolledEvent : public Event
     {
     public:
         MouseScrolledEvent(float xOffset, float yOffset)
@@ -51,7 +51,7 @@ namespace Nous {
         float m_XOffset, m_YOffset;
     };
 
-    class NOUS_API MouseEvent : public Event
+    class MouseEvent : public Event
     {
     public:
         MouseCode GetMouseButton() const { return m_Button; }
@@ -64,7 +64,7 @@ namespace Nous {
         MouseCode m_Button;
     };
 
-    class NOUS_API MouseButtonPressedEvent : public MouseEvent
+    class MouseButtonPressedEvent : public MouseEvent
     {
     public:
         MouseButtonPressedEvent(MouseCode button)
@@ -80,7 +80,7 @@ namespace Nous {
         EVENT_CLASS_TYPE(MouseButtonPressed)
     };
 
-    class NOUS_API MouseButtonReleasedEvent : public MouseEvent
+    class MouseButtonReleasedEvent : public MouseEvent
     {
     public:
         MouseButtonReleasedEvent(MouseCode button)
