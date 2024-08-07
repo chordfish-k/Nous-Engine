@@ -39,6 +39,8 @@ namespace Nous {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
         ImGui::Begin("Viewport");
 
+        auto viewportOffset = ImGui::GetCursorPos(); // 包含标签栏
+
         // TODO 修复焦点不在Viewport不能用快捷键的bug
         bool flag = ImGui::IsAnyItemActive() ?
             (!ImGui::IsWindowFocused() || !ImGui::IsWindowHovered()) :
@@ -52,6 +54,16 @@ namespace Nous {
 
         uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
         ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
+
+        auto windowSize = ImGui::GetWindowSize();
+        auto minBound = ImGui::GetWindowPos();
+        minBound.x += viewportOffset.x;
+        minBound.y += viewportOffset.y;
+
+        ImVec2 maxBound = {minBound.x + windowSize.x, minBound.y + windowSize.y };
+        m_ViewportBounds[0] = { minBound.x, minBound.y }; // 左上角
+        m_ViewportBounds[1] = { maxBound.x, maxBound.y }; // 右下角
+        m_ViewportContentSize = m_ViewportBounds[1] - m_ViewportBounds[0];
 
         // Gizmos
         Entity selectedEntity = m_Context->GetSelectedEntity();

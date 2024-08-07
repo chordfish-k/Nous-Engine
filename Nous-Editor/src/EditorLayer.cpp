@@ -21,7 +21,7 @@ namespace Nous {
         m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
         FramebufferSpecification fbSpec = {};
-        fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth};
+        fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
         m_Framebuffer = Framebuffer::Create(fbSpec);
@@ -70,8 +70,23 @@ namespace Nous {
         RenderCommand::Clear();
 
         // Update Scene
-//        m_ActiveScene->OnUpdateRuntime(dt);
         m_ActiveScene->OnUpdateEditor(dt, *m_EditorCamera);
+
+        auto [mx, my] = ImGui::GetMousePos();
+        mx -= m_ViewportPanel.GetMinBound().x;
+        my -= m_ViewportPanel.GetMinBound().y;
+        // 不包含标签栏
+        auto viewportContentSize = m_ViewportPanel.GetContentSize();
+
+        int mouseX = (int) mx;
+        int mouseY = (int) my;
+
+        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportContentSize.x && mouseY < (int)viewportContentSize.y)
+        {
+            int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+            NS_CORE_WARN("Pixel Data = {0}", pixelData);
+        }
+
 
         m_Framebuffer->Unbind();
     }
