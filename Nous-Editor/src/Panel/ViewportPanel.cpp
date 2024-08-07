@@ -50,7 +50,7 @@ namespace Nous {
 
         m_EditorCamera->SetViewportSize(m_ViewportSize.x,  m_ViewportSize.y);
 
-        uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+        uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
         ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
 
         // Gizmos
