@@ -5,6 +5,8 @@
     <mapping directory="$PROJECT_DIR$/Nous/vendor/GLFW" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Nous/vendor/glm" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Nous/vendor/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Nous/vendor/imguizmo" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Nous/vendor/spdlog" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Nous/vendor/yaml-cpp" vcs="Git" />
   </component>
 </project>

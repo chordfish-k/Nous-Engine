@@ -89,7 +89,7 @@ namespace Nous {
             if (!m_Minimized)
             {
                 {
-                    NS_PROFILE_SCOPE("LayerStack OnUpdate");
+                    NS_PROFILE_SCOPE("LayerStack OnUpdateRuntime");
 
                     for (auto* layer: m_LayerStack)
                         layer->OnUpdate(timestep);

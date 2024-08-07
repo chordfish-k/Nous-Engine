@@ -26,8 +26,10 @@ namespace Nous {
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
         m_ActiveScene = CreateRef<Scene>();
+        m_EditorCamera = CreateRef<EditorCamera>(30.0f, 1.778f, 0.1f, 1000.0f);
 
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
+        m_ViewportPanel.SetEditorCamera(m_EditorCamera);
 
         m_SceneHierarchyPanel.SetContent(m_ActiveScene);
         m_ViewportPanel.SetContent(m_ActiveScene);
@@ -57,6 +59,9 @@ namespace Nous {
             m_ActiveScene->OnViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
         }
 
+        // Update
+        m_EditorCamera->OnUpdate(dt);
+
         // Render
         Renderer2D::ResetStats();
         m_Framebuffer->Bind();
@@ -64,7 +69,8 @@ namespace Nous {
         RenderCommand::Clear();
 
         // Update Scene
-        m_ActiveScene->OnUpdate(dt);
+//        m_ActiveScene->OnUpdateRuntime(dt);
+        m_ActiveScene->OnUpdateEditor(dt, *m_EditorCamera);
 
         m_Framebuffer->Unbind();
     }
@@ -128,6 +134,8 @@ namespace Nous {
     {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+
+        m_EditorCamera->OnEvent(e);
     }
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)

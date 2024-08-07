@@ -29,6 +29,11 @@ namespace Nous {
         m_Context = scene;
     }
 
+    void ViewportPanel::SetEditorCamera(const Ref<EditorCamera>& camera)
+    {
+        m_EditorCamera = camera;
+    }
+
     void ViewportPanel::OnImGuiRender()
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
@@ -43,6 +48,8 @@ namespace Nous {
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 
+        m_EditorCamera->SetViewportSize(m_ViewportSize.x,  m_ViewportSize.y);
+
         uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
 
@@ -56,11 +63,15 @@ namespace Nous {
             float windowHeight = (float) ImGui::GetWindowHeight();
             ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
-            // 主摄像机
-            auto cameraEntity = m_Context->GetPrimaryCameraEntity();
-            const auto& camera = cameraEntity.GetComponent<CCamera>();
-            auto cameraProjection = camera.Camera.GetProjection();
-            auto cameraView = glm::inverse(cameraEntity.GetComponent<CTransform>().GetTransform());
+            // Runtime camera
+//            auto cameraEntity = m_Context->GetPrimaryCameraEntity();
+//            const auto& camera = cameraEntity.GetComponent<CCamera>();
+//            auto cameraProjection = camera.Camera.GetProjectionMatrix();
+//            auto cameraView = glm::inverse(cameraEntity.GetComponent<CTransform>().GetTransform());
+
+            // Editor camera
+            const glm::mat4& cameraProjection = m_EditorCamera->GetProjectionMatrix();
+            glm::mat4 cameraView = m_EditorCamera->GetViewMatrix();
 
             // Entity Transform
             auto& tc = selectedEntity.GetComponent<CTransform>();

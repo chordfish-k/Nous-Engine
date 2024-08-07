@@ -117,7 +117,7 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
+        glm::mat4 viewProj = camera.GetProjectionMatrix() * glm::inverse(transform);
 
         // 设置默认值
         s_Data.TextureShader->Bind();
@@ -127,6 +127,17 @@ namespace Nous {
     }
 
     void Renderer2D::BeginScene(const OrthoCamera& camera)
+    {
+        NS_PROFILE_FUNCTION();
+
+        // 设置默认值
+        s_Data.TextureShader->Bind();
+        s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+
+        StartBatch();
+    }
+
+    void Renderer2D::BeginScene(const EditorCamera& camera)
     {
         NS_PROFILE_FUNCTION();
 

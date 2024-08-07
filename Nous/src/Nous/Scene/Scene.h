@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include "entt.hpp"
-
 #include "Nous/Core/Timestep.h"
+#include "Nous/Renderer/EditorCamera.h"
+
+#include "entt.hpp"
 
 #include <glm/glm.hpp>
 
@@ -22,7 +23,8 @@ namespace Nous {
         // 暂时
         entt::registry& Reg() { return m_Registry; }
 
-        void OnUpdate(Timestep dt);
+        void OnUpdateRuntime(Timestep dt);
+        void OnUpdateEditor(Timestep dt, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 
         Entity GetPrimaryCameraEntity();

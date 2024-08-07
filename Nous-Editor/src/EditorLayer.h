@@ -3,6 +3,7 @@
 #include "Nous.h"
 #include "Panel/SceneHierarchyPanel.h"
 #include "Panel/ViewportPanel.h"
+#include "Nous/Renderer/EditorCamera.h"
 
 namespace Nous {
 
@@ -32,8 +33,7 @@ namespace Nous {
 
         Ref<Scene> m_ActiveScene;
         fs::path m_EditorScenePath;
-        Entity m_SquareEntity;
-        Entity m_CameraEntity;
+        Ref<EditorCamera> m_EditorCamera;
 
         Ref<Texture2D> m_MarioTexture, m_CheckerboardTexture;
 

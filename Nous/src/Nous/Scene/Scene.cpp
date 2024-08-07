@@ -46,7 +46,22 @@ namespace Nous {
         m_Registry.destroy(entity);
     }
 
-    void Scene::OnUpdate(Timestep dt)
+    void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
+    {
+        Renderer2D::BeginScene(camera);
+
+        auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
+        for (auto ent: group)
+        {
+            auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
+
+            Renderer2D::DrawQuad(transform, sprite.Color);
+        }
+
+        Renderer2D::EndScene();
+    }
+
+    void Scene::OnUpdateRuntime(Timestep dt)
     {
         // 执行脚本更新
         {

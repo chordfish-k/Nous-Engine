@@ -3,6 +3,7 @@
 #include "Nous/Renderer/Camera.h"
 #include "Nous/Renderer/OrthoCamera.h"
 #include "Nous/Renderer/Texture.h"
+#include "Nous/Renderer/EditorCamera.h"
 
 namespace Nous {
 
@@ -13,6 +14,7 @@ namespace Nous {
         static void Shutdown();
 
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void BeginScene(const EditorCamera& camera);
         static void BeginScene(const OrthoCamera& camera);
         static void EndScene();
         static void Flush();
