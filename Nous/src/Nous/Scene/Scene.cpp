@@ -166,7 +166,7 @@ namespace Nous {
     template<>
     void Scene::OnComponentAdded<CCamera>(Entity entity, CCamera& component)
     {
-        if (m_ViewportWidth && m_ViewportHeight)
+        if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
             component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     }
 
