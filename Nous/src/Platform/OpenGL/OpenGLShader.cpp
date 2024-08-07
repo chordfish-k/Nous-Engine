@@ -8,14 +8,18 @@
 
 namespace Nous {
 
-    static GLenum ShaderTypeFromString(const std::string& type)
-    {
-        if (type == "vertex")
-            return GL_VERTEX_SHADER;
-        if (type == "fragment" || type == "pixel")
-            return GL_FRAGMENT_SHADER;
-        NS_CORE_ASSERT(false, "着色器类型未知！")
-        return 0;
+    namespace Utils {
+
+        static GLenum ShaderTypeFromString(const std::string& type)
+        {
+            if (type == "vertex")
+                return GL_VERTEX_SHADER;
+            if (type == "fragment" || type == "pixel")
+                return GL_FRAGMENT_SHADER;
+            NS_CORE_ASSERT(false, "着色器类型未知！")
+            return 0;
+        }
+
     }
 
     OpenGLShader::OpenGLShader(const std::string& path)
@@ -90,7 +94,7 @@ namespace Nous {
             size_t nextLinePos = source.find_first_not_of("\r\n", eol);
             NS_CORE_ASSERT(nextLinePos != std::string::npos, "着色器语法错误！");
             pos = source.find(typeToken, nextLinePos);
-            shaderSrc[ShaderTypeFromString(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+            shaderSrc[Utils::ShaderTypeFromString(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
         }
         return shaderSrc;
     }
