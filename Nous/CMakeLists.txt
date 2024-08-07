@@ -77,13 +77,31 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/imGuizmo
 )
 
+# 获取Vulkan环境变量
+set(VULKAN_SDK "$ENV{VULKAN_SDK}")
+# 添加Vulkan依赖
+if (DEFINED ENV{VULKAN_SDK})
+    message("VulkanSDK:${VULKAN_SDK}")
+    target_include_directories(${PROJECT_NAME} PUBLIC
+            ${VULKAN_SDK}/Include
+    )
+else ()
+    message("没有安装VulkanSDK")
+endif ()
+
 # 链接依赖库
+set(VULKAN_LIB "${VULKAN_SDK}/Lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE
         glfw
         glad
         ImGui
         yaml-cpp
         opengl32.lib
+        # vulkan
+        ${VULKAN_LIB}/vulkan-1.lib
+        ${VULKAN_LIB}/spirv-cross-core.lib
+        ${VULKAN_LIB}/spirv-cross-glsl.lib
+        ${VULKAN_LIB}/shaderc_shared.lib
 )
 
 # 获取所有imGuizmo匹配的文件

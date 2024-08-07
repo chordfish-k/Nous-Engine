@@ -3,3 +3,5 @@ CMakeBuild
 Profile-**.json
 
 log.txt
+
+VulkanSDK/
