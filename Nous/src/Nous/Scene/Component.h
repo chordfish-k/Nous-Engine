@@ -7,7 +7,8 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Nous/Scene/SceneCamera.h"
-#include "ScriptableEntity.h"
+#include "Nous/Renderer/Texture.h"
+#include "Nous/Scene/ScriptableEntity.h"
 
 namespace Nous {
 
@@ -44,6 +45,8 @@ namespace Nous {
     struct CSpriteRenderer
     {
         glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+        Ref<Texture2D> Texture;
+        float TilingFactor = 1.0f;
 
         CSpriteRenderer() = default;
         CSpriteRenderer(const CSpriteRenderer&) = default;
