@@ -147,8 +147,6 @@ namespace Nous {
         ImGui::Text("FPS: %.2f", fps);
         ImGui::End();
 
-
-
         DockingSpace::EndDocking();
     }
 

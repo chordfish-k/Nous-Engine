@@ -39,9 +39,10 @@ namespace Nous {
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
+        float fontSize = 20.0f;
         auto chineseSupport = io.Fonts->GetGlyphRangesChineseSimplifiedCommon();
-        io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansSC/NotoSansSC-Bold.ttf", 20.0f, nullptr, chineseSupport);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf", 20.0f, nullptr, chineseSupport);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansSC/NotoSansSC-Bold.ttf", fontSize, nullptr, chineseSupport);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf", fontSize, nullptr, chineseSupport);
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
