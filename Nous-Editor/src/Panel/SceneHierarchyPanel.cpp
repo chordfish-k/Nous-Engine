@@ -14,10 +14,10 @@ namespace Nous {
 
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
     {
-        SetContent(scene);
+        SetContext(scene);
     }
 
-    void SceneHierarchyPanel::SetContent(const Ref<Scene>& scene)
+    void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
     {
         m_Context = scene;
         m_Context->SetSelectedEntity({});

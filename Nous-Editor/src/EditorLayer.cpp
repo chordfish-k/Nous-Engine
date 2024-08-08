@@ -2,15 +2,18 @@
 
 #include "Nous/Utils/PlatformUtils.h"
 #include "Panel/DockingSpace.h"
+#include "Event/EditorEvent.h"
 
 #include <imgui/imgui.h>
-#include <ImGuizmo.h>
 
 namespace Nous {
+
+    extern const std::filesystem::path g_AssetPath;
 
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
     {
+        EditorEventRepeater::AddObserver(this);
     }
 
     void EditorLayer::OnAttached()
@@ -46,8 +49,8 @@ namespace Nous {
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
         m_ViewportPanel.SetEditorCamera(m_EditorCamera);
 
-        m_SceneHierarchyPanel.SetContent(m_ActiveScene);
-        m_ViewportPanel.SetContent(m_ActiveScene);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnDetached()
@@ -206,32 +209,43 @@ namespace Nous {
         m_ActiveScene = CreateRef<Scene>();
         auto viewportSize = m_ViewportPanel.GetSize();
         m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-        m_SceneHierarchyPanel.SetContent(m_ActiveScene);
-        m_ViewportPanel.SetContent(m_ActiveScene);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
+
+        m_EditorScenePath = std::filesystem::path();
     }
 
     void EditorLayer::OpenScene()
     {
         std::string filepath = FileDialogs::OpenFile("Scene File (*scn)\0*.scn\0");
         if (!filepath.empty())
+            OpenScene(filepath);
+    }
+
+    void EditorLayer::OpenScene(const std::filesystem::path& path)
+    {
+        Ref<Scene> newScene = CreateRef<Scene>();
+        auto viewportSize = m_ViewportPanel.GetSize();
+
+        SceneSerializer serializer(newScene);
+        if (serializer.Deserialize(path.string()))
         {
-            m_ActiveScene = CreateRef<Scene>();
-            auto viewportSize = m_ViewportPanel.GetSize();
+            m_ActiveScene = newScene;
+            m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+            m_ViewportPanel.SetContext(m_ActiveScene);
+
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-            m_SceneHierarchyPanel.SetContent(m_ActiveScene);
-            m_ViewportPanel.SetContent(m_ActiveScene);
-
-            SceneSerializer serializer(m_ActiveScene);
-            serializer.Deserialize(filepath);
-
-            m_EditorScenePath = filepath;
+            m_EditorScenePath = path;
         }
     }
 
     void EditorLayer::SaveScene()
     {
         SceneSerializer serializer(m_ActiveScene);
-        serializer.Serialize(m_EditorScenePath.string());
+        if (!m_EditorScenePath.empty())
+            serializer.Serialize(m_EditorScenePath.string());
+        else
+            SaveSceneAs();
     }
 
     void EditorLayer::SaveSceneAs()
@@ -245,5 +259,19 @@ namespace Nous {
 
             m_EditorScenePath = filepath;
         }
+    }
+
+    void EditorLayer::OnEditorEvent(EditorEvent& e)
+    {
+        EditorEventDispatcher dispatcher(e);
+        dispatcher.Dispatch<OpenSceneEvent>(NS_BIND_EVENT_FN(EditorLayer::OnOpenScene));
+    }
+
+    void EditorLayer::OnOpenScene(OpenSceneEvent& e)
+    {
+        if (e.FilePath.empty())
+            OpenScene();
+        else
+            OpenScene(e.FilePath);
     }
 }

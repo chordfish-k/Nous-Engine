@@ -25,7 +25,7 @@ namespace Nous
         const glm::vec2& GetMinBound() const { return m_ViewportBounds[0]; }
         const glm::vec2& GetMaxBound() const { return m_ViewportBounds[1]; }
 
-        void SetContent(const Ref<Scene>& scene);
+        void SetContext(const Ref<Scene>& scene);
         void SetEditorCamera(const Ref<EditorCamera>& camera);
 
         const Ref<EditorCamera>& GetEditorCamera() const { return m_EditorCamera; }

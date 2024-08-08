@@ -12,7 +12,7 @@ namespace Nous {
         SceneHierarchyPanel() = default;
         SceneHierarchyPanel(const Ref<Scene>& scene);
 
-        void SetContent(const Ref<Scene>& scene);
+        void SetContext(const Ref<Scene>& scene);
 
         void OnImGuiRender();
     private:

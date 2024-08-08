@@ -3,14 +3,15 @@
 #include "Nous/Core/Application.h"
 #include "Nous/Scene/Component.h"
 
-#include "SceneHierarchyPanel.h"
+#include "Panel/SceneHierarchyPanel.h"
+#include "Event/EditorEvent.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include <ImGuizmo.h>
 
 namespace Nous {
-
+    extern const std::filesystem::path g_AssetPath;
 
     ViewportPanel::ViewportPanel(const Ref<Framebuffer>& framebuffer)
     {
@@ -22,9 +23,10 @@ namespace Nous {
         m_Framebuffer = framebuffer;
     }
 
-    void ViewportPanel::SetContent(const Ref<Scene>& scene)
+    void ViewportPanel::SetContext(const Ref<Scene>& scene)
     {
         m_Context = scene;
+        m_HoveredEntity = {};
     }
 
     void ViewportPanel::SetEditorCamera(const Ref<EditorCamera>& camera)
@@ -60,6 +62,19 @@ namespace Nous {
         uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
         ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
 
+        // 设置拖放目标
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
+            {
+                const wchar_t* path = (const wchar_t*)payload->Data;
+                // TODO 检测文件类型为.scn
+                OpenSceneEvent event {std::filesystem::path(g_AssetPath) / path};
+                EditorEventRepeater::Emit(event);
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         // Gizmos
         Entity selectedEntity = m_Context->GetSelectedEntity();
         if (selectedEntity && m_GizmoType >= 0 && m_GizmoType <= 3)
@@ -70,7 +85,6 @@ namespace Nous {
             ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y,
                               m_ViewportBounds[1].x - m_ViewportBounds[0].x,
                               m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-
 
             // Runtime camera
 //            auto cameraEntity = m_Context->GetPrimaryCameraEntity();
