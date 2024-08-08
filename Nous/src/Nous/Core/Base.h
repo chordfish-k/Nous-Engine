@@ -102,5 +102,4 @@ namespace Nous {
     }
 }
 
-#include "Nous/Core/Log.h"
 #include "Nous/Core/Assert.h"
