@@ -122,6 +122,15 @@ namespace Nous {
             ImGui::EndMenuBar();
         }
 
+        // Hierarchy
+        m_SceneHierarchyPanel.OnImGuiRender();
+
+        // Resource
+        m_ResourceBrowserPanel.OnImGuiRender();
+
+        // Viewport
+        m_ViewportPanel.OnImGuiRender();
+
         // Properties
         ImGui::Begin("Stats");
         std::string name = "None";
@@ -138,11 +147,7 @@ namespace Nous {
         ImGui::Text("FPS: %.2f", fps);
         ImGui::End();
 
-        // Hierarchy
-        m_SceneHierarchyPanel.OnImGuiRender();
 
-        // Viewport
-        m_ViewportPanel.OnImGuiRender();
 
         DockingSpace::EndDocking();
     }

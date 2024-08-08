@@ -2,6 +2,7 @@
 
 #include "Nous.h"
 #include "Panel/SceneHierarchyPanel.h"
+#include "Panel/ResourceBrowserPanel.h"
 #include "Panel/ViewportPanel.h"
 
 #include "Nous/Renderer/EditorCamera.h"
@@ -38,6 +39,7 @@ namespace Nous {
 
         // 面板窗口
         SceneHierarchyPanel m_SceneHierarchyPanel;
+        ResourceBrowserPanel m_ResourceBrowserPanel;
         ViewportPanel m_ViewportPanel;
     };
 }

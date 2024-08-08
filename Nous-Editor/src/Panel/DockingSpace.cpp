@@ -1,5 +1,4 @@
-﻿#include "pch.h"
-#include "DockingSpace.h"
+﻿#include "DockingSpace.h"
 
 #include "Nous/Core/Application.h"
 #include <imgui.h>

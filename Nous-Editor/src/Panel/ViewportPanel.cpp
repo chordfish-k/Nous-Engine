@@ -1,8 +1,6 @@
-﻿#include "pch.h"
-#include "ViewportPanel.h"
+﻿#include "ViewportPanel.h"
 
 #include "Nous/Core/Application.h"
-#include "Nous/Scene/Entity.h"
 #include "Nous/Scene/Component.h"
 
 #include "SceneHierarchyPanel.h"
