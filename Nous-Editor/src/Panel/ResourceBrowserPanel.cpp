@@ -4,10 +4,10 @@
 
 namespace Nous {
 
-    static const std::filesystem::path s_AssetsPath = "assets";
+    static const std::filesystem::path s_AssetPath = "assets";
 
     ResourceBrowserPanel::ResourceBrowserPanel()
-        : m_CurrentDirectory(s_AssetsPath)
+        : m_CurrentDirectory(s_AssetPath)
     {
     }
 
@@ -15,10 +15,32 @@ namespace Nous {
     {
         ImGui::Begin("Resources");
 
-        for (auto& p : std::filesystem::directory_iterator(m_CurrentDirectory))
+        if (m_CurrentDirectory != std::filesystem::path(s_AssetPath))
         {
-            ImGui::Text("%s", p.path().string().c_str());
-            p.path();
+            if (ImGui::Button("<-"))
+            {
+                m_CurrentDirectory = m_CurrentDirectory.parent_path();
+            }
+        }
+
+        for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+        {
+            const auto& path = directoryEntry.path();
+            auto relativePath = std::filesystem::relative(path, s_AssetPath);
+            auto fileNameString = relativePath.filename().string();
+            if (directoryEntry.is_directory())
+            {
+                if (ImGui::Button(fileNameString.c_str()))
+                {
+                    m_CurrentDirectory /= path.filename();
+                }
+            }
+            else
+            {
+                if (ImGui::Button(fileNameString.c_str()))
+                {
+                }
+            }
         }
 
         ImGui::End();
