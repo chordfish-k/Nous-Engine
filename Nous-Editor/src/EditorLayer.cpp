@@ -236,6 +236,8 @@ namespace Nous {
 
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_EditorScenePath = path;
+
+            m_EditorCamera->Reset();
         }
     }
 

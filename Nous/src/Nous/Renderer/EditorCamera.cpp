@@ -140,4 +140,19 @@ namespace Nous {
     {
         return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
     }
+
+    void EditorCamera::Reset()
+    {
+        m_ViewMatrix = glm::mat4{1.0f};
+        m_Position = {0.0f, 0.0f, 0.0f};
+        m_FocalPoint = {0.0f, 0.0f, 0.0f}; // 焦点位置
+
+        m_InitialMousePosition = {0.0f, 0.0f};
+
+        m_Distance = 10.0f;
+        m_Pitch = 0.0f;
+        m_Yaw = 0.0f; // 俯仰角， 水平角
+
+        RecalculateView();
+    }
 }

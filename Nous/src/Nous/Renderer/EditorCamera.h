@@ -36,6 +36,8 @@ namespace Nous {
 
         float GetPitch() const { return m_Pitch; }
         float GetYaw() const { return m_Yaw; }
+
+        void Reset();
     private:
         void RecalculateProjection();
         void RecalculateView();
