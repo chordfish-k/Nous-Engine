@@ -5,3 +5,6 @@ Profile-**.json
 log.txt
 
 VulkanSDK/
+
+**.frag
+**.vert

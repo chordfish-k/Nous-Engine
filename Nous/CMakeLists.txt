@@ -97,12 +97,26 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         ImGui
         yaml-cpp
         opengl32.lib
-        # vulkan
         ${VULKAN_LIB}/vulkan-1.lib
-        ${VULKAN_LIB}/spirv-cross-core.lib
-        ${VULKAN_LIB}/spirv-cross-glsl.lib
-        ${VULKAN_LIB}/shaderc_shared.lib
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+            # vulkan
+            ${VULKAN_LIB}/spirv-cross-cored.lib
+            ${VULKAN_LIB}/spirv-cross-glsld.lib
+            ${VULKAN_LIB}/shaderc_sharedd.lib
+    )
+endif ()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+            # vulkan
+            ${VULKAN_LIB}/spirv-cross-core.lib
+            ${VULKAN_LIB}/spirv-cross-glsl.lib
+            ${VULKAN_LIB}/shaderc_shared.lib
+    )
+endif ()
 
 # 获取所有imGuizmo匹配的文件
 file(GLOB_RECURSE IMGUIZMO_SOURCES "vendor/imGuizmo/*.cpp")
