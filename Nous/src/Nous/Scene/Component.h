@@ -81,4 +81,35 @@ namespace Nous {
             DestroyScript = [](CNativeScript* script) { delete script->Instance; script->Instance = nullptr;};
         }
     };
+
+    struct CRigidbody2D
+    {
+        enum class BodyType { Static = 0, Dynamic, Kinematic };
+        BodyType Type = BodyType::Static;
+        bool FixedRotation = false;
+
+        // 存放运行时的物理Body
+        void* RuntimeBody = nullptr;
+
+        CRigidbody2D() = default;
+        CRigidbody2D(const CRigidbody2D&) = default;
+    };
+
+    struct CBoxCollider2D
+    {
+        glm::vec2 Offset = { 0.0f, 0.0f };
+        glm::vec2 Size = { 0.5f, 0.5f };
+
+        // TODO 可能要移动到 物理材质系统
+        float Density = 1.0f; // 密度
+        float Friction = 0.5f; // 摩擦力
+        float Restitution = 0.0f; // 恢复系数 | 弹性系数
+        float RestitutionThreshold = 0.5f; // 弹性阈值
+
+        // 存放运行时的Fixture
+        void* RuntimeFixture = nullptr;
+
+        CBoxCollider2D() = default;
+        CBoxCollider2D(const CBoxCollider2D&) = default;
+    };
 }

@@ -1,0 +1,58 @@
+Scene: Untitled
+Entities:
+  - Entity: 123456
+    CTag:
+      Tag: Bar
+    CTransform:
+      Translation: [0, -2.20000005, 0]
+      Rotation: [0, 0, -0.0698131695]
+      Scale: [9, 0.400000006, 1]
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 123456
+    CTag:
+      Tag: Camera
+    CTransform:
+      Translation: [0, 0, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CCamera:
+      Camera:
+        ProjectionType: 1
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 10
+        OrthoNear: -10
+        OrthoFar: 10
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 123456
+    CTag:
+      Tag: BoxSprite
+    CTransform:
+      Translation: [-1.89101934, 1.32592309, 0]
+      Rotation: [0, 0, 0.12042772]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+    CRigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.74000001
+      RestitutionThreshold: 0.5

@@ -1,14 +1,33 @@
 ﻿#include "pch.h"
 #include "Scene.h"
 
-#include "Component.h"
+#include "Nous/Scene/Component.h"
 #include "Nous/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
 
 #include "Entity.h"
 
+// Box2D
+#include "box2d/b2_world.h"
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
+
 namespace Nous {
+
+    static b2BodyType Rigidbody2DTypeToBox2DBody(CRigidbody2D::BodyType bodyType)
+    {
+        switch (bodyType)
+        {
+            case CRigidbody2D::BodyType::Static:    return b2_staticBody;
+            case CRigidbody2D::BodyType::Dynamic:   return b2_dynamicBody;
+            case CRigidbody2D::BodyType::Kinematic: return b2_kinematicBody;
+        }
+
+        NS_CORE_ASSERT(false, "未知的 body type");
+        return b2_staticBody;
+    }
 
     Scene::Scene()
     {
@@ -61,6 +80,49 @@ namespace Nous {
         Renderer2D::EndScene();
     }
 
+    void Scene::OnRuntimeStart()
+    {
+        m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+        auto view = m_Registry.view<CRigidbody2D>();
+        for (auto e : view)
+        {
+            Entity entity = { e, this };
+            auto& transform = entity.GetComponent<CTransform>();
+            auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+            b2BodyDef bodyDef;
+            bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+            bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
+            bodyDef.angle = transform.Rotation.z;
+
+            b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
+            body->SetFixedRotation(rb2d.FixedRotation);
+            rb2d.RuntimeBody = body;
+
+            if (entity.HasComponent<CBoxCollider2D>())
+            {
+                auto& bc2d = entity.GetComponent<CBoxCollider2D>();
+
+                b2PolygonShape boxShape;
+                boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &boxShape;
+                fixtureDef.density = bc2d.Density;
+                fixtureDef.friction = bc2d.Friction;
+                fixtureDef.restitution = bc2d.Restitution;
+                fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+                body->CreateFixture(&fixtureDef);
+            }
+        }
+    }
+
+    void Scene::OnRuntimeStop()
+    {
+        delete m_PhysicsWorld;
+        m_PhysicsWorld = nullptr;
+    }
+
     void Scene::OnUpdateRuntime(Timestep dt)
     {
         // 执行脚本更新
@@ -77,6 +139,29 @@ namespace Nous {
 
                 script.Instance->OnUpdate(dt);
             });
+        }
+
+        // 物理更新
+        {
+            // 控制物理模拟的迭代次数
+            const int32_t velocityIterations = 6;
+            const int32_t positionIterations = 2;
+            m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+
+            // 从Box2D中取出transform数据
+            auto view = m_Registry.view<CRigidbody2D>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                auto& transform = entity.GetComponent<CTransform>();
+                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                b2Body* body = (b2Body*) rb2d.RuntimeBody;
+                const auto& position = body->GetPosition();
+                transform.Translation.x = position.x;
+                transform.Translation.y = position.y;
+                transform.Rotation.z = body->GetAngle();
+            }
         }
 
         // 2D渲染
@@ -182,6 +267,16 @@ namespace Nous {
 
     template<>
     void Scene::OnComponentAdded<CNativeScript>(Entity entity, CNativeScript& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CRigidbody2D>(Entity entity, CRigidbody2D& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CBoxCollider2D>(Entity entity, CBoxCollider2D& component)
     {
     }
 }

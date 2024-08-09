@@ -7,6 +7,8 @@
 
 #include <glm/glm.hpp>
 
+class b2World;
+
 namespace Nous {
 
     class Entity;
@@ -23,6 +25,9 @@ namespace Nous {
         // 暂时
         entt::registry& Reg() { return m_Registry; }
 
+        void OnRuntimeStart();
+        void OnRuntimeStop();
+
         void OnUpdateRuntime(Timestep dt);
         void OnUpdateEditor(Timestep dt, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
@@ -37,6 +42,7 @@ namespace Nous {
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
+        b2World* m_PhysicsWorld = nullptr;
         entt::entity m_SelectedEntityID = {};
 
         friend class Entity;

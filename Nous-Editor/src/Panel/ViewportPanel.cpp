@@ -86,6 +86,7 @@ namespace Nous {
                               m_ViewportBounds[1].x - m_ViewportBounds[0].x,
                               m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
+            // TODO 切换不同的摄像机
             // Runtime camera
 //            auto cameraEntity = m_Context->GetPrimaryCameraEntity();
 //            const auto& camera = cameraEntity.GetComponent<CCamera>();
