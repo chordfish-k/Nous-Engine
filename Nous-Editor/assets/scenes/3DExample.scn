@@ -1,6 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 123456
+  - Entity: 7410354370059520324
     CTag:
       Tag: Top
     CTransform:
@@ -9,7 +9,7 @@ Entities:
       Scale: [1, 1, 1]
     CSpriteRenderer:
       Color: [0.428034097, 0.918149471, 0.651289403, 1]
-  - Entity: 123456
+  - Entity: 2082595440320376945
     CTag:
       Tag: Camera
     CTransform:
@@ -27,7 +27,7 @@ Entities:
         OrthoFar: 10
       Primary: true
       FixedAspectRatio: false
-  - Entity: 123456
+  - Entity: 2468254203703205954
     CTag:
       Tag: Front
     CTransform:
@@ -36,7 +36,7 @@ Entities:
       Scale: [1, 1, 1]
     CSpriteRenderer:
       Color: [0.526082516, 0.953736663, 0.719652116, 1]
-  - Entity: 123456
+  - Entity: 8259468209543753420
     CTag:
       Tag: Right
     CTransform:

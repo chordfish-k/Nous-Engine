@@ -1,6 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 123456
+  - Entity: 7410354370059520324
     CTag:
       Tag: Bar
     CTransform:
@@ -19,7 +19,7 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 123456
+  - Entity: 15775383373780603297
     CTag:
       Tag: Camera
     CTransform:
@@ -37,7 +37,7 @@ Entities:
         OrthoFar: 10
       Primary: true
       FixedAspectRatio: false
-  - Entity: 123456
+  - Entity: 7440336366702553677
     CTag:
       Tag: BoxSprite
     CTransform:

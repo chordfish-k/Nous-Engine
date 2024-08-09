@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "Nous/Scene/Component.h"
+#include "Nous/Scene/ScriptableEntity.h"
 #include "Nous/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
@@ -49,7 +50,14 @@ namespace Nous {
 
     Entity Scene::CreateEntity(const std::string& name, const glm::vec3& position)
     {
+        return CreateEntityWithUUID(UUID(), name, position);
+    }
+
+    Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name, const glm::vec3& position)
+    {
         Entity entity = {m_Registry.create(), this};
+        entity.AddComponent<CUuid>(uuid);
+
         auto& transform = entity.AddComponent<CTransform>();
         transform.Translation.x = position.x;
         transform.Translation.y = position.y;
@@ -241,6 +249,11 @@ namespace Nous {
     void Scene::OnComponentAdded(Entity entity, T& component)
     {
         static_assert(false);
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CUuid>(Entity entity, CUuid& component)
+    {
     }
 
     template<>

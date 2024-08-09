@@ -1,16 +1,23 @@
 ﻿#pragma once
 
+#include "Nous/Scene/SceneCamera.h"
+#include "Nous/Renderer/Texture.h"
+#include "Nous/Core/UUID.h"
+
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "Nous/Scene/SceneCamera.h"
-#include "Nous/Renderer/Texture.h"
-#include "Nous/Scene/ScriptableEntity.h"
-
 namespace Nous {
+
+    struct CUuid
+    {
+        UUID ID;
+        CUuid() = default;
+        CUuid(const CUuid&) = default;
+    };
 
     struct CTag
     {
@@ -66,6 +73,9 @@ namespace Nous {
         CCamera() = default;
         CCamera(const CCamera&) = default;
     };
+
+    // 预先声明
+    class ScriptableEntity;
 
     struct CNativeScript
     {

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Nous/Core/Timestep.h"
+#include "Nous/Core/UUID.h"
 #include "Nous/Renderer/EditorCamera.h"
 
 #include "entt.hpp"
@@ -20,6 +21,7 @@ namespace Nous {
         ~Scene();
 
         Entity CreateEntity(const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
+        Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
         void DestroyEntity(Entity entity);
 
         // 暂时

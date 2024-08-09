@@ -138,8 +138,11 @@ namespace Nous {
 
     static void SerializeEntity(YAML::Emitter& out, Entity entity)
     {
+        // 必须具有ID组件
+        NS_CORE_ASSERT(entity.HasComponent<CUuid>());
+
         out << YAML::BeginMap;
-        out << YAML::Key << "Entity" << YAML::Value << "123456"; // TODO 改成 entity id
+        out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
         if(entity.HasComponent<CTag>())
         {
@@ -281,7 +284,7 @@ namespace Nous {
 
                 NS_CORE_TRACE("解析实体 ID = {0}, name = {1}", uuid, name);
 
-                Entity deserializedEntity = m_Scene->CreateEntity(name);
+                Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
                 auto transformComponent = entity["CTransform"];
                 if (transformComponent)
