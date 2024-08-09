@@ -2,6 +2,8 @@ cmake-build-**
 CMakeBuild
 Profile-**.json
 
+__pycache__
+
 log.txt
 
 VulkanSDK/

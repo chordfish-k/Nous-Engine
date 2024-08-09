@@ -11,6 +11,7 @@ add_subdirectory(vendor/GLFW)
 add_subdirectory(vendor/glad)
 add_subdirectory(vendor/imgui)
 add_subdirectory(vendor/yaml-cpp)
+add_subdirectory(vendor/box2d)
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES
@@ -75,6 +76,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         vendor/entt
         vendor/yaml-cpp/include
         vendor/imGuizmo
+        vendor/box2d/include
 )
 
 # 获取Vulkan环境变量
@@ -96,6 +98,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         glad
         ImGui
         yaml-cpp
+        box2d
         opengl32.lib
         ${VULKAN_LIB}/vulkan-1.lib
 )

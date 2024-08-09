@@ -16,3 +16,6 @@
 [submodule "Nous/vendor/imguizmo"]
 	path = Nous/vendor/imguizmo
 	url = https://github.com/thecherno/imguizmo
+[submodule "Nous/vendor/box2d"]
+	path = Nous/vendor/box2d
+	url = https://github.com/erincatto/box2d
