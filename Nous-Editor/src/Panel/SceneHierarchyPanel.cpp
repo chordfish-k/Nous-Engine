@@ -360,7 +360,7 @@ namespace Nous {
             }
         });
 
-        DrawComponent<CBoxCollider2D>("Rigidbody 2D", entity, [](auto& component)
+        DrawComponent<CBoxCollider2D>("Box Collider 2D", entity, [](auto& component)
         {
             ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
             ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
