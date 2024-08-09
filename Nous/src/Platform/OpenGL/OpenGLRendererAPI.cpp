@@ -39,7 +39,7 @@ namespace Nous {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // c1 * a1 + c2 * (1-a1)
-
+        NS_CORE_WARN("Blend");
         glEnable(GL_DEPTH_TEST);
     }
 
