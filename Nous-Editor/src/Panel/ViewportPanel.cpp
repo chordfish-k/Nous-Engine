@@ -1,12 +1,12 @@
 ﻿#include "ViewportPanel.h"
 
 #include "Nous/Core/Application.h"
-#include "Nous/Scene/Component.h"
 
 #include "Panel/SceneHierarchyPanel.h"
 #include "Event/EditorEvent.h"
 
 #include <glm/gtc/type_ptr.hpp>
+
 #include <imgui.h>
 #include <ImGuizmo.h>
 

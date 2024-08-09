@@ -31,7 +31,7 @@ namespace Nous {
         static float thumbnailSize = 128.0f; // 缩略图尺寸
         float cellSize = thumbnailSize + padding;
 
-        float panelWidth = ImGui::GetContentRegionAvailWidth();
+        float panelWidth = ImGui::GetContentRegionAvail().x;
         int columnCount = (int) (panelWidth / cellSize);
         if (columnCount < 1)
             columnCount = 1;

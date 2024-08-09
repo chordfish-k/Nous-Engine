@@ -220,7 +220,7 @@ namespace Nous {
 
         ImGui::SameLine();
         float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-        if (ImGui::Button("Add Component", {ImGui::GetContentRegionAvailWidth(), lineHeight}))
+        if (ImGui::Button("Add Component", {ImGui::GetContentRegionAvail().x, lineHeight}))
             ImGui::OpenPopup("AddComponent");
 
         if (ImGui::BeginPopup("AddComponent"))
