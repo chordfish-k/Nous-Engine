@@ -29,7 +29,7 @@ namespace Nous {
         m_HoveredEntity = {};
     }
 
-    void ViewportPanel::SetEditorCamera(const Ref<EditorCamera>& camera)
+    void ViewportPanel::SetEditorCamera(EditorCamera* camera)
     {
         m_EditorCamera = camera;
     }
@@ -143,6 +143,8 @@ namespace Nous {
         ImGui::End();
         ImGui::PopStyleVar();
     }
+
+
 
     void ViewportPanel::OnEvent(Event& event)
     {

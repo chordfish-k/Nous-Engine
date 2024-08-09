@@ -34,18 +34,31 @@ namespace Nous {
         void OpenScene(const std::filesystem::path& path);
         void SaveScene();
         void SaveSceneAs();
+
+        void OnScenePlay();
+        void OnSceneStop();
+
+        // UI Panels
+        void UI_Toolbar();
     private:
-        Ref<EditorCamera> m_EditorCamera;
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_ActiveScene;
 
         fs::path m_EditorScenePath;
-
-        Ref<Texture2D> m_MarioTexture, m_CheckerboardTexture;
+        EditorCamera m_EditorCamera;
 
         // 面板窗口
         SceneHierarchyPanel m_SceneHierarchyPanel;
         ResourceBrowserPanel m_ResourceBrowserPanel;
         ViewportPanel m_ViewportPanel;
+
+        enum class SceneState
+        {
+            Edit = 0, Play = 1
+        };
+        SceneState m_SceneState = SceneState::Edit;
+
+        // Editor resources
+        Ref<Texture2D> m_IconPlay, m_IconStop;
     };
 }

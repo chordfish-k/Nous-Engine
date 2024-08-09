@@ -20,8 +20,8 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        m_MarioTexture = Texture2D::Create("assets/textures/Mario.png");
-        m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
+        m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
+        m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
 
         FramebufferSpecification fbSpec = {};
         fbSpec.Attachments = {
@@ -44,10 +44,10 @@ namespace Nous {
             serializer.Deserialize(sceneFilePath);
         }
 
-        m_EditorCamera = CreateRef<EditorCamera>(30.0f, 1.778f, 0.1f, 1000.0f);
+        m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
-        m_ViewportPanel.SetEditorCamera(m_EditorCamera);
+        m_ViewportPanel.SetEditorCamera(&m_EditorCamera);
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         m_ViewportPanel.SetContext(m_ActiveScene);
@@ -70,7 +70,7 @@ namespace Nous {
         m_ViewportPanel.CheckAndResize();
 
         // Update
-        m_EditorCamera->OnUpdate(dt);
+        m_EditorCamera.OnUpdate(dt);
 
         m_Framebuffer->Bind();
 
@@ -81,7 +81,20 @@ namespace Nous {
         m_Framebuffer->ClearAttachment(1, -1); // 设置 entity ID 附件的值为 -1
 
         // Render
-        m_ActiveScene->OnUpdateEditor(dt, *m_EditorCamera);
+        switch (m_SceneState)
+        {
+            case SceneState::Edit:
+            {
+                m_EditorCamera.OnUpdate(dt);
+                m_ActiveScene->OnUpdateEditor(dt, m_EditorCamera);
+                break;
+            }
+            case SceneState::Play:
+            {
+                m_ActiveScene->OnUpdateRuntime(dt);
+                break;
+            }
+        }
 
         // Postprocess
         m_ViewportPanel.CheckHoveredEntity();
@@ -125,6 +138,8 @@ namespace Nous {
             ImGui::EndMenuBar();
         }
 
+        UI_Toolbar();
+
         // Hierarchy
         m_SceneHierarchyPanel.OnImGuiRender();
 
@@ -153,12 +168,40 @@ namespace Nous {
         DockingSpace::EndDocking();
     }
 
+    void EditorLayer::UI_Toolbar()
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        auto& colors = ImGui::GetStyle().Colors;
+        const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+        const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+        float size = ImGui::GetWindowHeight() - 4.0f;
+        Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+        if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+        {
+            if (m_SceneState == SceneState::Edit)
+                OnScenePlay();
+            else if (m_SceneState == SceneState::Play)
+                OnSceneStop();
+        }
+        ImGui::PopStyleVar(2);
+        ImGui::PopStyleColor(3);
+        ImGui::End();
+    }
+
     void EditorLayer::OnEvent(Event& e)
     {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 
-        m_EditorCamera->OnEvent(e);
+        m_EditorCamera.OnEvent(e);
         m_ViewportPanel.OnEvent(e);
     }
 
@@ -237,7 +280,7 @@ namespace Nous {
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_EditorScenePath = path;
 
-            m_EditorCamera->Reset();
+            m_EditorCamera.Reset();
         }
     }
 
@@ -275,5 +318,16 @@ namespace Nous {
             OpenScene();
         else
             OpenScene(e.FilePath);
+    }
+
+    void EditorLayer::OnScenePlay()
+    {
+        m_SceneState = SceneState::Play;
+    }
+
+    void EditorLayer::OnSceneStop()
+    {
+        m_SceneState = SceneState::Edit;
+
     }
 }

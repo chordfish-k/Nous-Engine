@@ -5,6 +5,7 @@
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Entity.h"
 #include "Nous/Event/KeyEvent.h"
+#include "Nous/Renderer/Texture.h"
 
 #include <glm/glm.hpp>
 
@@ -26,9 +27,9 @@ namespace Nous
         const glm::vec2& GetMaxBound() const { return m_ViewportBounds[1]; }
 
         void SetContext(const Ref<Scene>& scene);
-        void SetEditorCamera(const Ref<EditorCamera>& camera);
+        void SetEditorCamera(EditorCamera* camera);
 
-        const Ref<EditorCamera>& GetEditorCamera() const { return m_EditorCamera; }
+        EditorCamera* GetEditorCamera() const { return m_EditorCamera; }
 
         void CheckAndResize();
         void CheckHoveredEntity();
@@ -47,7 +48,7 @@ namespace Nous
     private:
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_Context;
-        Ref<EditorCamera> m_EditorCamera;
+        EditorCamera* m_EditorCamera;
 
         int m_GizmoType = -1; // no Gizmo
         bool m_ShowGizmo = false;
