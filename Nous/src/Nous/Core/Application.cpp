@@ -1,9 +1,11 @@
 ﻿#include "pch.h"
 #include "Application.h"
 
-#include "Log.h"
-#include "Input.h"
+#include "Nous/Core/Log.h"
+#include "Nous/Core/Input.h"
 #include "Nous/Renderer/Renderer.h"
+
+#include "Nous/Utils/PlatformUtils.h"
 
 namespace Nous {
 
@@ -83,7 +85,7 @@ namespace Nous {
         {
             NS_PROFILE_SCOPE("RunLoop");
 
-            float time = (float) Time::Now();
+            float time = Time::GetTime();
             Timestep timestep = time - m_lastFrameTime;
             m_lastFrameTime = time;
 

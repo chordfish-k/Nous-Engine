@@ -9,6 +9,11 @@
 
 namespace Nous {
 
+    float Time::GetTime()
+    {
+        return glfwGetTime();
+    }
+
     // 选择文件 返回文件名 空字符串代表取消
     std::string FileDialogs::OpenFile(const char* filter)
     {
