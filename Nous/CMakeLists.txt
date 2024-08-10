@@ -9,9 +9,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${OUTPUT_DIR}/${PROJ
 # 添加子模块
 add_subdirectory(vendor/GLFW)
 add_subdirectory(vendor/glad)
-add_subdirectory(vendor/imgui)
 add_subdirectory(vendor/yaml-cpp)
+
+set(BOX2D_BUILD_UNIT_TESTS OFF)
+set(BOX2D_BUILD_TESTBED OFF)
 add_subdirectory(vendor/box2d)
+
 
 # 源码搜集
 file(GLOB_RECURSE SOURCES
@@ -21,6 +24,17 @@ file(GLOB_RECURSE SOURCES
         vendor/stb_image/*.cpp
         vendor/glm/glm/*.hpp
         vendor/glm/glm/*.inl
+
+        vendor/imgui/imconfig.h
+        vendor/imgui/imgui.h
+        vendor/imgui/imgui.cpp
+        vendor/imgui/imgui_draw.cpp
+        vendor/imgui/imgui_internal.h
+        vendor/imgui/imgui_widgets.cpp
+        vendor/imgui/imstb_rectpack.h
+        vendor/imgui/imstb_textedit.h
+        vendor/imgui/imstb_truetype.h
+        vendor/imgui/imgui_demo.cpp
 
         vendor/imGuizmo/ImGuizmo.h
         vendor/imGuizmo/ImGuizmo.cpp
@@ -96,7 +110,7 @@ set(VULKAN_LIB "${VULKAN_SDK}/Lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE
         glfw
         glad
-        ImGui
+#        ImGui
         yaml-cpp
         box2d
         opengl32.lib

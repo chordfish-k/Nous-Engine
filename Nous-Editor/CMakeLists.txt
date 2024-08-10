@@ -39,6 +39,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ../Nous/vendor
         ../Nous/vendor/glm
         ../Nous/vendor/entt
+        ../Nous/vendor/imgui
         src
 )
 
