@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-//#include "Nous/Core/Base.h"
-#include "Nous/Core/Log.h"
 #include <filesystem>
 
 #ifdef NS_ENABLE_ASSERTS
