@@ -228,25 +228,25 @@ namespace Nous {
 
         if (ImGui::BeginPopup("AddComponent"))
         {
-            if (ImGui::MenuItem("Camera"))
+            if (!m_Context->GetSelectedEntity().HasComponent<CCamera>() &&ImGui::MenuItem("Camera"))
             {
                 m_Context->GetSelectedEntity().AddComponent<CCamera>();
                 ImGui::CloseCurrentPopup();
             }
 
-            if (ImGui::MenuItem("Sprite Renderer"))
+            if (!m_Context->GetSelectedEntity().HasComponent<CSpriteRenderer>() && ImGui::MenuItem("Sprite Renderer"))
             {
                 m_Context->GetSelectedEntity().AddComponent<CSpriteRenderer>();
                 ImGui::CloseCurrentPopup();
             }
 
-            if (ImGui::MenuItem("Rigidbody 2D"))
+            if (!m_Context->GetSelectedEntity().HasComponent<CRigidbody2D>() && ImGui::MenuItem("Rigidbody 2D"))
             {
                 m_Context->GetSelectedEntity().AddComponent<CRigidbody2D>();
                 ImGui::CloseCurrentPopup();
             }
 
-            if (ImGui::MenuItem("Box Collider 2D"))
+            if (!m_Context->GetSelectedEntity().HasComponent<CBoxCollider2D>() &&ImGui::MenuItem("Box Collider 2D"))
             {
                 m_Context->GetSelectedEntity().AddComponent<CBoxCollider2D>();
                 ImGui::CloseCurrentPopup();
