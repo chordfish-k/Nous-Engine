@@ -228,41 +228,12 @@ namespace Nous {
 
         if (ImGui::BeginPopup("AddComponent"))
         {
-            if (!m_Context->GetSelectedEntity().HasComponent<CCamera>() &&ImGui::MenuItem("Camera"))
-            {
-                m_Context->GetSelectedEntity().AddComponent<CCamera>();
-                ImGui::CloseCurrentPopup();
-            }
-
-            if (!m_Context->GetSelectedEntity().HasComponent<CSpriteRenderer>() && ImGui::MenuItem("Sprite Renderer"))
-            {
-                m_Context->GetSelectedEntity().AddComponent<CSpriteRenderer>();
-                ImGui::CloseCurrentPopup();
-            }
-
-            if (!m_Context->GetSelectedEntity().HasComponent<CCircleRenderer>() && ImGui::MenuItem("Circle Renderer"))
-            {
-                m_Context->GetSelectedEntity().AddComponent<CCircleRenderer>();
-                ImGui::CloseCurrentPopup();
-            }
-
-            if (!m_Context->GetSelectedEntity().HasComponent<CRigidbody2D>() && ImGui::MenuItem("Rigidbody 2D"))
-            {
-                m_Context->GetSelectedEntity().AddComponent<CRigidbody2D>();
-                ImGui::CloseCurrentPopup();
-            }
-
-            if (!m_Context->GetSelectedEntity().HasComponent<CBoxCollider2D>() &&ImGui::MenuItem("Box Collider 2D"))
-            {
-                m_Context->GetSelectedEntity().AddComponent<CBoxCollider2D>();
-                ImGui::CloseCurrentPopup();
-            }
-
-            if (!m_Context->GetSelectedEntity().HasComponent<CCircleCollider2D>() &&ImGui::MenuItem("Circle Collider 2D"))
-            {
-                m_Context->GetSelectedEntity().AddComponent<CCircleCollider2D>();
-                ImGui::CloseCurrentPopup();
-            }
+            DisplayAddComponentEntry<CCamera>("Camera");
+            DisplayAddComponentEntry<CSpriteRenderer>("Sprite Renderer");
+            DisplayAddComponentEntry<CCircleRenderer>("Circle Renderer");
+            DisplayAddComponentEntry<CRigidbody2D>("Rigidbody 2D");
+            DisplayAddComponentEntry<CBoxCollider2D>("Box Collider 2D");
+            DisplayAddComponentEntry<CCircleCollider2D>("Circle Collider 2D");
 
             ImGui::EndPopup();
         }
@@ -401,5 +372,18 @@ namespace Nous {
             ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
             ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
         });
+    }
+
+    template<typename T>
+    void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) {
+        Entity selectedEntity = m_Context->GetSelectedEntity();
+        if (!selectedEntity.HasComponent<T>())
+        {
+            if (ImGui::MenuItem(entryName.c_str()))
+            {
+                selectedEntity.AddComponent<T>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
     }
 }
