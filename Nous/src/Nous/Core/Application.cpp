@@ -11,16 +11,19 @@ namespace Nous {
 
     Application* Application::s_Instance = nullptr;
 
-    Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-        : m_CommandLineArgs(args)
+    Application::Application(const ApplicationSpecification& specification)
+        : m_Specification(specification)
     {
         NS_PROFILE_FUNCTION();
 
         NS_CORE_ASSERT(!s_Instance, "Application 已经存在!");
         s_Instance = this;
 
-        // 唯一指针，当Application销毁时一并销毁
-        m_Window = Scope<Window>(Window::Create(WindowProps(name)));
+        // 设置 working directory
+        if (!m_Specification.WorkingDirectory.empty())
+            std::filesystem::current_path(m_Specification.WorkingDirectory);
+
+        m_Window = Window::Create(WindowProps(m_Specification.Name));
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
 
         Renderer::Init();

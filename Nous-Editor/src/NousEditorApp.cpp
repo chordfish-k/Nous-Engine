@@ -10,8 +10,8 @@ namespace Nous {
     class NousEditor : public Application
     {
     public:
-        NousEditor(ApplicationCommandLineArgs args)
-            : Application("Nous Editor", args)
+        NousEditor(const ApplicationSpecification& spec)
+            : Application(spec)
         {
             PushLayer(new EditorLayer());
         }
@@ -24,6 +24,10 @@ namespace Nous {
 // 使用Nous的程序入口点，提供一个创建应用的函数
     Application* CreateApplication(ApplicationCommandLineArgs args)
     {
-        return new NousEditor(args);
+        ApplicationSpecification spec;
+        spec.Name = "Nous Editor";
+        spec.CommandLineArgs = args;
+
+        return new NousEditor(spec);
     }
 }

@@ -40,7 +40,7 @@ namespace Nous {
 
 
         // 根据命令行参数打开场景
-        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
             auto sceneFilePath = commandLineArgs[1];
