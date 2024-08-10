@@ -489,7 +489,6 @@ namespace Nous {
 
     void EditorLayer::OnDuplicateEntity()
     {
-        NS_CORE_WARN("YES");
         if (m_SceneState != SceneState::Edit)
             return;
 

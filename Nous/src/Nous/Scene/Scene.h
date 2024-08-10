@@ -64,7 +64,7 @@ namespace Nous {
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
         b2World* m_PhysicsWorld = nullptr;
-        entt::entity m_SelectedEntityID = {};
+        entt::entity m_SelectedEntityID = { entt::null };
 
         friend class Entity;
         friend class SceneSerializer;
