@@ -33,6 +33,7 @@ namespace Nous {
 
     Scene::Scene()
     {
+        delete m_PhysicsWorld;
     }
 
     Scene::~Scene()
@@ -132,62 +133,22 @@ namespace Nous {
 
     void Scene::OnRuntimeStart()
     {
-        m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
-        auto view = m_Registry.view<CRigidbody2D>();
-        for (auto e : view)
-        {
-            Entity entity = { e, this };
-            auto& transform = entity.GetComponent<CTransform>();
-            auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-            b2BodyDef bodyDef;
-            bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
-            bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
-            bodyDef.angle = transform.Rotation.z;
-
-            b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-            body->SetFixedRotation(rb2d.FixedRotation);
-            rb2d.RuntimeBody = body;
-
-            if (entity.HasComponent<CBoxCollider2D>())
-            {
-                auto& bc2d = entity.GetComponent<CBoxCollider2D>();
-
-                b2PolygonShape boxShape;
-                boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &boxShape;
-                fixtureDef.density = bc2d.Density;
-                fixtureDef.friction = bc2d.Friction;
-                fixtureDef.restitution = bc2d.Restitution;
-                fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-                body->CreateFixture(&fixtureDef);
-            }
-
-            if (entity.HasComponent<CCircleCollider2D>())
-            {
-                auto& cc2d = entity.GetComponent<CCircleCollider2D>();
-
-                b2CircleShape circleShape;
-                circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
-                circleShape.m_radius = transform.Scale.x * cc2d.Radius;
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &circleShape;
-                fixtureDef.density = cc2d.Density;
-                fixtureDef.friction = cc2d.Friction;
-                fixtureDef.restitution = cc2d.Restitution;
-                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-                body->CreateFixture(&fixtureDef);
-            }
-        }
+        OnPhysics2DStart();
     }
 
     void Scene::OnRuntimeStop()
     {
-        delete m_PhysicsWorld;
-        m_PhysicsWorld = nullptr;
+        OnPhysics2DStop();
+    }
+
+    void Scene::OnSimulationStart()
+    {
+        OnPhysics2DStart();
+    }
+
+    void Scene::OnSimulationStop()
+    {
+        OnPhysics2DStop();
     }
 
     void Scene::OnUpdateRuntime(Timestep dt)
@@ -278,34 +239,39 @@ namespace Nous {
 
     }
 
+    void Scene::OnUpdateSimulation(Timestep dt, EditorCamera& camera)
+    {
+        // 物理更新
+        {
+            // 控制物理模拟的迭代次数
+            const int32_t velocityIterations = 6;
+            const int32_t positionIterations = 2;
+            m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+
+            // 从Box2D中取出transform数据
+            auto view = m_Registry.view<CRigidbody2D>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                auto& transform = entity.GetComponent<CTransform>();
+                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                b2Body* body = (b2Body*) rb2d.RuntimeBody;
+                const auto& position = body->GetPosition();
+                transform.Translation.x = position.x;
+                transform.Translation.y = position.y;
+                transform.Rotation.z = body->GetAngle();
+            }
+        }
+
+        // 渲染
+        RenderScene(camera);
+    }
+
     void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
     {
-        Renderer2D::BeginScene(camera);
-
-        // Sprites
-        {
-            auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
-            for (auto ent: group)
-            {
-                auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
-
-                Renderer2D::DrawSprite(transform, sprite, (int)ent);
-            }
-        }
-
-        // Circles
-        {
-            auto view = m_Registry.view<CTransform, CCircleRenderer>();
-            for (auto ent : view)
-            {
-                auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
-
-                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
-            }
-
-        }
-
-        Renderer2D::EndScene();
+        // 渲染
+        RenderScene(camera);
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -361,6 +327,96 @@ namespace Nous {
     void Scene::SetSelectedEntity(Entity entity)
     {
         m_SelectedEntityID = entity;
+    }
+
+    void Scene::OnPhysics2DStart()
+    {
+        m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+        auto view = m_Registry.view<CRigidbody2D>();
+        for (auto e : view)
+        {
+            Entity entity = { e, this };
+            auto& transform = entity.GetComponent<CTransform>();
+            auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+            b2BodyDef bodyDef;
+            bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+            bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
+            bodyDef.angle = transform.Rotation.z;
+
+            b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
+            body->SetFixedRotation(rb2d.FixedRotation);
+            rb2d.RuntimeBody = body;
+
+            if (entity.HasComponent<CBoxCollider2D>())
+            {
+                auto& bc2d = entity.GetComponent<CBoxCollider2D>();
+
+                b2PolygonShape boxShape;
+                boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &boxShape;
+                fixtureDef.density = bc2d.Density;
+                fixtureDef.friction = bc2d.Friction;
+                fixtureDef.restitution = bc2d.Restitution;
+                fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+                body->CreateFixture(&fixtureDef);
+            }
+
+            if (entity.HasComponent<CCircleCollider2D>())
+            {
+                auto& cc2d = entity.GetComponent<CCircleCollider2D>();
+
+                b2CircleShape circleShape;
+                circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
+                circleShape.m_radius = transform.Scale.x * cc2d.Radius;
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &circleShape;
+                fixtureDef.density = cc2d.Density;
+                fixtureDef.friction = cc2d.Friction;
+                fixtureDef.restitution = cc2d.Restitution;
+                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+                body->CreateFixture(&fixtureDef);
+            }
+        }
+    }
+
+    void Scene::OnPhysics2DStop()
+    {
+        delete m_PhysicsWorld;
+        m_PhysicsWorld = nullptr;
+    }
+
+    void Scene::RenderScene(EditorCamera& camera)
+    {
+        Renderer2D::BeginScene(camera);
+
+        // Sprites
+        {
+            auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
+            for (auto ent: group)
+            {
+                auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
+
+                Renderer2D::DrawSprite(transform, sprite, (int)ent);
+            }
+        }
+
+        // Circles
+        {
+            auto view = m_Registry.view<CTransform, CCircleRenderer>();
+            for (auto ent : view)
+            {
+                auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
+
+                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
+            }
+
+        }
+
+        Renderer2D::EndScene();
     }
 
     template<typename T>

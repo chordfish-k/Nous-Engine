@@ -32,7 +32,11 @@ namespace Nous {
         void OnRuntimeStart();
         void OnRuntimeStop();
 
+        void OnSimulationStart();
+        void OnSimulationStop();
+
         void OnUpdateRuntime(Timestep dt);
+        void OnUpdateSimulation(Timestep dt, EditorCamera& camera); // 模拟：用编辑器的摄像机，不使用场景摄像机
         void OnUpdateEditor(Timestep dt, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 
@@ -50,6 +54,11 @@ namespace Nous {
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
+
+        void OnPhysics2DStart();
+        void OnPhysics2DStop();
+
+        void RenderScene(EditorCamera& camera);
     private:
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;

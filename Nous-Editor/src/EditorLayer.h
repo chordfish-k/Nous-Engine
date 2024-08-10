@@ -38,6 +38,7 @@ namespace Nous {
         void SaveSceneAs();
 
         void OnScenePlay();
+        void OnSceneSimulate();
         void OnSceneStop();
 
         void OnDuplicateEntity();
@@ -61,11 +62,11 @@ namespace Nous {
 
         enum class SceneState
         {
-            Edit = 0, Play = 1
+            Edit = 0, Play = 1, Simulate = 2 // 模拟：用编辑器的摄像机，不使用场景摄像机
         };
         SceneState m_SceneState = SceneState::Edit;
 
         // Editor resources
-        Ref<Texture2D> m_IconPlay, m_IconStop;
+        Ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
     };
 }

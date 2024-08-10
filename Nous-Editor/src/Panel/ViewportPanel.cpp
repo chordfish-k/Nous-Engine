@@ -158,7 +158,7 @@ namespace Nous {
     bool ViewportPanel::OnKeyPressed(KeyPressedEvent& e)
     {
         // 快捷键
-        if (e.GetRepeatCount() > 0)
+        if (e.IsRepeat())
             return false;
 
         switch (e.GetKeyCode())
