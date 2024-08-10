@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Nous.h"
 #include "Panel/SceneHierarchyPanel.h"
@@ -29,6 +29,8 @@ namespace Nous {
         bool OnKeyPressed(KeyPressedEvent& e);
         void OnOpenScene(OpenSceneEvent& e);
 
+        void OnOverlayRender(); // 覆盖层绘制
+
         void NewScene();
         void OpenScene();
         void OpenScene(const std::filesystem::path& path);
@@ -54,6 +56,8 @@ namespace Nous {
         SceneHierarchyPanel m_SceneHierarchyPanel;
         ResourceBrowserPanel m_ResourceBrowserPanel;
         ViewportPanel m_ViewportPanel;
+
+        bool m_ShowPhysicsColliders = false;
 
         enum class SceneState
         {

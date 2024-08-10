@@ -41,6 +41,12 @@ namespace Nous {
         Entity GetPrimaryCameraEntity();
         Entity GetSelectedEntity();
         void SetSelectedEntity(Entity entity);
+
+        template<typename... Components>
+        auto GetAllEntitiesWith()
+        {
+            return m_Registry.view<Components...>();
+        }
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
