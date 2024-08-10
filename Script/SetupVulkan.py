@@ -1,3 +1,4 @@
+# from https://github.com/TheCherno/Hazel
 import os
 import sys
 import subprocess
@@ -11,7 +12,7 @@ from urllib.request import urlopen
 class VulkanConfiguration:
     requiredVulkanVersion = "1.3."
     installVulkanVersion = "1.3.290.0"
-    vulkanDirectory = "./Hazel/vendor/VulkanSDK"
+    vulkanDirectory = "./Nous/vendor/VulkanSDK"
 
     @classmethod
     def Validate(cls):
