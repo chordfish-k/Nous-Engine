@@ -49,6 +49,8 @@ namespace Nous {
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
+        Renderer2D::SetLineWidth(4.0f);
+
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
         m_ViewportPanel.SetEditorCamera(&m_EditorCamera);
     }
@@ -344,6 +346,14 @@ namespace Nous {
                     Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.02f);
                 }
             }
+        }
+
+        // 绘制选中实体的矩形边框
+        if (Entity selectedEntity = m_ActiveScene->GetSelectedEntity()) {
+            const CTransform& transform = selectedEntity.GetComponent<CTransform>();
+
+            // Orange
+            Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
         }
 
         Renderer2D::EndScene();
