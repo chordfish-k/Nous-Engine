@@ -234,7 +234,12 @@ namespace Nous {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 
-        m_EditorCamera.OnEvent(e);
+        // 编辑状态才能移动编辑器摄像机
+        if (m_SceneState == SceneState::Edit)
+        {
+            m_EditorCamera.OnEvent(e);
+        }
+
         m_ViewportPanel.OnEvent(e);
     }
 
