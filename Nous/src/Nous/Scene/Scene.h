@@ -20,6 +20,8 @@ namespace Nous {
         Scene();
         ~Scene();
 
+        static Ref<Scene> Copy(Ref<Scene> other);
+
         Entity CreateEntity(const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
         void DestroyEntity(Entity entity);
@@ -33,6 +35,8 @@ namespace Nous {
         void OnUpdateRuntime(Timestep dt);
         void OnUpdateEditor(Timestep dt, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
+
+        void DuplicateEntity(Entity entity);
 
         Entity GetPrimaryCameraEntity();
         Entity GetSelectedEntity();

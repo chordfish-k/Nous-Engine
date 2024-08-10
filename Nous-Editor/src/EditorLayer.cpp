@@ -39,18 +39,14 @@ namespace Nous {
         auto commandLineArgs = Application::Get().GetCommandLineArgs();
         if (commandLineArgs.Count > 1)
         {
-            m_EditorScenePath = commandLineArgs[1];
-            SceneSerializer serializer(m_ActiveScene);
-            serializer.Deserialize(m_EditorScenePath.string());
+            auto sceneFilePath = commandLineArgs[1];
+            OpenScene(sceneFilePath);
         }
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
         m_ViewportPanel.SetFramebuffer(m_Framebuffer);
         m_ViewportPanel.SetEditorCamera(&m_EditorCamera);
-
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        m_ViewportPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnDetached()
@@ -233,11 +229,18 @@ namespace Nous {
             {
                 if (control)
                 {
-                    if ( shift || m_EditorScenePath.empty())
+                    if (shift)
                         SaveSceneAs();
                     else
                         SaveScene();
                 }
+                break;
+            }
+            // Scene Commands
+            case Key::D:
+            {
+                if (control)
+                    OnDuplicateEntity();
                 break;
             }
             default:
@@ -250,6 +253,7 @@ namespace Nous {
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();
+        m_EditorScene = CreateRef<Scene>();
         auto viewportSize = m_ViewportPanel.GetSize();
         m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
@@ -267,17 +271,21 @@ namespace Nous {
 
     void EditorLayer::OpenScene(const std::filesystem::path& path)
     {
+        if (m_SceneState != SceneState::Edit)
+            OnSceneStop();
+
         Ref<Scene> newScene = CreateRef<Scene>();
         auto viewportSize = m_ViewportPanel.GetSize();
 
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {
-            m_ActiveScene = newScene;
-            m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-            m_ViewportPanel.SetContext(m_ActiveScene);
+            m_EditorScene = newScene;
+            m_EditorScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+            m_SceneHierarchyPanel.SetContext(m_EditorScene);
+            m_ViewportPanel.SetContext(m_EditorScene);
 
-            m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+            m_ActiveScene = m_EditorScene;
             m_EditorScenePath = path;
 
             m_EditorCamera.Reset();
@@ -286,7 +294,7 @@ namespace Nous {
 
     void EditorLayer::SaveScene()
     {
-        SceneSerializer serializer(m_ActiveScene);
+        SceneSerializer serializer(m_EditorScene); // 应该保存运行前在编辑器的版本
         if (!m_EditorScenePath.empty())
             serializer.Serialize(m_EditorScenePath.string());
         else
@@ -299,7 +307,7 @@ namespace Nous {
 
         if (!filepath.empty())
         {
-            SceneSerializer serializer(m_ActiveScene);
+            SceneSerializer serializer(m_EditorScene); // 应该保存运行前在编辑器的版本
             serializer.Serialize(filepath);
 
             m_EditorScenePath = filepath;
@@ -323,12 +331,33 @@ namespace Nous {
     void EditorLayer::OnScenePlay()
     {
         m_SceneState = SceneState::Play;
+
+        m_ActiveScene = Scene::Copy(m_EditorScene); // 复制一个副本来运行
         m_ActiveScene->OnRuntimeStart();
+
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnSceneStop()
     {
         m_SceneState = SceneState::Edit;
+
         m_ActiveScene->OnRuntimeStop();
+        m_ActiveScene = m_EditorScene;
+
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
+    }
+
+    void EditorLayer::OnDuplicateEntity()
+    {
+        NS_CORE_WARN("YES");
+        if (m_SceneState != SceneState::Edit)
+            return;
+
+        Entity selectedEntity = m_ActiveScene->GetSelectedEntity();
+        if (selectedEntity)
+            m_EditorScene->DuplicateEntity(selectedEntity);
     }
 }

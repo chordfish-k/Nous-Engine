@@ -1,23 +1,23 @@
 Scene: Untitled
 Entities:
-  - Entity: 7410354370059520324
+  - Entity: 7440336366702553677
     CTag:
-      Tag: Bar
+      Tag: BoxSprite
     CTransform:
-      Translation: [0, -2.20000005, 0]
-      Rotation: [0, 0, -0.0698131695]
-      Scale: [9, 0.400000006, 1]
+      Translation: [-1.34200501, 1.47616458, -2.98023224e-08]
+      Rotation: [0, 0, 0.882575333]
+      Scale: [0.5, 0.5, 1]
     CSpriteRenderer:
       Color: [1, 1, 1, 1]
     CRigidbody2D:
-      BodyType: Static
+      BodyType: Dynamic
       FixedRotation: false
     CBoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
-      Restitution: 0
+      Restitution: 1
       RestitutionThreshold: 0.5
   - Entity: 15775383373780603297
     CTag:
@@ -32,27 +32,27 @@ Entities:
         PerspFOV: 0.785398185
         PerspNear: 0.00999999978
         PerspFar: 1000
-        OrthoSize: 10
+        OrthoSize: 6
         OrthoNear: -10
         OrthoFar: 10
       Primary: true
       FixedAspectRatio: false
-  - Entity: 7440336366702553677
+  - Entity: 7410354370059520324
     CTag:
-      Tag: BoxSprite
+      Tag: Bar
     CTransform:
-      Translation: [-1.89101934, 1.32592309, 0]
-      Rotation: [0, 0, 0.12042772]
-      Scale: [1, 1, 1]
+      Translation: [0, -2.20000005, 0]
+      Rotation: [0, 0, 0]
+      Scale: [9, 0.400000006, 1]
     CSpriteRenderer:
-      Color: [1, 1, 1, 1]
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
     CRigidbody2D:
-      BodyType: Dynamic
+      BodyType: Static
       FixedRotation: false
     CBoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
-      Restitution: 0.74000001
+      Restitution: 0
       RestitutionThreshold: 0.5

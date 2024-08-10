@@ -1,6 +1,7 @@
 #include "SceneHierarchyPanel.h"
 
 #include "Nous/Scene/Component.h"
+#include "Nous/Core/Application.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -28,30 +29,32 @@ namespace Nous {
     void SceneHierarchyPanel::OnImGuiRender()
     {
         ImGui::Begin("Scene Hierarchy");
-        m_Context->m_Registry.each([&](auto entityID)
+
+        if (m_Context)
         {
-            Entity entity{entityID, m_Context.get()};
-            DrawEntityNode(entity);
-        });
+            m_Context->m_Registry.each([&](auto entityID)
+                                       {
+                                           Entity entity{entityID, m_Context.get()};
+                                           DrawEntityNode(entity);
+                                       });
 
-        if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-            m_Context->SetSelectedEntity({});
+            if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+                m_Context->SetSelectedEntity({});
 
-        if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
-        {
-            if (ImGui::MenuItem("Create Empty Entity"))
-                m_Context->CreateEntity("Empty Entity");
+            if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
+            {
+                if (ImGui::MenuItem("Create Empty Entity"))
+                    m_Context->CreateEntity("Empty Entity");
 
-            ImGui::EndPopup();
+                ImGui::EndPopup();
+            }
         }
-
         ImGui::End();
 
         // TODO 分离到新的类
         ImGui::Begin("Properties");
-        if (m_Context->GetSelectedEntity())
+        if (m_Context && m_Context->GetSelectedEntity())
             DrawComponents(m_Context->GetSelectedEntity());
-
         ImGui::End();
     }
 

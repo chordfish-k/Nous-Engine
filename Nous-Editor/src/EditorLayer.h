@@ -38,13 +38,16 @@ namespace Nous {
         void OnScenePlay();
         void OnSceneStop();
 
+        void OnDuplicateEntity();
+
         // UI Panels
         void UI_Toolbar();
     private:
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_ActiveScene;
-
+        Ref<Scene> m_EditorScene;
         fs::path m_EditorScenePath;
+        
         EditorCamera m_EditorCamera;
 
         // 面板窗口

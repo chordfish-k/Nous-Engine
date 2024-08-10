@@ -20,6 +20,7 @@ namespace Nous {
         void Begin();
         void End();
 
+        // 设置是否阻止ImGui原本键鼠事件
         void SetBlockEvent(bool block) { m_BlockEvent = block; }
         bool IsBlockEvent() const { return m_BlockEvent; }
 

@@ -41,7 +41,7 @@ namespace Nous
         bool IsHovered() const { return m_ViewportHovered; };
         bool IsFocused() const { return m_ViewportFocused; };
 
-        Entity GetHoveredEntity() const { return m_HoveredEntity; }
+        Entity GetHoveredEntity() { return m_HoveredEntity; }
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
@@ -56,7 +56,7 @@ namespace Nous
         glm::vec2 m_ViewportContentSize = {0.0f, 0.0f};
         glm::vec2 m_ViewportBounds[2];
 
-        Entity m_HoveredEntity;
+        Entity m_HoveredEntity {entt::null, nullptr};
 
         bool m_ViewportHovered = false;
         bool m_ViewportFocused = false;

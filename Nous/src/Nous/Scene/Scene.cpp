@@ -48,6 +48,60 @@ namespace Nous {
         }
     }
 
+    template<typename Component>
+    static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+    {
+        auto view = src.view<Component>();
+        for (auto e : view)
+        {
+            UUID uuid = src.get<CUuid>(e).ID;
+            NS_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
+            entt::entity dstEnttID = enttMap.at(uuid);
+
+            auto& component = src.get<Component>(e);
+            dst.emplace_or_replace<Component>(dstEnttID, component);
+        }
+    }
+
+    template<typename Component>
+    static void CopyComponentIfExists(Entity dst, Entity src)
+    {
+        if (src.HasComponent<Component>())
+            dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+    }
+
+    Ref <Scene> Scene::Copy(Ref <Scene> other)
+    {
+        Ref<Scene> newScene = CreateRef<Scene>();
+
+        newScene->m_ViewportHeight = other->m_ViewportWidth;
+        newScene->m_ViewportHeight = other->m_ViewportHeight;
+
+        std::unordered_map<UUID, entt::entity> enttMap;
+
+        auto& srcSceneRegistry = other->m_Registry;
+        auto& dstSceneRegistry = newScene->m_Registry;
+        auto idView = srcSceneRegistry.view<CUuid>();
+        for (auto e : idView)
+        {
+            // 复制 Entity 到新场景
+            UUID uuid = srcSceneRegistry.get<CUuid>(e).ID;
+            const auto& name = srcSceneRegistry.get<CTag>(e).Tag;
+            Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+            enttMap[uuid] = (entt::entity)newEntity;
+        }
+
+        // 复制 Component 给新 Registry
+        CopyComponent<CTransform>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CSpriteRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CCamera>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CNativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CRigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CBoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+
+        return newScene;
+    }
+
     Entity Scene::CreateEntity(const std::string& name, const glm::vec3& position)
     {
         return CreateEntityWithUUID(UUID(), name, position);
@@ -209,18 +263,33 @@ namespace Nous {
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
     {
-        m_ViewportWidth = width;
-        m_ViewportHeight = height;
-
-        // 重设不固定高宽比的摄像机
-        auto view = m_Registry.view<CCamera>();
-        for (auto ent: view)
+        if (width > 0 && height > 0)
         {
-            auto& cameraComponent = view.get<CCamera>(ent);
-            if (!cameraComponent.FixedAspectRatio)
-                cameraComponent.Camera.SetViewportSize(width, height);
-        }
+            m_ViewportWidth = width;
+            m_ViewportHeight = height;
 
+            // 重设不固定高宽比的摄像机
+            auto view = m_Registry.view<CCamera>();
+            for (auto ent: view)
+            {
+                auto& cameraComponent = view.get<CCamera>(ent);
+                if (!cameraComponent.FixedAspectRatio)
+                    cameraComponent.Camera.SetViewportSize(width, height);
+            }
+        }
+    }
+
+    void Scene::DuplicateEntity(Entity entity)
+    {
+        std::string name = entity.GetName();
+        Entity newEntity = CreateEntity(name);
+
+        CopyComponentIfExists<CTransform>(newEntity, entity);
+        CopyComponentIfExists<CSpriteRenderer>(newEntity, entity);
+        CopyComponentIfExists<CCamera>(newEntity, entity);
+        CopyComponentIfExists<CNativeScript>(newEntity, entity);
+        CopyComponentIfExists<CRigidbody2D>(newEntity, entity);
+        CopyComponentIfExists<CBoxCollider2D>(newEntity, entity);
     }
 
     Entity Scene::GetPrimaryCameraEntity()
