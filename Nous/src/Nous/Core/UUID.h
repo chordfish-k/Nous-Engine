@@ -1,7 +1,5 @@
 #pragma once
 
-#include <xhash>
-
 namespace Nous {
 
     class UUID
@@ -19,6 +17,7 @@ namespace Nous {
 }
 
 namespace std {
+    template <typename T> struct hash;
 
     // 提供哈希函数，可以给unordered_map等依赖哈希算法的容器使用
     template<>
@@ -26,7 +25,7 @@ namespace std {
     {
         std::size_t operator()(const Nous::UUID& uuid) const
         {
-            return hash<uint64_t>()((uint64_t)uuid);
+            return (uint64_t)uuid;
         }
     };
 }
