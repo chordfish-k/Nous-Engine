@@ -50,26 +50,43 @@ namespace Nous {
         }
     }
 
-    template<typename Component>
+    template<typename... Component>
     static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
     {
-        auto view = src.view<Component>();
-        for (auto e : view)
+        // C++17的参数包展开语法 -> (func(), ...) 对可变参数模板的每个类型都执行操作
+        ([&]()
         {
-            UUID uuid = src.get<CUuid>(e).ID;
-            NS_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
-            entt::entity dstEnttID = enttMap.at(uuid);
+            auto view = src.view<Component>();
+            for (auto srcEntity : view)
+            {
+                entt::entity dstEntity = enttMap.at(src.get<CUuid>(srcEntity).ID);
 
-            auto& component = src.get<Component>(e);
-            dst.emplace_or_replace<Component>(dstEnttID, component);
-        }
+                auto& srcComponent = src.get<Component>(srcEntity);
+                dst.emplace_or_replace<Component>(dstEntity, srcComponent);
+            }
+        }(), ...);
     }
 
-    template<typename Component>
+    template<typename... Component>
+    static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+    {
+        CopyComponent<Component...>(dst, src, enttMap);
+    }
+
+    template<typename... Component>
     static void CopyComponentIfExists(Entity dst, Entity src)
     {
-        if (src.HasComponent<Component>())
-            dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+        ([&]()
+        {
+            if (src.HasComponent<Component>())
+                dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+        }(), ...);
+    }
+
+    template<typename... Component>
+    static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+    {
+        CopyComponentIfExists<Component...>(dst, src);
     }
 
     Ref <Scene> Scene::Copy(Ref <Scene> other)
@@ -94,14 +111,7 @@ namespace Nous {
         }
 
         // 复制 Component 给新 Registry
-        CopyComponent<CTransform>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CSpriteRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CCircleRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CCamera>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CNativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CRigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CBoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
-        CopyComponent<CCircleCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
 
         return newScene;
     }
@@ -294,17 +304,8 @@ namespace Nous {
 
     void Scene::DuplicateEntity(Entity entity)
     {
-        std::string name = entity.GetName();
-        Entity newEntity = CreateEntity(name);
-
-        CopyComponentIfExists<CTransform>(newEntity, entity);
-        CopyComponentIfExists<CSpriteRenderer>(newEntity, entity);
-        CopyComponentIfExists<CCircleRenderer>(newEntity, entity);
-        CopyComponentIfExists<CCamera>(newEntity, entity);
-        CopyComponentIfExists<CNativeScript>(newEntity, entity);
-        CopyComponentIfExists<CRigidbody2D>(newEntity, entity);
-        CopyComponentIfExists<CBoxCollider2D>(newEntity, entity);
-        CopyComponentIfExists<CCircleCollider2D>(newEntity, entity);
+        Entity newEntity = CreateEntity(entity.GetName());
+        CopyComponentIfExists(AllComponents{}, newEntity, entity);
     }
 
     Entity Scene::GetPrimaryCameraEntity()

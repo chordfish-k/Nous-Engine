@@ -150,4 +150,15 @@ namespace Nous {
         CCircleCollider2D() = default;
         CCircleCollider2D(const CCircleCollider2D&) = default;
     };
+
+
+    template<typename... Component>
+    struct ComponentGroup
+    {
+    };
+
+    using AllComponents =
+        ComponentGroup<CTransform, CSpriteRenderer,
+            CCircleRenderer, CCamera, CNativeScript,
+            CRigidbody2D, CBoxCollider2D, CCircleCollider2D>;
 }
