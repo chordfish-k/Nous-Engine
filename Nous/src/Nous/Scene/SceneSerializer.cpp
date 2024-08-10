@@ -245,6 +245,22 @@ namespace Nous {
             out << YAML::EndMap; // CBoxCollider2D
         }
 
+        if (entity.HasComponent<CCircleCollider2D>())
+        {
+            out << YAML::Key << "CCircleCollider2D";
+            out << YAML::BeginMap; // CCircleCollider2D
+
+            auto& cc2dComponent = entity.GetComponent<CCircleCollider2D>();
+            out << YAML::Key << "Offset" << YAML::Value << cc2dComponent.Offset;
+            out << YAML::Key << "Radius" << YAML::Value << cc2dComponent.Radius;
+            out << YAML::Key << "Density" << YAML::Value << cc2dComponent.Density;
+            out << YAML::Key << "Friction" << YAML::Value << cc2dComponent.Friction;
+            out << YAML::Key << "Restitution" << YAML::Value << cc2dComponent.Restitution;
+            out << YAML::Key << "RestitutionThreshold" << YAML::Value << cc2dComponent.RestitutionThreshold;
+
+            out << YAML::EndMap; // CCircleCollider2D
+        }
+
         out << YAML::EndMap; // Entity
     }
 
@@ -363,6 +379,18 @@ namespace Nous {
                     bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
                     bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
                     bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+                }
+
+                auto circleCollider2D = entity["CCircleCollider2D"];
+                if (circleCollider2D)
+                {
+                    auto& cc2d = deserializedEntity.AddComponent<CCircleCollider2D>();
+                    cc2d.Offset = circleCollider2D["Offset"].as<glm::vec2>();
+                    cc2d.Radius = circleCollider2D["Radius"].as<float>();
+                    cc2d.Density = circleCollider2D["Density"].as<float>();
+                    cc2d.Friction = circleCollider2D["Friction"].as<float>();
+                    cc2d.Restitution = circleCollider2D["Restitution"].as<float>();
+                    cc2d.RestitutionThreshold = circleCollider2D["RestitutionThreshold"].as<float>();
                 }
             }
         }

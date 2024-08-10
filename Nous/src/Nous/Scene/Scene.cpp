@@ -14,6 +14,7 @@
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_circle_shape.h"
 
 namespace Nous {
 
@@ -99,6 +100,7 @@ namespace Nous {
         CopyComponent<CNativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
         CopyComponent<CRigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
         CopyComponent<CBoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CCircleCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 
         return newScene;
     }
@@ -160,6 +162,23 @@ namespace Nous {
                 fixtureDef.friction = bc2d.Friction;
                 fixtureDef.restitution = bc2d.Restitution;
                 fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+                body->CreateFixture(&fixtureDef);
+            }
+
+            if (entity.HasComponent<CCircleCollider2D>())
+            {
+                auto& cc2d = entity.GetComponent<CCircleCollider2D>();
+
+                b2CircleShape circleShape;
+                circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
+                circleShape.m_radius = transform.Scale.x * cc2d.Radius;
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &circleShape;
+                fixtureDef.density = cc2d.Density;
+                fixtureDef.friction = cc2d.Friction;
+                fixtureDef.restitution = cc2d.Restitution;
+                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
                 body->CreateFixture(&fixtureDef);
             }
         }
@@ -314,10 +333,12 @@ namespace Nous {
 
         CopyComponentIfExists<CTransform>(newEntity, entity);
         CopyComponentIfExists<CSpriteRenderer>(newEntity, entity);
+        CopyComponentIfExists<CCircleRenderer>(newEntity, entity);
         CopyComponentIfExists<CCamera>(newEntity, entity);
         CopyComponentIfExists<CNativeScript>(newEntity, entity);
         CopyComponentIfExists<CRigidbody2D>(newEntity, entity);
         CopyComponentIfExists<CBoxCollider2D>(newEntity, entity);
+        CopyComponentIfExists<CCircleCollider2D>(newEntity, entity);
     }
 
     Entity Scene::GetPrimaryCameraEntity()
@@ -392,6 +413,11 @@ namespace Nous {
 
     template<>
     void Scene::OnComponentAdded<CBoxCollider2D>(Entity entity, CBoxCollider2D& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CCircleCollider2D>(Entity entity, CCircleCollider2D& component)
     {
     }
 }

@@ -132,4 +132,22 @@ namespace Nous {
         CBoxCollider2D() = default;
         CBoxCollider2D(const CBoxCollider2D&) = default;
     };
+
+    struct CCircleCollider2D
+    {
+        glm::vec2 Offset = { 0.0f, 0.0f };
+        float Radius = 0.5f;
+
+        // TODO 可能要移动到 物理材质系统
+        float Density = 1.0f; // 密度
+        float Friction = 0.5f; // 摩擦力
+        float Restitution = 0.0f; // 恢复系数 | 弹性系数
+        float RestitutionThreshold = 0.5f; // 弹性阈值
+
+        // 存放运行时的Fixture
+        void* RuntimeFixture = nullptr;
+
+        CCircleCollider2D() = default;
+        CCircleCollider2D(const CCircleCollider2D&) = default;
+    };
 }
