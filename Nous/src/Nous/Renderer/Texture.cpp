@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "Texture.h"
 
-#include "Renderer.h"
+#include "Nous/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace Nous {

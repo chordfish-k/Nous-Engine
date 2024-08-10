@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "RenderCommand.h"
-#include "Shader.h"
-#include "OrthoCamera.h"
+#include "Nous/Renderer/RenderCommand.h"
+#include "Nous/Renderer/Shader.h"
+#include "Nous/Renderer/OrthoCamera.h"
 
 namespace Nous {
 

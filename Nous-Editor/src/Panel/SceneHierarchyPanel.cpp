@@ -1,11 +1,11 @@
 #include "SceneHierarchyPanel.h"
-
-#include "Nous/Scene/Component.h"
 #include "Nous/Core/Application.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <cstring>
 
 #ifdef _MSVC_LANG
     #define _CRT_SECURE_NO_WARNINGS

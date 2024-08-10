@@ -20,25 +20,23 @@ namespace Nous {
         return state == GLFW_PRESS;
     }
 
-    std::pair<float, float> Input::GetMousePos()
+    glm::vec2 Input::GetMousePos()
     {
-        auto window = static_cast<GLFWwindow *>(Application::Get().GetWindow().GetNativeWindow());
+        auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        return { (float) xpos, (float) ypos };
+
+        return { (float)xpos, (float)ypos };
     }
 
     float Input::GetMouseX()
     {
-        // c++17 结构化绑定
-        auto [x, _] = GetMousePos();
-        return x;
+        return GetMousePos().x;
     }
 
     float Input::GetMouseY()
     {
-        auto [_, y] = GetMousePos();
-        return y;
+        return GetMousePos().y;
     }
 
 }

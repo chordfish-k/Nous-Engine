@@ -49,7 +49,7 @@ namespace Nous {
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_ActiveScene;
         Ref<Scene> m_EditorScene;
-        fs::path m_EditorScenePath;
+        std::filesystem::path m_EditorScenePath;
         
         EditorCamera m_EditorCamera;
 

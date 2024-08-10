@@ -1,13 +1,12 @@
 ﻿#include "pch.h"
-#include "Scene.h"
+#include "Nous/Scene/Scene.h"
+#include "Nous/Scene/Entity.h"
 
 #include "Nous/Scene/Component.h"
 #include "Nous/Scene/ScriptableEntity.h"
 #include "Nous/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
-
-#include "Entity.h"
 
 // Box2D
 #include "box2d/b2_world.h"

@@ -1,10 +1,8 @@
 #pragma once
 
-#include <filesystem>
-
-#include "Nous/Core/Base.h"
 #include "Nous/Renderer/Texture.h"
 
+#include <filesystem>
 namespace Nous {
 
     class ResourceBrowserPanel

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Nous/Core/Base.h"
+
+#include <string>
+
 namespace Nous {
 
     class Texture

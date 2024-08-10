@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "pch.h"
+#include "Nous/Debug/Instrument.h"
 #include "Nous/Core/Base.h"
 
-#include "spdlog/fmt/ostr.h"
+#include <functional>
 
 namespace Nous {
 

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Entity.h"
+#include "Nous/Scene/Entity.h"
 
 namespace Nous {
 

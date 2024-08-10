@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#include "pch.h"
-
-#include "Base.h"
+#include "Nous/Core/Base.h"
 #include "Nous/Event/Event.h"
 
 namespace Nous {

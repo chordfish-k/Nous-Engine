@@ -1,6 +1,7 @@
 ﻿#include "DockingSpace.h"
 
 #include "Nous/Core/Application.h"
+
 #include <imgui.h>
 
 namespace Nous {

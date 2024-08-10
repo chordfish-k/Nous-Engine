@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
-#include "OpenGLShader.h"
+#include "Platform/OpenGL/OpenGLShader.h"
+#include "Nous/Core/Timer.h"
 
 #include <fstream>
-
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -10,7 +10,7 @@
 #include <spirv_cross/spirv_cross.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
 
-#include "Nous/Core/Timer.h"
+
 
 
 namespace Nous {

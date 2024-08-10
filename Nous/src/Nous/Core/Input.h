@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Base.h"
 #include "Nous/Core/KeyCodes.h"
 #include "Nous/Core/MouseCodes.h"
+
+#include <glm/glm.hpp>
 
 namespace Nous {
 
@@ -15,7 +16,7 @@ namespace Nous {
 
         static bool IsKeyPressed(KeyCode keycode);
         static bool IsMouseButtonPressed(MouseCode button);
-        static std::pair<float, float> GetMousePos();
+        static glm::vec2 GetMousePos();
         static float GetMouseX();
         static float GetMouseY();
     };

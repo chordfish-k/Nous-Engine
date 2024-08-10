@@ -1,12 +1,11 @@
 ﻿#include "pch.h"
 #include "Nous/Utils/PlatformUtils.h"
+#include "Nous/Core/Application.h"
 
 #include <commdlg.h> // Windows Only
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
-
-#include "Nous/Core/Application.h"
 
 namespace Nous {
 

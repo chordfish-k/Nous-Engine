@@ -1,7 +1,5 @@
 #include "pch.h"
-#include "Renderer.h"
-
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Nous/Renderer/Renderer.h"
 #include "Nous/Renderer/Renderer2D.h"
 
 namespace Nous {

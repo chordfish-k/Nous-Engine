@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Buffer.h"
+#include "Nous/Renderer/Buffer.h"
+
+#include <memory>
 
 namespace Nous {
 
