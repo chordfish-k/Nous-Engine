@@ -1,61 +1,16 @@
 Scene: Untitled
 Entities:
-  - Entity: 2026840844774714788
+  - Entity: 1017223792134808028
     CTag:
-      Tag: Bar
+      Tag: Circle
     CTransform:
-      Translation: [0, -2.20000005, 0]
-      Rotation: [0, 0, 5.6696496]
-      Scale: [9, 0.400000006, 1]
-    CSpriteRenderer:
-      Color: [0.832740188, 0.567648828, 0.177809313, 1]
-    CRigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    CBoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 7410354370059520324
-    CTag:
-      Tag: Bar
-    CTransform:
-      Translation: [0, -0.710875213, 0]
-      Rotation: [0, 0, 0.905567467]
-      Scale: [9, 0.400000006, 1]
-    CSpriteRenderer:
-      Color: [0.832740188, 0.567648828, 0.177809313, 1]
-    CRigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    CBoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 15775383373780603297
-    CTag:
-      Tag: Camera
-    CTransform:
-      Translation: [0, 0, 1]
+      Translation: [-0.540638566, 0.294030726, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CCamera:
-      Camera:
-        ProjectionType: 1
-        PerspFOV: 0.785398185
-        PerspNear: 0.00999999978
-        PerspFar: 1000
-        OrthoSize: 6
-        OrthoNear: -10
-        OrthoFar: 10
-      Primary: true
-      FixedAspectRatio: false
+      Scale: [1, -0.400000006, 1]
+    CCircleRenderer:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
   - Entity: 7440336366702553677
     CTag:
       Tag: BoxSprite
@@ -75,14 +30,59 @@ Entities:
       Friction: 0.5
       Restitution: 1
       RestitutionThreshold: 0.5
-  - Entity: 1017223792134808028
+  - Entity: 15775383373780603297
     CTag:
-      Tag: Circle
+      Tag: Camera
     CTransform:
-      Translation: [-0.540638566, 0.294030726, 0]
+      Translation: [0, 0, 1]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CCircleRenderer:
-      Color: [1, 1, 1, 1]
-      Thickness: 1
-      Fade: 0.00499999989
+    CCamera:
+      Camera:
+        ProjectionType: 1
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 6
+        OrthoNear: -10
+        OrthoFar: 10
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 7410354370059520324
+    CTag:
+      Tag: Bar
+    CTransform:
+      Translation: [0, -0.710875213, 0]
+      Rotation: [0, 0, 0.905567467]
+      Scale: [9, 0.400000006, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 2026840844774714788
+    CTag:
+      Tag: Bar
+    CTransform:
+      Translation: [0, -2.20000005, 0]
+      Rotation: [0, 0, 5.6696496]
+      Scale: [9, 0.400000006, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
