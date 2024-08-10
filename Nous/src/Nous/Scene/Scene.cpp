@@ -94,6 +94,7 @@ namespace Nous {
         // 复制 Component 给新 Registry
         CopyComponent<CTransform>(dstSceneRegistry, srcSceneRegistry, enttMap);
         CopyComponent<CSpriteRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
+        CopyComponent<CCircleRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
         CopyComponent<CCamera>(dstSceneRegistry, srcSceneRegistry, enttMap);
         CopyComponent<CNativeScript>(dstSceneRegistry, srcSceneRegistry, enttMap);
         CopyComponent<CRigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
@@ -125,21 +126,6 @@ namespace Nous {
     void Scene::DestroyEntity(Entity entity)
     {
         m_Registry.destroy(entity);
-    }
-
-    void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
-    {
-        Renderer2D::BeginScene(camera);
-
-        auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
-        for (auto ent: group)
-        {
-            auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
-
-            Renderer2D::DrawSprite(transform, sprite, (int)ent);
-        }
-
-        Renderer2D::EndScene();
     }
 
     void Scene::OnRuntimeStart()
@@ -248,6 +234,7 @@ namespace Nous {
         {
             Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
+            // Sprites
             auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
             for (auto ent: group)
             {
@@ -256,9 +243,50 @@ namespace Nous {
                 Renderer2D::DrawSprite(transform, sprite, (int)ent);
             }
 
+            // Circles
+            {
+                auto view = m_Registry.view<CTransform, CCircleRenderer>();
+                for (auto ent : view)
+                {
+                    auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
+
+                    Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
+                }
+            }
+
             Renderer2D::EndScene();
         }
 
+    }
+
+    void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
+    {
+        Renderer2D::BeginScene(camera);
+
+        // Sprites
+        {
+            auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
+            for (auto ent: group)
+            {
+                auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
+
+                Renderer2D::DrawSprite(transform, sprite, (int)ent);
+            }
+        }
+
+        // Circles
+        {
+            auto view = m_Registry.view<CTransform, CCircleRenderer>();
+            for (auto ent : view)
+            {
+                auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
+
+                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
+            }
+
+        }
+
+        Renderer2D::EndScene();
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -344,6 +372,11 @@ namespace Nous {
 
     template<>
     void Scene::OnComponentAdded<CSpriteRenderer>(Entity entity, CSpriteRenderer& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CCircleRenderer>(Entity entity, CCircleRenderer& component)
     {
     }
 

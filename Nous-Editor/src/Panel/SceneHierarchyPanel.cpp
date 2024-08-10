@@ -240,6 +240,12 @@ namespace Nous {
                 ImGui::CloseCurrentPopup();
             }
 
+            if (!m_Context->GetSelectedEntity().HasComponent<CCircleRenderer>() && ImGui::MenuItem("Circle Renderer"))
+            {
+                m_Context->GetSelectedEntity().AddComponent<CCircleRenderer>();
+                ImGui::CloseCurrentPopup();
+            }
+
             if (!m_Context->GetSelectedEntity().HasComponent<CRigidbody2D>() && ImGui::MenuItem("Rigidbody 2D"))
             {
                 m_Context->GetSelectedEntity().AddComponent<CRigidbody2D>();
@@ -337,6 +343,13 @@ namespace Nous {
             }
 
             ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+        });
+
+        DrawComponent<CCircleRenderer>("Circle Renderer", entity, [](auto& component)
+        {
+            ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+            ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
+            ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
         });
 
         DrawComponent<CRigidbody2D>("Rigidbody 2D", entity, [](auto& component)

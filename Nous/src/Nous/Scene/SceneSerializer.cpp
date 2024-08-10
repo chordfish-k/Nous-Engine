@@ -204,6 +204,19 @@ namespace Nous {
             out << YAML::EndMap; // CSpriteRenderer
         }
 
+        if (entity.HasComponent<CCircleRenderer>())
+        {
+            out << YAML::Key << "CCircleRenderer";
+            out << YAML::BeginMap; // CircleRendererComponent
+
+            auto& circleRendererComponent = entity.GetComponent<CCircleRenderer>();
+            out << YAML::Key << "Color" << YAML::Value << circleRendererComponent.Color;
+            out << YAML::Key << "Thickness" << YAML::Value << circleRendererComponent.Thickness;
+            out << YAML::Key << "Fade" << YAML::Value << circleRendererComponent.Fade;
+
+            out << YAML::EndMap; // CircleRendererComponent
+        }
+
         if (entity.HasComponent<CRigidbody2D>())
         {
             out << YAML::Key << "CRigidbody2D";
@@ -321,6 +334,15 @@ namespace Nous {
                 {
                     auto& src = deserializedEntity.AddComponent<CSpriteRenderer>();
                     src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+                }
+
+                auto circleRendererComponent = entity["CCircleRenderer"];
+                if (circleRendererComponent)
+                {
+                    auto& crc = deserializedEntity.AddComponent<CCircleRenderer>();
+                    crc.Color = circleRendererComponent["Color"].as<glm::vec4>();
+                    crc.Thickness = circleRendererComponent["Thickness"].as<float>();
+                    crc.Fade = circleRendererComponent["Fade"].as<float>();
                 }
 
                 auto rigidbody2DComponent = entity["CRigidbody2D"];

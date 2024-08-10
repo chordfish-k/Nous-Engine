@@ -6,7 +6,7 @@
 #include "Nous/Renderer/UniformBuffer.h"
 #include "Nous/Renderer/RenderCommand.h"
 
-#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Nous {
@@ -19,9 +19,20 @@ namespace Nous {
         float TexIndex;
         float TilingFactor;
 
-        // Editor-only
+        // 仅用于编辑器
         int EntityID;
+    };
 
+    struct CircleVertex
+    {
+        glm::vec3 WorldPosition;
+        glm::vec3 LocalPosition;
+        glm::vec4 Color;
+        float Thickness;
+        float Fade;
+
+        // 仅用于编辑器
+        int EntityID;
     };
 
     struct Renderer2DData
@@ -33,14 +44,22 @@ namespace Nous {
 
         Ref <VertexArray> QuadVertexArray;
         Ref <VertexBuffer> QuadVertexBuffer;
-        Ref <Shader> TextureShader;
+        Ref <Shader> QuadShader;
         Ref <Texture2D> WhiteTexture;
+
+        Ref <VertexArray> CircleVertexArray;
+        Ref <VertexBuffer> CircleVertexBuffer;
+        Ref <Shader> CircleShader;
 
         uint32_t QuadIndexCount = 0;
         QuadVertex* QuadVertexBufferBase = nullptr; // 缓冲区基地址
         QuadVertex* QuadVertexBufferPtr = nullptr; // 缓冲区读写指针
 
-        std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
+        uint32_t CircleIndexCount = 0;
+        CircleVertex* CircleVertexBufferBase = nullptr;
+        CircleVertex* CircleVertexBufferPtr = nullptr;
+
+        std::array<Ref < Texture2D>, MaxTextureSlots> TextureSlots;
         uint32_t TextureSlotIndex = 1; // 0 = 白色纹理
 
         glm::vec4 QuadVertexPositions[4];
@@ -52,7 +71,7 @@ namespace Nous {
             glm::mat4 ViewProjection;
         };
         CameraData CameraBuffer;
-        Ref<UniformBuffer> CameraUniformBuffer;
+        Ref <UniformBuffer> CameraUniformBuffer;
     };
 
     static Renderer2DData s_Data;
@@ -61,26 +80,27 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        s_Data.QuadVertexArray = Nous::VertexArray::Create();
+        // Quads
+        s_Data.QuadVertexArray = VertexArray::Create();
 
         s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
         s_Data.QuadVertexBuffer->SetLayout(
             {
-                {Nous::ShaderDataType::Float3, "a_Position"     },
-                {Nous::ShaderDataType::Float4, "a_Color"        },
-                {Nous::ShaderDataType::Float2, "a_TexCoord"     },
-                {Nous::ShaderDataType::Float,  "a_TexIndex"     },
-                {Nous::ShaderDataType::Float,  "a_TilingFactor" },
-                {Nous::ShaderDataType::Int,    "a_EntityID"     },
+                {ShaderDataType::Float3, "a_Position"},
+                {ShaderDataType::Float4, "a_Color"},
+                {ShaderDataType::Float2, "a_TexCoord"},
+                {ShaderDataType::Float,  "a_TexIndex"},
+                {ShaderDataType::Float,  "a_TilingFactor"},
+                {ShaderDataType::Int,    "a_EntityID"},
             });
         s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
         s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 
-        uint32_t * quadIndices = new uint32_t[s_Data.MaxIndices];
+        uint32_t* quadIndices = new uint32_t[s_Data.MaxIndices];
 
         uint32_t offset = 0;
-        for (uint32_t i = 0; i < s_Data.MaxIndices; i+= 6)
+        for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
         {
             quadIndices[i + 0] = offset + 0;
             quadIndices[i + 1] = offset + 1;
@@ -93,9 +113,27 @@ namespace Nous {
             offset += 4; // 偏移为顶点数
         }
 
-        Ref<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
+        Ref <IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
         s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
         delete[] quadIndices;
+
+        // Circles
+        s_Data.CircleVertexArray = VertexArray::Create();
+
+        s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
+        s_Data.CircleVertexBuffer->SetLayout(
+            {
+                {ShaderDataType::Float3, "a_WorldPosition"},
+                {ShaderDataType::Float3, "a_LocalPosition"},
+                {ShaderDataType::Float4, "a_Color"},
+                {ShaderDataType::Float,  "a_Thickness"},
+                {ShaderDataType::Float,  "a_Fade"},
+                {ShaderDataType::Int,    "a_EntityID"}
+            });
+        s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer);
+        s_Data.CircleVertexArray->SetIndexBuffer(quadIB); // Use quad IB
+        s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
+
 
         // 生成白色纹理
         s_Data.WhiteTexture = Texture2D::Create(1, 1);
@@ -106,15 +144,16 @@ namespace Nous {
         for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
             samplers[i] = i;
 
-        s_Data.TextureShader = Nous::Shader::Create("assets/shaders/Texture.glsl");
+        s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
+        s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
 
         // 设置0号槽为白色纹理
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
-        s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-        s_Data.QuadVertexPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
-        s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
-        s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+        s_Data.QuadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+        s_Data.QuadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
+        s_Data.QuadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
+        s_Data.QuadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
 
         s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
     }
@@ -130,8 +169,9 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
-        s_Data.TextureShader->Bind();
-        s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        s_Data.CameraBuffer.ViewProjection = camera.GetViewProjectionMatrix();
+        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+
         StartBatch();
     }
 
@@ -162,30 +202,42 @@ namespace Nous {
         Flush();
     }
 
-    void Renderer2D::Flush()
-    {
-        if (s_Data.QuadIndexCount == 0)
-            return; // 空帧
-
-        uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
-        s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
-
-        // 绑定纹理
-        for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-            s_Data.TextureSlots[i]->Bind(i);
-
-        s_Data.TextureShader->Bind();
-        RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
-
-        s_Data.Stats.DrawCalls++;
-    }
-
     void Renderer2D::StartBatch()
     {
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
+        s_Data.CircleIndexCount = 0;
+        s_Data.CircleVertexBufferPtr = s_Data.CircleVertexBufferBase;
+
         s_Data.TextureSlotIndex = 1;
+    }
+
+    void Renderer2D::Flush()
+    {
+        if (s_Data.QuadIndexCount)
+        {
+            uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+            s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
+
+            // 纹理绑定
+            for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+                s_Data.TextureSlots[i]->Bind(i);
+
+            s_Data.QuadShader->Bind();
+            RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+            s_Data.Stats.DrawCalls++;
+        }
+
+        if (s_Data.CircleIndexCount)
+        {
+            uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.CircleVertexBufferPtr - (uint8_t*)s_Data.CircleVertexBufferBase);
+            s_Data.CircleVertexBuffer->SetData(s_Data.CircleVertexBufferBase, dataSize);
+
+            s_Data.CircleShader->Bind();
+            RenderCommand::DrawIndexed(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
+            s_Data.Stats.DrawCalls++;
+        }
     }
 
     void Renderer2D::NextBatch()
@@ -251,8 +303,8 @@ namespace Nous {
         NS_PROFILE_FUNCTION();
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f})
-            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+                              * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f})
+                              * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
         DrawQuad(transform, texture, tilingFactor, color);
     }
@@ -265,7 +317,10 @@ namespace Nous {
             NextBatch();
 
         constexpr size_t quadVertexCount = 4;
-        constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+        constexpr glm::vec2 textureCoords[] = {{0.0f, 0.0f},
+                                               {1.0f, 0.0f},
+                                               {1.0f, 1.0f},
+                                               {0.0f, 1.0f}};
 
         const float textureIndex = 0.0f;
         const float tilingFactor = 1.0f;
@@ -292,7 +347,10 @@ namespace Nous {
             NextBatch();
 
         constexpr size_t quadVertexCount = 4;
-        constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+        constexpr glm::vec2 textureCoords[] = {{0.0f, 0.0f},
+                                               {1.0f, 0.0f},
+                                               {1.0f, 1.0f},
+                                               {0.0f, 1.0f}};
 
         float textureIndex = 0.0f;
         // 找出当前纹理的id
@@ -329,6 +387,30 @@ namespace Nous {
         }
 
         s_Data.QuadIndexCount += 6;
+
+        s_Data.Stats.QuadCount++;
+    }
+
+    void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, int entityID)
+    {
+        NS_PROFILE_FUNCTION();
+
+        // TODO: 实现圆形的整批绘制
+        // if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+        // 	NextBatch();
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            s_Data.CircleVertexBufferPtr->WorldPosition = transform * s_Data.QuadVertexPositions[i];
+            s_Data.CircleVertexBufferPtr->LocalPosition = s_Data.QuadVertexPositions[i] * 2.0f;
+            s_Data.CircleVertexBufferPtr->Color = color;
+            s_Data.CircleVertexBufferPtr->Thickness = thickness;
+            s_Data.CircleVertexBufferPtr->Fade = fade;
+            s_Data.CircleVertexBufferPtr->EntityID = entityID;
+            s_Data.CircleVertexBufferPtr++;
+        }
+
+        s_Data.CircleIndexCount += 6;
 
         s_Data.Stats.QuadCount++;
     }
