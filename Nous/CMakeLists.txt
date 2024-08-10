@@ -11,8 +11,8 @@ add_subdirectory(vendor/GLFW)
 add_subdirectory(vendor/glad)
 add_subdirectory(vendor/yaml-cpp)
 
-set(BOX2D_BUILD_UNIT_TESTS OFF)
-set(BOX2D_BUILD_TESTBED OFF)
+option(BOX2D_BUILD_UNIT_TESTS OFF)
+option(BOX2D_BUILD_TESTBED OFF)
 add_subdirectory(vendor/box2d)
 
 
