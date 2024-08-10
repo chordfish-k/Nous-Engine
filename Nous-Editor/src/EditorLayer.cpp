@@ -383,13 +383,18 @@ namespace Nous {
         if (m_SceneState != SceneState::Edit)
             OnSceneStop();
 
-        Ref<Scene> newScene = CreateRef<Scene>();
-        auto viewportSize = m_ViewportPanel.GetSize();
+        if (path.extension().string() != ".scn")
+        {
+            NS_WARN("无法加载 {0} - 不是一个场景(*.scn)文件", path.filename().string());
+            return;
+        }
 
+        Ref<Scene> newScene = CreateRef<Scene>();
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {
             m_EditorScene = newScene;
+            auto viewportSize = m_ViewportPanel.GetSize();
             m_EditorScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_SceneHierarchyPanel.SetContext(m_EditorScene);
             m_ViewportPanel.SetContext(m_EditorScene);

@@ -43,6 +43,9 @@ namespace Nous {
             NS_CORE_ERROR("{}", path);
             NS_CORE_ASSERT(false, "加载图像失败！")
         }
+
+        m_IsLoaded = true;
+
         m_Width = width;
         m_Height = height;
 

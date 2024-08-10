@@ -15,10 +15,6 @@ namespace Nous {
         {
             PushLayer(new EditorLayer());
         }
-
-        ~NousEditor()
-        {
-        }
     };
 
 // 使用Nous的程序入口点，提供一个创建应用的函数

@@ -314,7 +314,11 @@ namespace Nous {
                 {
                     const wchar_t* path = (const wchar_t*)payload->Data;
                     std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
-                    component.Texture = Texture2D::Create(texturePath.string());
+                    Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+                    if (texture->IsLoaded())
+                        component.Texture = texture;
+                    else
+                        NS_WARN("无法加载纹理 {0}", texturePath.filename().string());
                 }
                 ImGui::EndDragDropTarget();
             }
