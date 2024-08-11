@@ -247,10 +247,11 @@ namespace Nous {
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
     {
-        // 快捷键
+        // 按下只响应一次
         if (e.IsRepeat())
             return false;
 
+        // 快捷键
         bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
         bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
 

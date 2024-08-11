@@ -4,6 +4,7 @@
 #include "Nous/Core/Timestep.h"
 #include "Nous/Event/Event.h"
 #include "Nous/Event/MouseEvent.h"
+#include "Nous/Event/KeyEvent.h"
 
 #include <glm/glm.hpp>
 
@@ -43,6 +44,7 @@ namespace Nous {
         void RecalculateView();
 
         bool OnMouseScroll(MouseScrolledEvent& e);
+        bool OnKeyPressed(KeyPressedEvent& e);
 
         void MousePan(const glm::vec2& delta); // 视窗操作 - 平移
         void MouseRotate(const glm::vec2& delta); // 视窗操作 - 旋转
@@ -66,6 +68,9 @@ namespace Nous {
         float m_Distance = 10.0f;
         float m_Pitch = 0.0f, m_Yaw = 0.0f; // 俯仰角， 水平角
         float m_ViewportWidth = 1280, m_ViewportHeight = 720;
+
+        enum class ProjectionType {Perspective = 0, Orthographic = 1};
+        ProjectionType m_ProjectionType = ProjectionType::Orthographic;
     };
 
 }

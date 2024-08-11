@@ -21,7 +21,18 @@ namespace Nous {
     void EditorCamera::RecalculateProjection()
     {
         m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
-        m_Projection = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+        if (m_ProjectionType == ProjectionType::Perspective)
+        {
+            m_Projection = glm::perspective(glm::radians(m_FOV), m_AspectRatio, m_NearClip, m_FarClip);
+        }
+        else
+        {
+            float orthoLeft = -m_Distance * m_AspectRatio * 0.5f;
+            float orthoRight = m_Distance * m_AspectRatio * 0.5f;
+            float orthoBottom = -m_Distance * 0.5f;
+            float orthoTop = m_Distance * 0.5f;
+            m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_NearClip, m_FarClip);
+        }
     }
 
     void EditorCamera::RecalculateView()
@@ -31,6 +42,7 @@ namespace Nous {
         glm::quat orientation = GetOrientation();
         m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
         m_ViewMatrix = glm::inverse(m_ViewMatrix);
+
     }
 
     std::pair<float, float> EditorCamera::PanSpeed() const
@@ -81,6 +93,7 @@ namespace Nous {
     {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<MouseScrolledEvent>(NS_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+        dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorCamera::OnKeyPressed));
     }
 
     bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e)
@@ -88,6 +101,30 @@ namespace Nous {
         float delta = e.GetYOffset() * 0.1f;
         MouseZoom(delta);
         RecalculateView();
+        return false;
+    }
+
+    bool EditorCamera::OnKeyPressed(KeyPressedEvent& e)
+    {
+        if (e.IsRepeat())
+            return false;
+
+        switch (e.GetKeyCode())
+        {
+            case NS_KEY_8:
+            case NS_KEY_KP_8:
+                m_ProjectionType = ProjectionType::Orthographic;
+                break;
+            case NS_KEY_9:
+            case NS_KEY_KP_9:
+                m_ProjectionType = ProjectionType::Perspective;
+                break;
+            case NS_KEY_0:
+            case NS_KEY_KP_0:
+                Reset();
+                break;
+        }
+
         return false;
     }
 
