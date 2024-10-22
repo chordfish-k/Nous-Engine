@@ -19,3 +19,6 @@
 [submodule "Nous/vendor/box2d"]
 	path = Nous/vendor/box2d
 	url = https://github.com/erincatto/box2d
+[submodule "Nous/vendor/glfw"]
+	path = Nous/vendor/glfw
+	url = https://github.com/TheCherno/glfw.git
