@@ -13,11 +13,14 @@ intermediates/
 VulkanSDK/
 
 
-.vs/
+*.log
+
 .idea/
+.vs/
 **.sln
 **.vcxproj
-**.vcxproj.**
+**.vcxproj.filters
+**.vcxproj.user
 **.csproj
 
 **.frag
