@@ -1,24 +1,21 @@
 [submodule "Nous/vendor/spdlog"]
 	path = Nous/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "Nous/vendor/GLFW"]
-	path = Nous/vendor/GLFW
-	url = https://github.com/glfw/glfw.git
 [submodule "Nous/vendor/imgui"]
 	path = Nous/vendor/imgui
-	url = https://github.com/ocornut/imgui.git
+url=https://github.com/chordfish-k/imgui.git
 [submodule "Nous/vendor/glm"]
 	path = Nous/vendor/glm
 	url = https://github.com/icaven/glm
 [submodule "Nous/vendor/yaml-cpp"]
 	path = Nous/vendor/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp.git
+url=https://github.com/chordfish-k/yaml-cpp.git
 [submodule "Nous/vendor/imguizmo"]
 	path = Nous/vendor/imguizmo
-	url = https://github.com/thecherno/imguizmo
+url=https://github.com/chordfish-k/ImGuizmo.git
 [submodule "Nous/vendor/box2d"]
 	path = Nous/vendor/box2d
-	url = https://github.com/erincatto/box2d
+	url=https://github.com/chordfish-k/box2d
 [submodule "Nous/vendor/glfw"]
 	path = Nous/vendor/glfw
-	url = https://github.com/TheCherno/glfw.git
+url=https://github.com/chordfish-k/glfw.git
