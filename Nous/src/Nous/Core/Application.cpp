@@ -3,8 +3,8 @@
 
 #include "Nous/Core/Log.h"
 #include "Nous/Core/Input.h"
+#include "Nous/Script/ScriptEngine.h"
 #include "Nous/Renderer/Renderer.h"
-
 #include "Nous/Utils/PlatformUtils.h"
 
 namespace Nous {
@@ -27,6 +27,7 @@ namespace Nous {
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
 
         Renderer::Init();
+        ScriptEngine::Init();
 
         // 创建ImGui层
         m_ImGuiLayer = new ImGuiLayer();
@@ -38,6 +39,7 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
+        ScriptEngine::Shutdown();
         Renderer::Shutdown();
     }
 

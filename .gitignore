@@ -6,7 +6,19 @@ __pycache__
 
 log.txt
 
+**/bin/
+bin-int/
+intermediates/
+
 VulkanSDK/
+
+
+.vs/
+.idea/
+**.sln
+**.vcxproj
+**.vcxproj.**
+**.csproj
 
 **.frag
 **.vert

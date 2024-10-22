@@ -2,10 +2,11 @@
 #include "ExampleLayer.h"
 
 #include "imgui/imgui.h"
-#include "ext/matrix_transform.hpp"
-
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "gtc/type_ptr.hpp"
+
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm/gtc/type_ptr.hpp>
 
 ExampleLayer::ExampleLayer()
     : Layer("Example"), m_CameraController(1280.0f / 720.0f)
