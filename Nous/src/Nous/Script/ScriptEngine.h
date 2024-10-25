@@ -1,30 +1,18 @@
 #pragma once
 
+#include "Nous/Scene/Entity.h"
+#include "Nous/Scene/Scene.h"
+
 // ÏòÇ°ÉùÃ÷
 extern "C" {
 	typedef struct _MonoClass MonoClass;
 	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoMethod MonoMethod;
+	typedef struct _MonoAssembly MonoAssembly;
 }
 
 namespace Nous
 {
-	class ScriptEngine
-	{
-	public:
-		static void Init();
-		static void Shutdown();
-
-		static void LoadAssembly(const std::filesystem::path& filepath);
-	private:
-		static void InitMono();
-		static void ShutdownMono();
-
-		static MonoObject* InstantiateClass(MonoClass* monoClass);
-
-		friend class ScriptClass;
-	};
-
 	class ScriptClass
 	{
 	public:
@@ -39,6 +27,48 @@ namespace Nous
 		std::string m_ClassName;
 
 		MonoClass* m_MonoClass = nullptr;
+	};
+
+	class ScriptInstance
+	{
+	public:
+		ScriptInstance(Ref<ScriptClass> scriptClass);
+
+		void InvokeOnCreate();
+		void InvokeOnUpdate(float dt);
+	private:
+		Ref<ScriptClass> m_ScriptClass;
+
+		MonoObject* m_Instance = nullptr;
+		MonoMethod* m_OnCreateMethod = nullptr;
+		MonoMethod* m_OnUpdateMethod = nullptr;
+	};
+
+	class ScriptEngine
+	{
+	public:
+		static void Init();
+		static void Shutdown();
+
+		static void LoadAssembly(const std::filesystem::path& filepath);
+
+		static void OnRuntimeStart(Scene* scene);
+		static void OnRuntimeStop();
+
+		static bool EntityClassExists(const std::string& fullClassName);
+
+		static void OnCreateEntity(Entity entity);
+		static void OnUpdateEntity(Entity entity, Timestep dt);
+
+		static std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();
+	private:
+		static void InitMono();
+		static void ShutdownMono();
+
+		static MonoObject* InstantiateClass(MonoClass* monoClass);
+		static void LoadAssemblyClasses(MonoAssembly* assembly);
+
+		friend class ScriptClass;
 	};
 }
 

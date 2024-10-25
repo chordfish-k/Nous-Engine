@@ -1,6 +1,8 @@
 #include "SceneHierarchyPanel.h"
 #include "Nous/Core/Application.h"
 
+#include "Nous/Script/ScriptEngine.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -229,6 +231,7 @@ namespace Nous {
         if (ImGui::BeginPopup("AddComponent"))
         {
             DisplayAddComponentEntry<CCamera>("Camera");
+            DisplayAddComponentEntry<CMonoScript>("Script");
             DisplayAddComponentEntry<CSpriteRenderer>("Sprite Renderer");
             DisplayAddComponentEntry<CCircleRenderer>("Circle Renderer");
             DisplayAddComponentEntry<CRigidbody2D>("Rigidbody 2D");
@@ -301,6 +304,25 @@ namespace Nous {
 
                 ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
             }
+        });
+
+        DrawComponent<CMonoScript>("Script", entity, [](auto& component)
+        {
+            bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+            static char buffer[64];
+            strcpy(buffer, component.ClassName.c_str());
+
+            if (!scriptClassExists)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+
+            if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+            {
+                component.ClassName = buffer;
+            }
+
+            if (!scriptClassExists)
+                ImGui::PopStyleColor();
         });
 
         DrawComponent<CSpriteRenderer>("Sprite Renderer", entity, [](auto& component)

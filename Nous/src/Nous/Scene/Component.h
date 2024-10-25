@@ -84,6 +84,14 @@ namespace Nous {
         CCamera(const CCamera&) = default;
     };
 
+    struct CMonoScript
+    {
+        std::string ClassName;
+
+        CMonoScript() = default;
+        CMonoScript(const CMonoScript&) = default;
+    };
+
     // 预先声明
     class ScriptableEntity;
 
@@ -159,6 +167,6 @@ namespace Nous {
 
     using AllComponents =
         ComponentGroup<CTransform, CSpriteRenderer,
-            CCircleRenderer, CCamera, CNativeScript,
+            CCircleRenderer, CCamera, CNativeScript, CMonoScript,
             CRigidbody2D, CBoxCollider2D, CCircleCollider2D>;
 }

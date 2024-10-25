@@ -1,14 +1,95 @@
 Scene: Untitled
 Entities:
-  - Entity: 12931146566311773044
+  - Entity: 2026840844774714788
+    CTag:
+      Tag: Bar
+    CTransform:
+      Translation: [0, -2.20000005, 0]
+      Rotation: [0, 0, 5.89135885]
+      Scale: [9, 0.400000006, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TilingFactor: 1
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 7410354370059520324
+    CTag:
+      Tag: Bar
+    CTransform:
+      Translation: [1.73883629, -1.02997541, 0]
+      Rotation: [0, 0, 0.549604177]
+      Scale: [9, 0.400000006, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TilingFactor: 1
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 1
+      RestitutionThreshold: 0.5
+  - Entity: 15775383373780603297
+    CTag:
+      Tag: Camera
+    CTransform:
+      Translation: [0, 0, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CCamera:
+      Camera:
+        ProjectionType: 1
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 6
+        OrthoNear: -10
+        OrthoFar: 10
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 7440336366702553677
+    CTag:
+      Tag: BoxSprite
+    CTransform:
+      Translation: [-1.8460412, 1.59866309, -2.95864382e-08]
+      Rotation: [0, 0, 0.882575333]
+      Scale: [0.5, 0.5, 1]
+    CMonoScript:
+      ClassName: Sandbox.Player
+    CSpriteRenderer:
+      Color: [0.999989986, 1, 0.999990046, 1]
+      TexturePath: assets\textures\Mario.png
+      TilingFactor: 1
+    CRigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 1
+      RestitutionThreshold: 0.5
+  - Entity: 1017223792134808028
     CTag:
       Tag: Circle
     CTransform:
-      Translation: [-0.540638566, 2.38765931, 0]
+      Translation: [-0.540638566, 1.27141213, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CCircleRenderer:
-      Color: [0.660804927, 0.447600722, 0.822064042, 1]
+      Color: [0.229948938, 0.955674946, 0.964412808, 1]
       Thickness: 0.400000006
       Fade: 0.0270000007
     CRigidbody2D:
@@ -42,15 +123,15 @@ Entities:
       Friction: 0.5
       Restitution: 1
       RestitutionThreshold: 0.5
-  - Entity: 1017223792134808028
+  - Entity: 12931146566311773044
     CTag:
       Tag: Circle
     CTransform:
-      Translation: [-0.540638566, 1.27141213, 0]
+      Translation: [-0.540638566, 2.38765931, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CCircleRenderer:
-      Color: [0.229948938, 0.955674946, 0.964412808, 1]
+      Color: [0.660804927, 0.447600722, 0.822064042, 1]
       Thickness: 0.400000006
       Fade: 0.0270000007
     CRigidbody2D:
@@ -62,83 +143,4 @@ Entities:
       Density: 1
       Friction: 0.5
       Restitution: 1
-      RestitutionThreshold: 0.5
-  - Entity: 7440336366702553677
-    CTag:
-      Tag: BoxSprite
-    CTransform:
-      Translation: [-1.8460412, 1.59866309, -2.95864382e-08]
-      Rotation: [0, 0, 0.882575333]
-      Scale: [0.5, 0.5, 1]
-    CSpriteRenderer:
-      Color: [0.999989986, 1, 0.999990046, 1]
-      TexturePath: assets\textures\Mario.png
-      TilingFactor: 1
-    CRigidbody2D:
-      BodyType: Dynamic
-      FixedRotation: false
-    CBoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 1
-      RestitutionThreshold: 0.5
-  - Entity: 15775383373780603297
-    CTag:
-      Tag: Camera
-    CTransform:
-      Translation: [0, 0, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CCamera:
-      Camera:
-        ProjectionType: 1
-        PerspFOV: 0.785398185
-        PerspNear: 0.00999999978
-        PerspFar: 1000
-        OrthoSize: 6
-        OrthoNear: -10
-        OrthoFar: 10
-      Primary: true
-      FixedAspectRatio: false
-  - Entity: 7410354370059520324
-    CTag:
-      Tag: Bar
-    CTransform:
-      Translation: [1.73883629, -1.02997541, 0]
-      Rotation: [0, 0, 0.549604177]
-      Scale: [9, 0.400000006, 1]
-    CSpriteRenderer:
-      Color: [0.832740188, 0.567648828, 0.177809313, 1]
-      TilingFactor: 1
-    CRigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    CBoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 1
-      RestitutionThreshold: 0.5
-  - Entity: 2026840844774714788
-    CTag:
-      Tag: Bar
-    CTransform:
-      Translation: [0, -2.20000005, 0]
-      Rotation: [0, 0, 5.89135885]
-      Scale: [9, 0.400000006, 1]
-    CSpriteRenderer:
-      Color: [0.832740188, 0.567648828, 0.177809313, 1]
-      TilingFactor: 1
-    CRigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    CBoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
       RestitutionThreshold: 0.5

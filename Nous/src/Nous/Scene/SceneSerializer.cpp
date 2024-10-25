@@ -193,6 +193,16 @@ namespace Nous {
             out << YAML::EndMap; // CCamera
         }
 
+        if (entity.HasComponent<CMonoScript>())
+        {
+            auto& scriptComponent = entity.GetComponent<CMonoScript>();
+
+            out << YAML::Key << "CMonoScript";
+            out << YAML::BeginMap;
+            out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+            out << YAML::EndMap;
+        }
+
         if (entity.HasComponent<CSpriteRenderer>())
         {
             out << YAML::Key << "CSpriteRenderer";
@@ -358,6 +368,13 @@ namespace Nous {
 
                     cc.Primary = cameraComponent["Primary"].as<bool>();
                     cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+                }
+
+                auto monoScriptComponent = entity["CMonoScript"];
+                if (monoScriptComponent)
+                {
+                    auto& sc = deserializedEntity.AddComponent<CMonoScript>();
+                    sc.ClassName = monoScriptComponent["ClassName"].as<std::string>();
                 }
 
                 auto spriteRendererComponent = entity["CSpriteRenderer"];

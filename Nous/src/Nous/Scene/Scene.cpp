@@ -5,6 +5,7 @@
 #include "Nous/Scene/Component.h"
 #include "Nous/Scene/ScriptableEntity.h"
 #include "Nous/Renderer/Renderer2D.h"
+#include "Nous/Script/ScriptEngine.h"
 
 #include <glm/glm.hpp>
 
@@ -143,11 +144,27 @@ namespace Nous {
     void Scene::OnRuntimeStart()
     {
         OnPhysics2DStart();
+
+        // 脚本
+        {
+            ScriptEngine::OnRuntimeStart(this);
+            // 实例化所有脚本entites
+
+            auto view = m_Registry.view<CMonoScript>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnCreateEntity(entity);
+            }
+        }
+        
     }
 
     void Scene::OnRuntimeStop()
     {
         OnPhysics2DStop();
+
+        ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
@@ -164,13 +181,20 @@ namespace Nous {
     {
         // 执行脚本更新
         {
+            // C# Entity Update
+            auto view = m_Registry.view<CMonoScript>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnUpdateEntity(entity, dt);
+            }
+
             m_Registry.view<CNativeScript>().each([=](auto ent, auto& script) {
                 // 没有脚本实例就先创建
                 if (!script.Instance)
                 {
                    script.Instance = script.InitScript();
                    script.Instance->m_Entity = Entity{ent, this};
-
                    script.Instance->OnCreate();
                 }
 
@@ -442,6 +466,7 @@ namespace Nous {
             component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     }
 
+
     template<>
     void Scene::OnComponentAdded<CTag>(Entity entity, CTag& component)
     {
@@ -459,6 +484,11 @@ namespace Nous {
 
     template<>
     void Scene::OnComponentAdded<CNativeScript>(Entity entity, CNativeScript& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CMonoScript>(Entity entity, CMonoScript& component)
     {
     }
 

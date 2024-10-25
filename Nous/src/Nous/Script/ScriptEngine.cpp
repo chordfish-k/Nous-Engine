@@ -77,7 +77,7 @@ namespace Nous
 				const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
 				const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
 
-				NS_CORE_TRACE("{}.{}\n", nameSpace, name);
+				NS_CORE_TRACE("{}.{}", nameSpace, name);
 			}
 		}
 	}
@@ -91,6 +91,11 @@ namespace Nous
 		MonoImage* CoreAssemblyImage = nullptr;
 
 		ScriptClass EntityClass;
+
+		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
+		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+
+		Scene* SceneContext = nullptr;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
@@ -101,9 +106,11 @@ namespace Nous
 
 		InitMono();
 		LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
-
+		LoadAssemblyClasses(s_Data->CoreAssembly);
+		auto& classes = s_Data->EntityClasses;
 		ScriptGlue::RegisterFunctions();
 	
+#if 0
 		// 检索并实例化类（并调用构造函数）
 		s_Data->EntityClass = ScriptClass("Nous", "Entity");
 		MonoObject* instance = s_Data->EntityClass.Instantiate();
@@ -138,6 +145,7 @@ namespace Nous
 		s_Data->EntityClass.InvokeMethod(instance, printCustomMessageFunc, &stringParam);
 
 		// NS_CORE_ASSERT(false);
+#endif
 	}
 
 	void ScriptEngine::Shutdown()
@@ -178,6 +186,81 @@ namespace Nous
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 	}
 
+	void ScriptEngine::OnRuntimeStart(Scene* scene)
+	{
+		s_Data->SceneContext = scene;
+	}
+
+	void ScriptEngine::OnRuntimeStop()
+	{
+		s_Data->SceneContext = nullptr;
+
+		s_Data->EntityInstances.clear();
+	}
+
+	bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
+	{
+		return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
+	}
+
+	void ScriptEngine::OnCreateEntity(Entity entity)
+	{
+		const auto& sc = entity.GetComponent<CMonoScript>();
+		if (ScriptEngine::EntityClassExists(sc.ClassName))
+		{
+			Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[sc.ClassName]);
+			s_Data->EntityInstances[entity.GetUUID()] = instance;
+			instance->InvokeOnCreate();
+		}
+	}
+
+	void ScriptEngine::OnUpdateEntity(Entity entity, Timestep dt)
+	{
+		UUID entityUUID = entity.GetUUID();
+		NS_CORE_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end());
+	
+		Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+		instance->InvokeOnUpdate((float)dt);
+	}
+
+	std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses()
+	{
+		return s_Data->EntityClasses;
+	}
+
+	void ScriptEngine::LoadAssemblyClasses(MonoAssembly* assembly)
+	{
+		s_Data->EntityClasses.clear();
+
+		MonoImage* image = mono_assembly_get_image(assembly);
+		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+		MonoClass* entityClass = mono_class_from_name(image, "Nous", "Entity");
+
+		for (int32_t i = 0; i < numTypes; i++)
+		{
+			uint32_t cols[MONO_TYPEDEF_SIZE];
+			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+			std::string fullName;
+			if (strlen(nameSpace) != 0)
+				fullName = fmt::format("{}.{}", nameSpace, name);
+			else
+				fullName = name;
+
+			MonoClass* monoClass = mono_class_from_name(image, nameSpace, name);
+
+			if (monoClass == entityClass)
+				continue;
+
+			bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
+			if (isEntity)
+				s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
+		}
+	}
+
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
 	{
 		MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
@@ -204,5 +287,25 @@ namespace Nous
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params)
 	{
 		return	mono_runtime_invoke(method, instance, params, nullptr);
+	}
+
+	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass)
+		: m_ScriptClass(scriptClass)
+	{
+		m_Instance = scriptClass->Instantiate();
+
+		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
+		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+	}
+
+	void Nous::ScriptInstance::InvokeOnCreate()
+	{
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod, nullptr);
+	}
+
+	void Nous::ScriptInstance::InvokeOnUpdate(float dt)
+	{
+		void* param = &dt;
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
 	}
 }
