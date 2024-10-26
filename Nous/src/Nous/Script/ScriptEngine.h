@@ -32,7 +32,7 @@ namespace Nous
 	class ScriptInstance
 	{
 	public:
-		ScriptInstance(Ref<ScriptClass> scriptClass);
+		ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity);
 
 		void InvokeOnCreate();
 		void InvokeOnUpdate(float dt);
@@ -40,6 +40,7 @@ namespace Nous
 		Ref<ScriptClass> m_ScriptClass;
 
 		MonoObject* m_Instance = nullptr;
+		MonoMethod* m_Constructor = nullptr;
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
 	};
@@ -60,6 +61,7 @@ namespace Nous
 		static void OnCreateEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
 
+		static Scene* GetSceneContext();
 		static std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();
 	private:
 		static void InitMono();
@@ -69,6 +71,7 @@ namespace Nous
 		static void LoadAssemblyClasses(MonoAssembly* assembly);
 
 		friend class ScriptClass;
+		friend class ScriptGlue;
 	};
 }
 

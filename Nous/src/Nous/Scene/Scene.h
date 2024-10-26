@@ -42,6 +42,8 @@ namespace Nous {
 
         void DuplicateEntity(Entity entity);
 
+        Entity GetEntityByUUID(UUID uuid);
+
         Entity GetPrimaryCameraEntity();
         Entity GetSelectedEntity();
         void SetSelectedEntity(Entity entity);
@@ -65,6 +67,8 @@ namespace Nous {
 
         b2World* m_PhysicsWorld = nullptr;
         entt::entity m_SelectedEntityID = { entt::null };
+
+        std::unordered_map<UUID, entt::entity> m_EntityMap;
 
         friend class Entity;
         friend class SceneSerializer;

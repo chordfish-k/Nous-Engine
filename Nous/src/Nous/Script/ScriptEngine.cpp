@@ -110,9 +110,10 @@ namespace Nous
 		auto& classes = s_Data->EntityClasses;
 		ScriptGlue::RegisterFunctions();
 	
+		s_Data->EntityClass = ScriptClass("Nous", "Entity");
+
 #if 0
 		// 检索并实例化类（并调用构造函数）
-		s_Data->EntityClass = ScriptClass("Nous", "Entity");
 		MonoObject* instance = s_Data->EntityClass.Instantiate();
 
 		// 调用无参函数
@@ -208,7 +209,7 @@ namespace Nous
 		const auto& sc = entity.GetComponent<CMonoScript>();
 		if (ScriptEngine::EntityClassExists(sc.ClassName))
 		{
-			Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[sc.ClassName]);
+			Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
 			s_Data->EntityInstances[entity.GetUUID()] = instance;
 			instance->InvokeOnCreate();
 		}
@@ -221,6 +222,11 @@ namespace Nous
 	
 		Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
 		instance->InvokeOnUpdate((float)dt);
+	}
+
+	Scene* ScriptEngine::GetSceneContext()
+	{
+		return s_Data->SceneContext;
 	}
 
 	std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses()
@@ -289,21 +295,28 @@ namespace Nous
 		return	mono_runtime_invoke(method, instance, params, nullptr);
 	}
 
-	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass)
+	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass)
 	{
 		m_Instance = scriptClass->Instantiate();
 
+		m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+
+		{
+			UUID entityID = entity.GetUUID();
+			void* param = &entityID;
+			m_ScriptClass->InvokeMethod(m_Instance, m_Constructor, &param);
+		}
 	}
 
-	void Nous::ScriptInstance::InvokeOnCreate()
+	void ScriptInstance::InvokeOnCreate()
 	{
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod, nullptr);
 	}
 
-	void Nous::ScriptInstance::InvokeOnUpdate(float dt)
+	void ScriptInstance::InvokeOnUpdate(float dt)
 	{
 		void* param = &dt;
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);

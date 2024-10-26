@@ -133,12 +133,17 @@ namespace Nous {
 
         auto& tag = entity.AddComponent<CTag>();
         tag.Tag = name.empty() ? "Entity" : name;
+
+        m_EntityMap[uuid] = entity;
+
         return entity;
     }
 
     void Scene::DestroyEntity(Entity entity)
     {
         m_Registry.destroy(entity);
+
+        m_EntityMap.erase(entity.GetUUID());
     }
 
     void Scene::OnRuntimeStart()
@@ -329,6 +334,13 @@ namespace Nous {
     {
         Entity newEntity = CreateEntity(entity.GetName());
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
+    }
+
+    Entity Scene::GetEntityByUUID(UUID uuid)
+    {
+        if (m_EntityMap.find(uuid) != m_EntityMap.end())
+            return {m_EntityMap.at(uuid), this};
+        return {};
     }
 
     Entity Scene::GetPrimaryCameraEntity()
