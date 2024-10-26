@@ -108,45 +108,11 @@ namespace Nous
 		LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
 		LoadAssemblyClasses(s_Data->CoreAssembly);
 		auto& classes = s_Data->EntityClasses;
+
+		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterFunctions();
 	
 		s_Data->EntityClass = ScriptClass("Nous", "Entity");
-
-#if 0
-		// 检索并实例化类（并调用构造函数）
-		MonoObject* instance = s_Data->EntityClass.Instantiate();
-
-		// 调用无参函数
-		MonoMethod* printMessageFunc = s_Data->EntityClass.GetMethod("PrintMessage", 0);
-		s_Data->EntityClass.InvokeMethod(instance, printMessageFunc, nullptr);
-
-		// 调用有参函数
-		MonoMethod* printIntFunc = s_Data->EntityClass.GetMethod("PrintInt", 1);
-
-		int value = 5;
-		void* param = &value;
-
-		s_Data->EntityClass.InvokeMethod(instance, printIntFunc, &param);
-
-		MonoMethod* printIntsFunc = s_Data->EntityClass.GetMethod("PrintInts", 2);
-
-		int value2 = 233;
-		void* params[2] =
-		{
-			&value,
-			&value2
-		};
-
-		s_Data->EntityClass.InvokeMethod(instance, printIntsFunc, params);
-
-		// 字符串
-		MonoString* monoString = mono_string_new(s_Data->AppDomain, "Hello World From C++!");
-		MonoMethod* printCustomMessageFunc = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
-		void* stringParam = monoString;
-		s_Data->EntityClass.InvokeMethod(instance, printCustomMessageFunc, &stringParam);
-
-		// NS_CORE_ASSERT(false);
-#endif
 	}
 
 	void ScriptEngine::Shutdown()
@@ -185,6 +151,11 @@ namespace Nous
 
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath.string());
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
+	}
+
+	MonoImage* ScriptEngine::GetCoreAssmblyImage()
+	{
+		return s_Data->CoreAssemblyImage;
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
@@ -313,12 +284,16 @@ namespace Nous
 
 	void ScriptInstance::InvokeOnCreate()
 	{
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod, nullptr);
+		if (m_OnCreateMethod)
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod, nullptr);
 	}
 
 	void ScriptInstance::InvokeOnUpdate(float dt)
 	{
-		void* param = &dt;
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+		if (m_OnUpdateMethod)
+		{
+			void* param = &dt;
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+		}
 	}
 }
