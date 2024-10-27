@@ -13,6 +13,8 @@ namespace Sandbox
         private CTransform m_Transform = null;
         private CRigidbody2D m_Rigidbody = null;
 
+        public float Speed;
+
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate = {ID}");

@@ -10,6 +10,9 @@ log.txt
 bin-int/
 intermediates/
 
+Binaries/
+Intermediates/
+
 VulkanSDK/
 
 

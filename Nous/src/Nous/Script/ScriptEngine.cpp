@@ -4,10 +4,30 @@
 #include "ScriptGlue.h"
 
 #include <mono/jit/jit.h>
+#include <mono/metadata/attrdefs.h>
 #include <mono/metadata/assembly.h>
 
 namespace Nous
 {
+	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap =
+	{
+		{"System.Single", ScriptFieldType::Float},
+		{"System.Double", ScriptFieldType::Double},
+		{"System.Boolean", ScriptFieldType::Bool},
+		{"System.Char", ScriptFieldType::Float},
+		{"System.Int16", ScriptFieldType::Short},
+		{"System.Int32", ScriptFieldType::Int},
+		{"System.Int64", ScriptFieldType::Long},
+		{"System.Byte", ScriptFieldType::Byte},
+
+		{"System.UByte", ScriptFieldType::UByte},
+		{"System.UInt16", ScriptFieldType::UShort},
+		{"System.UInt32", ScriptFieldType::UInt},
+		{"System.UInt64", ScriptFieldType::ULong},
+
+		{"Nous.Entity", ScriptFieldType::Entity},
+	};
+
 	namespace Utils
 	{
 		char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
@@ -79,6 +99,44 @@ namespace Nous
 
 				NS_CORE_TRACE("{}.{}", nameSpace, name);
 			}
+		}
+
+		ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType)
+		{
+			std::string typeName = mono_type_get_name(monoType);
+
+			auto it = s_ScriptFieldTypeMap.find(typeName);
+			if (it == s_ScriptFieldTypeMap.end())
+			{
+				NS_CORE_ERROR("Î´ÖªÀàÐÍ: {}", typeName);
+				return ScriptFieldType::None;
+			}
+
+			return it->second;
+		}
+
+		const char* ScriptFieldTypeToString(ScriptFieldType type)
+		{
+			switch (type)
+			{
+				case Nous::ScriptFieldType::Float:		return "Float";
+				case Nous::ScriptFieldType::Double:		return "Double";
+				case Nous::ScriptFieldType::Bool:		return "Bool";
+				case Nous::ScriptFieldType::Char:		return "Char";
+				case Nous::ScriptFieldType::Byte:		return "Byte";
+				case Nous::ScriptFieldType::Short:		return "Short";
+				case Nous::ScriptFieldType::Int:		return "Int";
+				case Nous::ScriptFieldType::Long:		return "Long";
+				case Nous::ScriptFieldType::UByte:		return "UByte";
+				case Nous::ScriptFieldType::UShort:		return "UShort";
+				case Nous::ScriptFieldType::UInt:		return "UInt";
+				case Nous::ScriptFieldType::ULong:		return "ULong";
+				case Nous::ScriptFieldType::Vector2:	return "Vector2";
+				case Nous::ScriptFieldType::Vector3:	return "Vector3";
+				case Nous::ScriptFieldType::Vector4:	return "Vector4";
+				case Nous::ScriptFieldType::Entity:		return "Entity";
+			}
+			return "<Invaild>";
 		}
 	}
 
@@ -180,6 +238,14 @@ namespace Nous
 		s_Data->EntityInstances.clear();
 	}
 
+	Ref<ScriptInstance> ScriptEngine::GetEntityScriptInstance(UUID entityID)
+	{
+		auto it = s_Data->EntityInstances.find(entityID);
+		if (it == s_Data->EntityInstances.end())
+			return nullptr;
+		return it->second;
+	}
+
 	bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
 	{
 		return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
@@ -229,21 +295,43 @@ namespace Nous
 			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
 			const char* nameSpace = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* name = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
+			const char* className = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
 			std::string fullName;
 			if (strlen(nameSpace) != 0)
-				fullName = fmt::format("{}.{}", nameSpace, name);
+				fullName = fmt::format("{}.{}", nameSpace, className);
 			else
-				fullName = name;
+				fullName = className;
 
-			MonoClass* monoClass = mono_class_from_name(s_Data->AppAssemblyImage, nameSpace, name);
+			MonoClass* monoClass = mono_class_from_name(s_Data->AppAssemblyImage, nameSpace, className);
 
 			if (monoClass == entityClass)
 				continue;
 
 			bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
-			if (isEntity)
-				s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
+			if (!isEntity)
+				continue;
+
+			Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(nameSpace, className);
+			s_Data->EntityClasses[fullName] = scriptClass;
+
+
+			int fieldCount = mono_class_num_fields(monoClass);
+			NS_CORE_WARN("{} has {} fields:", className, fieldCount);
+			void* iterator = nullptr;
+			while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
+			{
+				const char* fieldName = mono_field_get_name(field);
+				uint32_t flags = mono_field_get_flags(field);
+				
+				if (flags & MONO_FIELD_ATTR_PUBLIC)
+				{
+					MonoType* type = mono_field_get_type(field);
+					ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
+					NS_CORE_WARN("  {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
+
+					scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
+				}
+			}
 		}
 	}
 
@@ -304,5 +392,29 @@ namespace Nous
 			void* param = &dt;
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
 		}
+	}
+
+	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
+	{
+		const auto& fields = m_ScriptClass->GetFields();
+		auto it = fields.find(name);
+		if (it == fields.end())
+			return false;
+
+		const ScriptField& field = it->second;
+		mono_field_get_value(m_Instance, field.ClassField, buffer);
+		return true;
+	}
+
+	bool ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value)
+	{
+		const auto& fields = m_ScriptClass->GetFields();
+		auto it = fields.find(name);
+		if (it == fields.end())
+			return false;
+
+		const ScriptField& field = it->second;
+		mono_field_set_value(m_Instance, field.ClassField, (void*)value);
+		return true;
 	}
 }
