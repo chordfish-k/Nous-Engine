@@ -35,6 +35,38 @@ namespace Nous
 		MonoClassField* ClassField;
 	};
 
+	// 存储字段数据
+	struct ScriptFieldInstance
+	{
+		ScriptField Field;
+
+		ScriptFieldInstance()
+		{
+			memset(m_Buffer, 0, sizeof(m_Buffer));
+		}
+
+		template<typename T>
+		T GetValue()
+		{
+			static_assert(sizeof(T) <= 8, "Type too large!");
+			return *(T*)m_Buffer;
+		}
+
+		template<typename T>
+		void SetValue(T value)
+		{
+			static_assert(sizeof(T) <= 8, "Type too large!");
+			memcpy(m_Buffer, &value, sizeof(T));
+		}
+	private:
+		uint8_t m_Buffer[8]; // 最大存储8个字节 
+
+		friend class ScriptEngine;
+		friend class ScriptInstance;
+	};
+
+	using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
+
 	class ScriptClass
 	{
 	public:
@@ -70,6 +102,8 @@ namespace Nous
 		template<typename T>
 		T GetFieldValue(const std::string& name)
 		{
+			static_assert(sizeof(T) <= 8, "Type too large!");
+
 			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
 			if (!success)
 				return T();
@@ -79,6 +113,8 @@ namespace Nous
 		template<typename T>
 		void SetFieldValue(const std::string& name, const T& value)
 		{
+			static_assert(sizeof(T) <= 8, "Type too large!");
+
 			SetFieldValueInternal(name, &value);
 		}
 	private:
@@ -93,6 +129,9 @@ namespace Nous
 		MonoMethod* m_OnUpdateMethod = nullptr;
 
 		inline static char s_FieldValueBuffer[8];
+
+		friend class ScriptEngine;
+		friend class ScriptFieldInstance;
 	};
 
 	class ScriptEngine
@@ -115,8 +154,10 @@ namespace Nous
 		static Scene* GetSceneContext();
 		static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
 
+		static Ref<ScriptClass> GetEntityClass(const std::string className);
 		static std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();
-	
+		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
+
 		static MonoImage* GetCoreAssmblyImage();
 	private:
 		static void InitMono();

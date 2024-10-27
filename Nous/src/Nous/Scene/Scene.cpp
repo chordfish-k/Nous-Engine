@@ -101,6 +101,8 @@ namespace Nous {
         auto& srcSceneRegistry = other->m_Registry;
         auto& dstSceneRegistry = newScene->m_Registry;
         auto idView = srcSceneRegistry.view<CUuid>();
+        auto selected = Entity{ other->m_SelectedEntityID, other.get() };
+
         for (auto e : idView)
         {
             // 复制 Entity 到新场景
@@ -108,6 +110,9 @@ namespace Nous {
             const auto& name = srcSceneRegistry.get<CTag>(e).Tag;
             Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
             enttMap[uuid] = (entt::entity)newEntity;
+
+            if (selected && e == selected)
+                newScene->m_SelectedEntityID = (entt::entity)newEntity;
         }
 
         // 复制 Component 给新 Registry
@@ -147,6 +152,8 @@ namespace Nous {
 
     void Scene::OnRuntimeStart()
     {
+        m_IsRunning = true;
+
         OnPhysics2DStart();
 
         // 脚本
@@ -166,6 +173,8 @@ namespace Nous {
 
     void Scene::OnRuntimeStop()
     {
+        m_IsRunning = false;
+
         OnPhysics2DStop();
 
         ScriptEngine::OnRuntimeStop();

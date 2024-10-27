@@ -155,7 +155,9 @@ namespace Nous
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
+		// Runtime
 		Scene* SceneContext = nullptr;
 	};
 
@@ -256,8 +258,19 @@ namespace Nous
 		const auto& sc = entity.GetComponent<CMonoScript>();
 		if (ScriptEngine::EntityClassExists(sc.ClassName))
 		{
+			UUID entityID = entity.GetUUID();
+
 			Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
 			s_Data->EntityInstances[entity.GetUUID()] = instance;
+			
+			// 复制缓存的字段到脚本实例
+			if (s_Data->EntityScriptFields.find(entityID) != s_Data->EntityScriptFields.end())
+			{
+				const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
+				for (const auto& [name, fieldInstance] : fieldMap)
+					instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+			}
+
 			instance->InvokeOnCreate();
 		}
 	}
@@ -279,6 +292,21 @@ namespace Nous
 	std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses()
 	{
 		return s_Data->EntityClasses;
+	}
+
+	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string className)
+	{
+		if (s_Data->EntityClasses.find(className) == s_Data->EntityClasses.end())
+			return nullptr;
+		return s_Data->EntityClasses.at(className);
+	}
+
+	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
+	{
+		NS_CORE_ASSERT(entity);
+
+		UUID entityID = entity.GetUUID();
+		return s_Data->EntityScriptFields[entityID]; // 如果不存在这个key，会自动创建
 	}
 
 	void ScriptEngine::LoadAppAssemblyClasses()

@@ -11,9 +11,10 @@ namespace Sandbox
 	public class Camera : Entity
 	{
 		public Entity OtherEntity;
+		public float Speed = 1.0f;
+
 		void OnUpdate(float ts)
 		{
-			float speed = 1.0f;
 			Vector3 velocity = Vector3.Zero;
 
 			if (Input.IsKeyDown(KeyCode.Up))
@@ -26,7 +27,7 @@ namespace Sandbox
 			else if (Input.IsKeyDown(KeyCode.Right))
 				velocity.X = 1.0f;
 
-			velocity *= speed;
+			velocity *= Speed;
 
 			Vector3 translation = Translation;
 			translation += velocity * ts;

@@ -25,7 +25,7 @@ namespace Nous {
     void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
     {
         m_Context = scene;
-        m_Context->SetSelectedEntity({});
+        //m_Context->SetSelectedEntity({});
     }
 
     void SceneHierarchyPanel::OnImGuiRender()
@@ -306,19 +306,80 @@ namespace Nous {
             }
         });
 
-        DrawComponent<CMonoScript>("Script", entity, [](auto& component)
+        DrawComponent<CMonoScript>("Script", entity, [entity, scene = m_Context](auto& component) mutable // mutable:允许修改捕获的变量
         {
             bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
             static char buffer[64];
-            strcpy(buffer, component.ClassName.c_str());
+            strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
             if (!scriptClassExists)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
 
             if (ImGui::InputText("Class", buffer, sizeof(buffer)))
-            {
                 component.ClassName = buffer;
+
+            // 字段 Fields
+            bool sceneRunning = scene->IsRunning();
+            if (sceneRunning)
+            {
+                Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+                if (scriptInstance)
+                {
+                    const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+                    for (const auto& [name, field] : fields)
+                    {
+                        if (field.Type == ScriptFieldType::Float)
+                        {
+                            float data = scriptInstance->GetFieldValue<float>(name);
+                            if (ImGui::DragFloat(name.c_str(), &data))
+                            {
+                                scriptInstance->SetFieldValue(name, data);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            else
+            {
+                if (scriptClassExists)
+                {
+                    Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+                    const auto& fields = entityClass->GetFields();
+                    auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+
+                    for (const auto& [name, field] : fields)
+                    {
+                        // 如果该字段已经缓存
+                        if (entityFields.find(name) != entityFields.end())
+                        {
+                            ScriptFieldInstance& scriptField = entityFields.at(name);
+
+                            // 
+                            if (field.Type == ScriptFieldType::Float)
+                            {
+                                float data = scriptField.GetValue<float>();
+                                if (ImGui::DragFloat(name.c_str(), &data))
+                                    scriptField.SetValue(data);
+                            }
+                        }
+                        else
+                        {
+                            if (field.Type == ScriptFieldType::Float)
+                            {
+                                float data = 0.0f;
+                                if (ImGui::DragFloat(name.c_str(), &data))
+                                {
+                                    ScriptFieldInstance& scriptField = entityFields[name];
+                                    scriptField.Field = field;
+                                    scriptField.SetValue(data);
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
 
             if (!scriptClassExists)

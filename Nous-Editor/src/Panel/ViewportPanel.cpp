@@ -39,6 +39,14 @@ namespace Nous {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
         ImGui::Begin("Viewport");
 
+        static bool isOnRunning = false;
+        if (m_Context)
+        {
+            if (m_Context->IsRunning() && !isOnRunning)
+                ImGui::SetWindowFocus();
+            isOnRunning = m_Context->IsRunning();
+        }
+
         auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
         auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
         auto viewportOffset = ImGui::GetWindowPos(); // 包含标签栏

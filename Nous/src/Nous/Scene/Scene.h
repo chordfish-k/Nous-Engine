@@ -48,6 +48,8 @@ namespace Nous {
         Entity GetSelectedEntity();
         void SetSelectedEntity(Entity entity);
 
+        bool IsRunning() const { return m_IsRunning; }
+
         template<typename... Components>
         auto GetAllEntitiesWith()
         {
@@ -64,6 +66,7 @@ namespace Nous {
     private:
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+        bool m_IsRunning = false;
 
         b2World* m_PhysicsWorld = nullptr;
         entt::entity m_SelectedEntityID = { entt::null };
