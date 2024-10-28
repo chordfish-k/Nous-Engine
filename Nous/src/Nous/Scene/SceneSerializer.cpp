@@ -404,158 +404,157 @@ namespace Nous {
         NS_CORE_TRACE("正在解析场景文件 '{0}'", sceneName);
 
         auto entities = data["Entities"];
-        if (entities)
+        if (!entities)
+            return false;
+
+        for (auto entity : entities)
         {
-            for (auto entity : entities)
+            uint64_t uuid = entity["Entity"].as<uint64_t>();
+
+            std::string name;
+            auto tagComponent = entity["CTag"];
+            if (tagComponent)
+                name = tagComponent["Tag"].as<std::string>();
+
+            NS_CORE_TRACE("解析实体 ID = {0}, name = {1}", uuid, name);
+
+            Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+
+            auto transformComponent = entity["CTransform"];
+            if (transformComponent)
             {
-                uint64_t uuid = entity["Entity"].as<uint64_t>();
+                // 取出实体默认的Transform并赋值
+                auto& tc = deserializedEntity.GetComponent<CTransform>();
+                tc.Translation = transformComponent["Translation"].as<glm::vec3>();
+                tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
+                tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+            }
 
-                std::string name;
-                auto tagComponent = entity["CTag"];
-                if (tagComponent)
-                    name = tagComponent["Tag"].as<std::string>();
+            auto cameraComponent = entity["CCamera"];
+            if (cameraComponent)
+            {
+                auto& cc = deserializedEntity.AddComponent<CCamera>();
 
-                NS_CORE_TRACE("解析实体 ID = {0}, name = {1}", uuid, name);
+                auto cameraProps = cameraComponent["Camera"];
+                cc.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
 
-                Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+                cc.Camera.SetPerspFOV(cameraProps["PerspFOV"].as<float>());
+                cc.Camera.SetPerspNearClip(cameraProps["PerspNear"].as<float>());
+                cc.Camera.SetPerspFarClip(cameraProps["PerspFar"].as<float>());
 
-                auto transformComponent = entity["CTransform"];
-                if (transformComponent)
-                {
-                    // 取出实体默认的Transform并赋值
-                    auto& tc = deserializedEntity.GetComponent<CTransform>();
-                    tc.Translation = transformComponent["Translation"].as<glm::vec3>();
-                    tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
-                    tc.Scale = transformComponent["Scale"].as<glm::vec3>();
-                }
+                cc.Camera.SetOrthoSize(cameraProps["OrthoSize"].as<float>());
+                cc.Camera.SetOrthoNearClip(cameraProps["OrthoNear"].as<float>());
+                cc.Camera.SetOrthoFarClip(cameraProps["OrthoFar"].as<float>());
 
-                auto cameraComponent = entity["CCamera"];
-                if (cameraComponent)
-                {
-                    auto& cc = deserializedEntity.AddComponent<CCamera>();
+                cc.Primary = cameraComponent["Primary"].as<bool>();
+                cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+            }
 
-                    auto cameraProps = cameraComponent["Camera"];
-                    cc.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
-
-                    cc.Camera.SetPerspFOV(cameraProps["PerspFOV"].as<float>());
-                    cc.Camera.SetPerspNearClip(cameraProps["PerspNear"].as<float>());
-                    cc.Camera.SetPerspFarClip(cameraProps["PerspFar"].as<float>());
-
-                    cc.Camera.SetOrthoSize(cameraProps["OrthoSize"].as<float>());
-                    cc.Camera.SetOrthoNearClip(cameraProps["OrthoNear"].as<float>());
-                    cc.Camera.SetOrthoFarClip(cameraProps["OrthoFar"].as<float>());
-
-                    cc.Primary = cameraComponent["Primary"].as<bool>();
-                    cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
-                }
-
-                auto scriptComponent = entity["CMonoScript"];
-                if (scriptComponent)
-                {
-                    auto& sc = deserializedEntity.AddComponent<CMonoScript>();
-                    sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+            auto scriptComponent = entity["CMonoScript"];
+            if (scriptComponent)
+            {
+                auto& sc = deserializedEntity.AddComponent<CMonoScript>();
+                sc.ClassName = scriptComponent["ClassName"].as<std::string>();
                 
-                    auto scriptFields = scriptComponent["ScriptFields"];
-                    if (scriptFields)
+                auto scriptFields = scriptComponent["ScriptFields"];
+                Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+
+                if (scriptFields && entityClass)
+                {
+                    const auto& fields = entityClass->GetFields();
+                    auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+
+                    for (auto scriptField : scriptFields)
                     {
-                        Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
-                        NS_CORE_ASSERT(entityClass);
-                        const auto& fields = entityClass->GetFields();
-                        auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+                        std::string name = scriptField["Name"].as<std::string>();
+                        std::string typeString = scriptField["Type"].as<std::string>();
+                        ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
 
-                        for (auto scriptField : scriptFields)
+                        ScriptFieldInstance& fieldInstance = entityFields[name];
+
+                        // NS_CORE_ASSERT(fields.find(name) != fields.end());
+                        if (fields.find(name) == fields.end())
+                            continue;
+
+                        fieldInstance.Field = fields.at(name);
+
+                        switch (type)
                         {
-                            std::string name = scriptField["Name"].as<std::string>();
-                            std::string typeString = scriptField["Type"].as<std::string>();
-                            ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
-
-                            ScriptFieldInstance& fieldInstance = entityFields[name];
-
-                            // NS_CORE_ASSERT(fields.find(name) != fields.end());
-                            if (fields.find(name) == fields.end())
-                                continue;
-
-                            fieldInstance.Field = fields.at(name);
-
-                            switch (type)
-                            {
-                                READ_SCRIPT_FIELD(Float,    float       );
-                                READ_SCRIPT_FIELD(Double,   double      );
-                                READ_SCRIPT_FIELD(Bool,     bool        );
-                                READ_SCRIPT_FIELD(Char,     char        );
-                                READ_SCRIPT_FIELD(Byte,     int8_t      );
-                                READ_SCRIPT_FIELD(Short,    int16_t     );
-                                READ_SCRIPT_FIELD(Int,      int32_t     );
-                                READ_SCRIPT_FIELD(Long,     int64_t     );
-                                READ_SCRIPT_FIELD(UByte,    uint8_t     );
-                                READ_SCRIPT_FIELD(UShort,   uint16_t    );
-                                READ_SCRIPT_FIELD(UInt,     uint32_t    );
-                                READ_SCRIPT_FIELD(ULong,    uint64_t    );
-                                READ_SCRIPT_FIELD(Vector2,  glm::vec2   );
-                                READ_SCRIPT_FIELD(Vector3,  glm::vec3   );
-                                READ_SCRIPT_FIELD(Vector4,  glm::vec4   );
-                                READ_SCRIPT_FIELD(Entity,   UUID        );
-                            }
+                            READ_SCRIPT_FIELD(Float,    float       );
+                            READ_SCRIPT_FIELD(Double,   double      );
+                            READ_SCRIPT_FIELD(Bool,     bool        );
+                            READ_SCRIPT_FIELD(Char,     char        );
+                            READ_SCRIPT_FIELD(Byte,     int8_t      );
+                            READ_SCRIPT_FIELD(Short,    int16_t     );
+                            READ_SCRIPT_FIELD(Int,      int32_t     );
+                            READ_SCRIPT_FIELD(Long,     int64_t     );
+                            READ_SCRIPT_FIELD(UByte,    uint8_t     );
+                            READ_SCRIPT_FIELD(UShort,   uint16_t    );
+                            READ_SCRIPT_FIELD(UInt,     uint32_t    );
+                            READ_SCRIPT_FIELD(ULong,    uint64_t    );
+                            READ_SCRIPT_FIELD(Vector2,  glm::vec2   );
+                            READ_SCRIPT_FIELD(Vector3,  glm::vec3   );
+                            READ_SCRIPT_FIELD(Vector4,  glm::vec4   );
+                            READ_SCRIPT_FIELD(Entity,   UUID        );
                         }
                     }
                 }
+            }
 
-                auto spriteRendererComponent = entity["CSpriteRenderer"];
-                if (spriteRendererComponent)
-                {
-                    auto& src = deserializedEntity.AddComponent<CSpriteRenderer>();
-                    src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+            auto spriteRendererComponent = entity["CSpriteRenderer"];
+            if (spriteRendererComponent)
+            {
+                auto& src = deserializedEntity.AddComponent<CSpriteRenderer>();
+                src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 
-                    if (spriteRendererComponent["TexturePath"])
-                        src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+                if (spriteRendererComponent["TexturePath"])
+                    src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
 
-                    if (spriteRendererComponent["TilingFactor"])
-                        src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
-                }
+                if (spriteRendererComponent["TilingFactor"])
+                    src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+            }
 
-                auto circleRendererComponent = entity["CCircleRenderer"];
-                if (circleRendererComponent)
-                {
-                    auto& crc = deserializedEntity.AddComponent<CCircleRenderer>();
-                    crc.Color = circleRendererComponent["Color"].as<glm::vec4>();
-                    crc.Thickness = circleRendererComponent["Thickness"].as<float>();
-                    crc.Fade = circleRendererComponent["Fade"].as<float>();
-                }
+            auto circleRendererComponent = entity["CCircleRenderer"];
+            if (circleRendererComponent)
+            {
+                auto& crc = deserializedEntity.AddComponent<CCircleRenderer>();
+                crc.Color = circleRendererComponent["Color"].as<glm::vec4>();
+                crc.Thickness = circleRendererComponent["Thickness"].as<float>();
+                crc.Fade = circleRendererComponent["Fade"].as<float>();
+            }
 
-                auto rigidbody2DComponent = entity["CRigidbody2D"];
-                if (rigidbody2DComponent)
-                {
-                    auto& rb2d = deserializedEntity.AddComponent<CRigidbody2D>();
-                    rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
-                    rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
-                }
+            auto rigidbody2DComponent = entity["CRigidbody2D"];
+            if (rigidbody2DComponent)
+            {
+                auto& rb2d = deserializedEntity.AddComponent<CRigidbody2D>();
+                rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
+                rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+            }
 
-                auto boxCollider2DComponent = entity["CBoxCollider2D"];
-                if (boxCollider2DComponent)
-                {
-                    auto& bc2d = deserializedEntity.AddComponent<CBoxCollider2D>();
-                    bc2d.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
-                    bc2d.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
-                    bc2d.Density = boxCollider2DComponent["Density"].as<float>();
-                    bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
-                    bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
-                    bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
-                }
+            auto boxCollider2DComponent = entity["CBoxCollider2D"];
+            if (boxCollider2DComponent)
+            {
+                auto& bc2d = deserializedEntity.AddComponent<CBoxCollider2D>();
+                bc2d.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
+                bc2d.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+                bc2d.Density = boxCollider2DComponent["Density"].as<float>();
+                bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
+                bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+                bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+            }
 
-                auto circleCollider2D = entity["CCircleCollider2D"];
-                if (circleCollider2D)
-                {
-                    auto& cc2d = deserializedEntity.AddComponent<CCircleCollider2D>();
-                    cc2d.Offset = circleCollider2D["Offset"].as<glm::vec2>();
-                    cc2d.Radius = circleCollider2D["Radius"].as<float>();
-                    cc2d.Density = circleCollider2D["Density"].as<float>();
-                    cc2d.Friction = circleCollider2D["Friction"].as<float>();
-                    cc2d.Restitution = circleCollider2D["Restitution"].as<float>();
-                    cc2d.RestitutionThreshold = circleCollider2D["RestitutionThreshold"].as<float>();
-                }
+            auto circleCollider2D = entity["CCircleCollider2D"];
+            if (circleCollider2D)
+            {
+                auto& cc2d = deserializedEntity.AddComponent<CCircleCollider2D>();
+                cc2d.Offset = circleCollider2D["Offset"].as<glm::vec2>();
+                cc2d.Radius = circleCollider2D["Radius"].as<float>();
+                cc2d.Density = circleCollider2D["Density"].as<float>();
+                cc2d.Friction = circleCollider2D["Friction"].as<float>();
+                cc2d.Restitution = circleCollider2D["Restitution"].as<float>();
+                cc2d.RestitutionThreshold = circleCollider2D["RestitutionThreshold"].as<float>();
             }
         }
-
         return true;
     }
 

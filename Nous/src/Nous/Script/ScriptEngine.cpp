@@ -162,8 +162,19 @@ namespace Nous
 		InitMono();
 		ScriptGlue::RegisterFunctions();
 
-		LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
-		LoadAppAssembly("SandboxProject/Assets/Script/Binaries/Sandbox.dll");
+		bool status = LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
+		if (!status)
+		{
+			NS_CORE_ERROR("[ScriptEngine] 无法加载 Nous-ScriptCore.dll");
+			return;
+		}
+		status = LoadAppAssembly("SandboxProject/Assets/Script/Binaries/Sandbox.dll");
+		if (!status)
+		{
+			NS_CORE_ERROR("[ScriptEngine] 无法加载脚本二进制文件");
+			return;
+		}
+		
 		LoadAppAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
@@ -217,7 +228,7 @@ namespace Nous
 		s_Data->RootDomain = nullptr;
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		// 创建一个 app domain
 		s_Data->AppDomain = mono_domain_create_appdomain("NousScriptDomain", nullptr);
@@ -225,18 +236,25 @@ namespace Nous
 
 		s_Data->CoreAssemblyFilePath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		if (s_Data->CoreAssembly == nullptr)
+			return false;
+
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
+		return true;
 	}
 
-	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
-	
+		if (s_Data->CoreAssembly == nullptr)
+			return false;
+
 		// 监视文件变动并重载
 		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
+		return true;
 	}
 
 	void ScriptEngine::ReloadAssembly()
@@ -315,10 +333,15 @@ namespace Nous
 	void ScriptEngine::OnUpdateEntity(Entity entity, Timestep dt)
 	{
 		UUID entityUUID = entity.GetUUID();
-		NS_CORE_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end());
-	
-		Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
-		instance->InvokeOnUpdate((float)dt);
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnUpdate((float)dt);
+		}
+		else
+		{
+			NS_CORE_ERROR("[ScriptEngine] 找不到 entity {} 的 ScriptInstance", entityUUID);
+		}
 	}
 
 	Scene* ScriptEngine::GetSceneContext()
