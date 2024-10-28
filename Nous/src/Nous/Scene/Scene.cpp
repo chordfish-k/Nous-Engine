@@ -192,49 +192,52 @@ namespace Nous {
 
     void Scene::OnUpdateRuntime(Timestep dt)
     {
-        // 执行脚本更新
+        if (!m_IsPaused || m_StepFrames-- > 0)
         {
-            // C# Entity Update
-            auto view = m_Registry.view<CMonoScript>();
-            for (auto e : view)
+            // 执行脚本更新
             {
-                Entity entity = { e, this };
-                ScriptEngine::OnUpdateEntity(entity, dt);
-            }
-
-            m_Registry.view<CNativeScript>().each([=](auto ent, auto& script) {
-                // 没有脚本实例就先创建
-                if (!script.Instance)
+                // C# Entity Update
+                auto view = m_Registry.view<CMonoScript>();
+                for (auto e : view)
                 {
-                   script.Instance = script.InitScript();
-                   script.Instance->m_Entity = Entity{ent, this};
-                   script.Instance->OnCreate();
+                    Entity entity = { e, this };
+                    ScriptEngine::OnUpdateEntity(entity, dt);
                 }
 
-                script.Instance->OnUpdate(dt);
-            });
-        }
+                m_Registry.view<CNativeScript>().each([=](auto ent, auto& script) {
+                    // 没有脚本实例就先创建
+                    if (!script.Instance)
+                    {
+                       script.Instance = script.InitScript();
+                       script.Instance->m_Entity = Entity{ent, this};
+                       script.Instance->OnCreate();
+                    }
 
-        // 物理更新
-        {
-            // 控制物理模拟的迭代次数
-            const int32_t velocityIterations = 6;
-            const int32_t positionIterations = 2;
-            m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+                    script.Instance->OnUpdate(dt);
+                });
+            }
 
-            // 从Box2D中取出transform数据
-            auto view = m_Registry.view<CRigidbody2D>();
-            for (auto e : view)
+            // 物理更新
             {
-                Entity entity = { e, this };
-                auto& transform = entity.GetComponent<CTransform>();
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+                // 控制物理模拟的迭代次数
+                const int32_t velocityIterations = 6;
+                const int32_t positionIterations = 2;
+                m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
 
-                b2Body* body = (b2Body*) rb2d.RuntimeBody;
-                const auto& position = body->GetPosition();
-                transform.Translation.x = position.x;
-                transform.Translation.y = position.y;
-                transform.Rotation.z = body->GetAngle();
+                // 从Box2D中取出transform数据
+                auto view = m_Registry.view<CRigidbody2D>();
+                for (auto e : view)
+                {
+                    Entity entity = { e, this };
+                    auto& transform = entity.GetComponent<CTransform>();
+                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    const auto& position = body->GetPosition();
+                    transform.Translation.x = position.x;
+                    transform.Translation.y = position.y;
+                    transform.Rotation.z = body->GetAngle();
+                }
             }
         }
 
@@ -287,26 +290,29 @@ namespace Nous {
 
     void Scene::OnUpdateSimulation(Timestep dt, EditorCamera& camera)
     {
-        // 物理更新
+        if (!m_IsPaused || m_StepFrames-- > 0)
         {
-            // 控制物理模拟的迭代次数
-            const int32_t velocityIterations = 6;
-            const int32_t positionIterations = 2;
-            m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-
-            // 从Box2D中取出transform数据
-            auto view = m_Registry.view<CRigidbody2D>();
-            for (auto e : view)
+            // 物理更新
             {
-                Entity entity = { e, this };
-                auto& transform = entity.GetComponent<CTransform>();
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+                // 控制物理模拟的迭代次数
+                const int32_t velocityIterations = 6;
+                const int32_t positionIterations = 2;
+                m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
 
-                b2Body* body = (b2Body*) rb2d.RuntimeBody;
-                const auto& position = body->GetPosition();
-                transform.Translation.x = position.x;
-                transform.Translation.y = position.y;
-                transform.Rotation.z = body->GetAngle();
+                // 从Box2D中取出transform数据
+                auto view = m_Registry.view<CRigidbody2D>();
+                for (auto e : view)
+                {
+                    Entity entity = { e, this };
+                    auto& transform = entity.GetComponent<CTransform>();
+                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                    b2Body* body = (b2Body*) rb2d.RuntimeBody;
+                    const auto& position = body->GetPosition();
+                    transform.Translation.x = position.x;
+                    transform.Translation.y = position.y;
+                    transform.Rotation.z = body->GetAngle();
+                }
             }
         }
 
@@ -386,6 +392,11 @@ namespace Nous {
     void Scene::SetSelectedEntity(Entity entity)
     {
         m_SelectedEntityID = entity;
+    }
+
+    void Scene::Step(int frames)
+    {
+        m_StepFrames = frames;
     }
 
     void Scene::OnPhysics2DStart()

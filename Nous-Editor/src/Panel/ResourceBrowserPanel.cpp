@@ -10,8 +10,8 @@ namespace Nous {
     ResourceBrowserPanel::ResourceBrowserPanel()
         : m_CurrentDirectory(g_AssetPath)
     {
-        m_DirectoryIcon = Texture2D::Create("resources/icons/DirectoryIcon.png");
-        m_FileIcon = Texture2D::Create("resources/icons/FileIcon.png");
+        m_DirectoryIcon = Texture2D::Create("resources/icons/ResourceBrowser/DirectoryIcon.png");
+        m_FileIcon = Texture2D::Create("resources/icons/ResourceBrowser/FileIcon.png");
     }
 
     void ResourceBrowserPanel::OnImGuiRender()
