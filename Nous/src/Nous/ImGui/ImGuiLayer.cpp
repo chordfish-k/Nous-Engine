@@ -1,15 +1,16 @@
 ﻿#include "pch.h"
 #include "ImGuiLayer.h"
 
-#include "imgui.h"
-#include "examples/imgui_impl_glfw.h"
-#include "examples/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <examples/imgui_impl_glfw.h>
+#include <examples/imgui_impl_opengl3.h>
 
 #include "Nous/Core/Application.h"
 
 #include <GLFW/glfw3.h>
 
-#include "ImGuizmo.h"
+#include <ImGuizmo.h>
 
 namespace Nous {
 
@@ -147,5 +148,10 @@ namespace Nous {
         colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
         colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
         colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-    };
+    }
+    uint32_t ImGuiLayer::GetActiveWidgetID() const
+    {
+        return GImGui->ActiveId;
+    }
+    ;
 }

@@ -25,6 +25,8 @@ namespace Nous {
         bool IsBlockEvent() const { return m_BlockEvent; }
 
         void SetDarkThemeColor();
+
+        uint32_t GetActiveWidgetID() const;
     private:
         bool m_BlockEvent = true; // 阻止ImGui的事件
     };

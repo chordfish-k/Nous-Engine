@@ -40,7 +40,7 @@ namespace Nous {
         void OnUpdateEditor(Timestep dt, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 
-        void DuplicateEntity(Entity entity);
+        Entity DuplicateEntity(Entity entity);
 
         Entity GetEntityByUUID(UUID uuid);
         Entity GetEntityByName(std::string_view name);

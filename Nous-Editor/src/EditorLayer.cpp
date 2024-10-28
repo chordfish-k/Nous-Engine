@@ -195,10 +195,13 @@ namespace Nous
 
         // Properties
         ImGui::Begin("Stats");
+
+#if 0
         std::string name = "None";
         if (m_ViewportPanel.GetHoveredEntity())
             name = m_ViewportPanel.GetHoveredEntity().GetComponent<CTag>().Tag;
         ImGui::Text("Hovered Entity: %s", name.c_str());
+#endif
 
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -363,6 +366,19 @@ namespace Nous
             {
                 if (control)
                     OnDuplicateEntity();
+                break;
+            }
+            case Key::Delete:
+            {
+                if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0 && m_ActiveScene)
+                {
+                    Entity selectedEntity = m_ActiveScene->GetSelectedEntity();
+                    if (selectedEntity)
+                    {
+                        m_ActiveScene->SetSelectedEntity({});
+                        m_ActiveScene->DestroyEntity(selectedEntity);
+                    }
+                }
                 break;
             }
         }

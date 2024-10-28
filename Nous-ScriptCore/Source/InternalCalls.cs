@@ -28,6 +28,15 @@ namespace Nous
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Rigidbody2DComponent_ApplyLinearImpulseToCenter(ulong entityID, ref Vector2 impluse, bool wake);
 
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody2DComponent_GetLinearVelocity(ulong entityID, out Vector2 linearVelocity);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static CRigidbody2D.BodyType Rigidbody2DComponent_GetType(ulong entityID);
+		
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Rigidbody2DComponent_SetType(ulong entityID, CRigidbody2D.BodyType type);
+
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);

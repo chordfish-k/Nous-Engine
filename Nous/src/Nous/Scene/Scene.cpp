@@ -6,6 +6,7 @@
 #include "Nous/Scene/ScriptableEntity.h"
 #include "Nous/Renderer/Renderer2D.h"
 #include "Nous/Script/ScriptEngine.h"
+#include "Nous/Physics/Physics2D.h"
 
 #include <glm/glm.hpp>
 
@@ -347,10 +348,12 @@ namespace Nous {
         }
     }
 
-    void Scene::DuplicateEntity(Entity entity)
+    Entity Scene::DuplicateEntity(Entity entity)
     {
-        Entity newEntity = CreateEntity(entity.GetName());
+        std::string name = entity.GetName();
+        Entity newEntity = CreateEntity(name);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
+        return newEntity;
     }
 
     Entity Scene::GetEntityByUUID(UUID uuid)
@@ -410,7 +413,7 @@ namespace Nous {
             auto& rb2d = entity.GetComponent<CRigidbody2D>();
 
             b2BodyDef bodyDef;
-            bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+            bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
             bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
             bodyDef.angle = transform.Rotation.z;
 
