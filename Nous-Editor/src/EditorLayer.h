@@ -32,6 +32,7 @@ namespace Nous {
         void OnOverlayRender(); // 覆盖层绘制
 
         void NewProject();
+        bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
         void SaveProject();
 

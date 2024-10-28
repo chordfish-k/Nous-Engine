@@ -15,6 +15,7 @@
 #include "Nous/Core/Timer.h"
 #include "Nous/Core/Buffer.h"
 #include "Nous/Core/FileSystem.h"
+#include "Nous/Project/Project.h"
 
 namespace Nous
 {
@@ -168,7 +169,9 @@ namespace Nous
 			NS_CORE_ERROR("[ScriptEngine] 无法加载 Nous-ScriptCore.dll");
 			return;
 		}
-		status = LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+
+		auto scriptModulePath = Project::GetAssetsDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+		status = LoadAppAssembly(scriptModulePath);
 		if (!status)
 		{
 			NS_CORE_ERROR("[ScriptEngine] 无法加载脚本二进制文件");

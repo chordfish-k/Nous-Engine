@@ -50,7 +50,10 @@ namespace Nous
         else
         {
             // TODO 选择一个文件夹
-            NewProject();
+            // NewProject();
+            // 如果没有打开的项目，直接关闭程序
+            if (!OpenProject())
+                Application::Get().Close();
         }
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
@@ -139,18 +142,22 @@ namespace Nous
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("New", "Ctrl+N"))
+                // 打开项目
+                if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+                    OpenProject();
+
+                ImGui::Separator();
+
+                // 新建场景
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                     NewScene();
 
-                if (ImGui::MenuItem("Open...", "Ctrl+O"))
-                    OpenScene();
-
                 // 保存
-                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
                     SaveScene();
 
                 // 另存为
-                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
                     SaveSceneAs();
 
                 ImGui::Separator();
@@ -328,7 +335,7 @@ namespace Nous
             case Key::O:
             {
                 if (control)
-                    OpenScene();
+                    OpenProject();
                 break;
             }
             case Key::S:
@@ -433,10 +440,22 @@ namespace Nous
         Project::New();
     }
 
+    bool EditorLayer::OpenProject()
+    {
+        std::string filepath = FileDialogs::OpenFile("Nous Project (*.nsproj)\0*.nsproj\0");
+        if (filepath.empty())
+            return false;
+
+        OpenProject(filepath);
+        return true;
+    }
+
     void EditorLayer::OpenProject(const std::filesystem::path& path)
     {
         if (Project::Load(path))
         {
+            ScriptEngine::Init();
+
             auto startScenePath = Project::GetAssetsFileSystemPath(Project::GetActive()->GetConfig().StartScene);
             OpenScene(startScenePath);
             m_ResourceBrowserPanel = CreateScope<ResourceBrowserPanel>();

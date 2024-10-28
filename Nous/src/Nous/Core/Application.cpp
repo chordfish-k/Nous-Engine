@@ -27,7 +27,6 @@ namespace Nous {
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
 
         Renderer::Init();
-        ScriptEngine::Init();
 
         // 创建ImGui层
         m_ImGuiLayer = new ImGuiLayer();
