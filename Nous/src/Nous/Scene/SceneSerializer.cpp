@@ -393,7 +393,7 @@ namespace Nous {
         }
         catch (YAML::ParserException& e)
         {
-            NS_CORE_ERROR("无法加载 .scn 文件 '{0}'\n     {1}", filepath, e.what());
+            NS_CORE_ERROR("无法加载 .nous 文件 '{0}'\n     {1}", filepath, e.what());
             return false;
         }
 

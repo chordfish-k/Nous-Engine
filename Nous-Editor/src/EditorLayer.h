@@ -31,6 +31,10 @@ namespace Nous {
 
         void OnOverlayRender(); // 覆盖层绘制
 
+        void NewProject();
+        void OpenProject(const std::filesystem::path& path);
+        void SaveProject();
+
         void NewScene();
         void OpenScene();
         void OpenScene(const std::filesystem::path& path);
@@ -56,7 +60,7 @@ namespace Nous {
 
         // 面板窗口
         SceneHierarchyPanel m_SceneHierarchyPanel;
-        ResourceBrowserPanel m_ResourceBrowserPanel;
+        Scope<ResourceBrowserPanel> m_ResourceBrowserPanel;
         ViewportPanel m_ViewportPanel;
 
         bool m_ShowPhysicsColliders = false;

@@ -20,21 +20,21 @@ namespace Nous
 {
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap =
 	{
-		{"System.Single", ScriptFieldType::Float},
-		{"System.Double", ScriptFieldType::Double},
-		{"System.Boolean", ScriptFieldType::Bool},
-		{"System.Char", ScriptFieldType::Float},
-		{"System.Int16", ScriptFieldType::Short},
-		{"System.Int32", ScriptFieldType::Int},
-		{"System.Int64", ScriptFieldType::Long},
-		{"System.Byte", ScriptFieldType::Byte},
+		{"System.Single",	ScriptFieldType::Float	},
+		{"System.Double",	ScriptFieldType::Double	},
+		{"System.Boolean",	ScriptFieldType::Bool	},
+		{"System.Char",		ScriptFieldType::Float	},
+		{"System.Int16",	ScriptFieldType::Short	},
+		{"System.Int32",	ScriptFieldType::Int	},
+		{"System.Int64",	ScriptFieldType::Long	},
+		{"System.Byte",		ScriptFieldType::Byte	},
 
-		{"System.UByte", ScriptFieldType::UByte},
-		{"System.UInt16", ScriptFieldType::UShort},
-		{"System.UInt32", ScriptFieldType::UInt},
-		{"System.UInt64", ScriptFieldType::ULong},
+		{"System.UByte",	ScriptFieldType::UByte	},
+		{"System.UInt16",	ScriptFieldType::UShort	},
+		{"System.UInt32",	ScriptFieldType::UInt	},
+		{"System.UInt64",	ScriptFieldType::ULong	},
 
-		{"Nous.Entity", ScriptFieldType::Entity},
+		{"Nous.Entity",		ScriptFieldType::Entity	},
 	};
 
 	namespace Utils
@@ -168,7 +168,7 @@ namespace Nous
 			NS_CORE_ERROR("[ScriptEngine] 无法加载 Nous-ScriptCore.dll");
 			return;
 		}
-		status = LoadAppAssembly("SandboxProject/Assets/Script/Binaries/Sandbox.dll");
+		status = LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
 		if (!status)
 		{
 			NS_CORE_ERROR("[ScriptEngine] 无法加载脚本二进制文件");

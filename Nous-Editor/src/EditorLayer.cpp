@@ -8,10 +8,8 @@
 
 #include <imgui/imgui.h>
 
-namespace Nous {
-
-    extern const std::filesystem::path g_AssetPath;
-
+namespace Nous 
+{
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
     {
@@ -46,8 +44,13 @@ namespace Nous {
         auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
-            auto sceneFilePath = commandLineArgs[1];
-            OpenScene(sceneFilePath);
+            auto projectFilePath = commandLineArgs[1];
+            OpenProject(projectFilePath);
+        }
+        else
+        {
+            // TODO 选择一个文件夹
+            NewProject();
         }
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
@@ -174,7 +177,7 @@ namespace Nous {
         m_SceneHierarchyPanel.OnImGuiRender();
 
         // Resource
-        m_ResourceBrowserPanel.OnImGuiRender();
+        m_ResourceBrowserPanel->OnImGuiRender();
 
         // Viewport
         m_ViewportPanel.OnImGuiRender();
@@ -425,12 +428,30 @@ namespace Nous {
         Renderer2D::EndScene();
     }
 
+    void EditorLayer::NewProject()
+    {
+        Project::New();
+    }
+
+    void EditorLayer::OpenProject(const std::filesystem::path& path)
+    {
+        if (Project::Load(path))
+        {
+            auto startScenePath = Project::GetAssetsFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+            OpenScene(startScenePath);
+            m_ResourceBrowserPanel = CreateScope<ResourceBrowserPanel>();
+        }
+    }
+
+    void EditorLayer::SaveProject()
+    {
+        // Project::SaveActive();
+    }
+
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();
         m_EditorScene = CreateRef<Scene>();
-        //auto viewportSize = m_ViewportPanel.GetSize();
-        //m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         m_ViewportPanel.SetContext(m_ActiveScene);
 
@@ -439,7 +460,7 @@ namespace Nous {
 
     void EditorLayer::OpenScene()
     {
-        std::string filepath = FileDialogs::OpenFile("Scene File (*scn)\0*.scn\0");
+        std::string filepath = FileDialogs::OpenFile("Nous Scene (*nous)\0*.nous\0");
         if (!filepath.empty())
             OpenScene(filepath);
     }
@@ -449,9 +470,9 @@ namespace Nous {
         if (m_SceneState != SceneState::Edit)
             OnSceneStop();
 
-        if (path.extension().string() != ".scn")
+        if (path.extension().string() != ".nous")
         {
-            NS_WARN("无法加载 {0} - 不是一个场景(*.scn)文件", path.filename().string());
+            NS_WARN("无法加载 {0} - 不是一个场景(*.nous)文件", path.filename().string());
             return;
         }
 
@@ -460,8 +481,6 @@ namespace Nous {
         if (serializer.Deserialize(path.string()))
         {
             m_EditorScene = newScene;
-            //auto viewportSize = m_ViewportPanel.GetSize();
-            //m_EditorScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_SceneHierarchyPanel.SetContext(m_EditorScene);
             m_ViewportPanel.SetContext(m_EditorScene);
 
@@ -483,7 +502,7 @@ namespace Nous {
 
     void EditorLayer::SaveSceneAs()
     {
-        std::string filepath = FileDialogs::SaveFile("Scene File (*scn)\0*.scn\0");
+        std::string filepath = FileDialogs::SaveFile("Nous Scene (*Nous)\0*.nous\0");
 
         if (!filepath.empty())
         {

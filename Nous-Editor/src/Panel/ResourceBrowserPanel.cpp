@@ -1,14 +1,14 @@
-﻿#include "ResourceBrowserPanel.h"
+﻿#include "pch.h"
+#include "ResourceBrowserPanel.h"
+
+#include "Nous/Project/Project.h"
 
 #include <imgui.h>
 
-namespace Nous {
-
-    // 一旦打开一个项目，改变这个路径
-    extern const std::filesystem::path g_AssetPath = "assets";
-
+namespace Nous 
+{
     ResourceBrowserPanel::ResourceBrowserPanel()
-        : m_CurrentDirectory(g_AssetPath)
+        : m_BaseDirectory(Project::GetAssetsDirectory()), m_CurrentDirectory(m_BaseDirectory)
     {
         m_DirectoryIcon = Texture2D::Create("resources/icons/ResourceBrowser/DirectoryIcon.png");
         m_FileIcon = Texture2D::Create("resources/icons/ResourceBrowser/FileIcon.png");
@@ -18,7 +18,7 @@ namespace Nous {
     {
         ImGui::Begin("Resources");
 
-        if (m_CurrentDirectory != std::filesystem::path(g_AssetPath))
+        if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory))
         {
             if (ImGui::Button("<-"))
             {
@@ -54,7 +54,7 @@ namespace Nous {
 
             if (ImGui::BeginDragDropSource())
             {
-                auto relativePath = std::filesystem::relative(path, g_AssetPath);
+                auto relativePath = std::filesystem::relative(path);
                 const wchar_t* itemPath = relativePath.c_str();
                 ImGui::SetDragDropPayload("RESOURCE_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
                 ImGui::EndDragDropSource();

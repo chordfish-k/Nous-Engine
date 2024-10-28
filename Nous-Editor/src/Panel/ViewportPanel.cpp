@@ -10,9 +10,8 @@
 #include <imgui.h>
 #include <ImGuizmo.h>
 
-namespace Nous {
-    extern const std::filesystem::path g_AssetPath;
-
+namespace Nous 
+{
     ViewportPanel::ViewportPanel(const Ref<Framebuffer>& framebuffer)
     {
         SetFramebuffer(framebuffer);
@@ -73,9 +72,13 @@ namespace Nous {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
             {
                 const wchar_t* path = (const wchar_t*)payload->Data;
-                // TODO 检测文件类型为.scn
-                OpenSceneEvent event {std::filesystem::path(g_AssetPath) / path};
-                EditorEventRepeater::Emit(event);
+                // TODO 检测文件类型为.nous
+                auto ext = std::filesystem::path(path).extension();
+                if (ext == ".nous")
+                {
+                    OpenSceneEvent event {path};
+                    EditorEventRepeater::Emit(event);
+                }
             }
             ImGui::EndDragDropTarget();
         }

@@ -21,6 +21,8 @@
 #include "Nous/Scene/ScriptableEntity.h"
 #include "Nous/Scene/SceneSerializer.h"
 
+#include "Nous/Project/ProjectSerializer.h"
+
 // -----------------渲染器-----------------
 #include "Nous/Renderer/Renderer.h"
 #include "Nous/Renderer/Renderer2D.h"
