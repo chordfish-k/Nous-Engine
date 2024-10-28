@@ -7,6 +7,11 @@
 #include <mono/metadata/attrdefs.h>
 #include <mono/metadata/assembly.h>
 
+#include <FileWatch.h>
+
+#include "Nous/Core/Application.h"
+#include "Nous/Core/Timer.h"
+
 namespace Nous
 {
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap =
@@ -138,11 +143,30 @@ namespace Nous
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
+		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		bool AssemblyReloadPending = false;
+
 		// Runtime
 		Scene* SceneContext = nullptr;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
+
+	static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event changeType)
+	{
+		// 如果脚本dll被修改，则重载
+		if (!s_Data->AssemblyReloadPending && changeType == filewatch::Event::modified)
+		{
+			s_Data->AssemblyReloadPending = true;
+
+			// 发送一个待处理事件给主线程执行（此时处于filewatch的线程）
+			Application::Get().SubmitToMainThread([]()
+			{
+				s_Data->AppAssemblyFileWatcher.reset();
+				ScriptEngine::ReloadAssembly();
+			});
+		}
+	}
 
 	void ScriptEngine::Init()
 	{
@@ -204,6 +228,10 @@ namespace Nous
 		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+	
+		// 监视文件变动并重载
+		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
+		s_Data->AssemblyReloadPending = false;
 	}
 
 	void ScriptEngine::ReloadAssembly()

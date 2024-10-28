@@ -82,6 +82,13 @@ namespace Nous {
         m_Running = false;
     }
 
+    void Application::SubmitToMainThread(const std::function<void()>& function)
+    {
+        std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+        m_MainThreadQueue.emplace_back(function);
+    }
+
     void Application::Run()
     {
         NS_PROFILE_FUNCTION();
@@ -91,8 +98,10 @@ namespace Nous {
             NS_PROFILE_SCOPE("RunLoop");
 
             float time = Time::GetTime();
-            Timestep timestep = time - m_lastFrameTime;
-            m_lastFrameTime = time;
+            Timestep timestep = time - m_LastFrameTime;
+            m_LastFrameTime = time;
+
+            ExecuteMainThreadQueue();
 
             if (!m_Minimized)
             {
@@ -138,5 +147,14 @@ namespace Nous {
         Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
         return false;
+    }
+    void Application::ExecuteMainThreadQueue()
+    {
+        std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+        for (auto& func : m_MainThreadQueue)
+            func();
+
+        m_MainThreadQueue.clear();
     }
 }
