@@ -115,29 +115,7 @@ namespace Nous
 			return it->second;
 		}
 
-		const char* ScriptFieldTypeToString(ScriptFieldType type)
-		{
-			switch (type)
-			{
-				case Nous::ScriptFieldType::Float:		return "Float";
-				case Nous::ScriptFieldType::Double:		return "Double";
-				case Nous::ScriptFieldType::Bool:		return "Bool";
-				case Nous::ScriptFieldType::Char:		return "Char";
-				case Nous::ScriptFieldType::Byte:		return "Byte";
-				case Nous::ScriptFieldType::Short:		return "Short";
-				case Nous::ScriptFieldType::Int:		return "Int";
-				case Nous::ScriptFieldType::Long:		return "Long";
-				case Nous::ScriptFieldType::UByte:		return "UByte";
-				case Nous::ScriptFieldType::UShort:		return "UShort";
-				case Nous::ScriptFieldType::UInt:		return "UInt";
-				case Nous::ScriptFieldType::ULong:		return "ULong";
-				case Nous::ScriptFieldType::Vector2:	return "Vector2";
-				case Nous::ScriptFieldType::Vector3:	return "Vector3";
-				case Nous::ScriptFieldType::Vector4:	return "Vector4";
-				case Nous::ScriptFieldType::Entity:		return "Entity";
-			}
-			return "<Invaild>";
-		}
+		
 	}
 
 	struct ScriptEngineData

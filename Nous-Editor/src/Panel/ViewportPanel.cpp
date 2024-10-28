@@ -57,7 +57,7 @@ namespace Nous {
         // TODO 修复焦点不在Viewport不能用快捷键的bug
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->SetBlockEvent(!m_ViewportFocused && !m_ViewportHovered);
+        Application::Get().GetImGuiLayer()->SetBlockEvent(!m_ViewportHovered);
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
