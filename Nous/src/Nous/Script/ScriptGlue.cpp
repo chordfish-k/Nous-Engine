@@ -96,7 +96,7 @@ namespace Nous
 	}
 
 	// Rigidbody2D：应用线性冲量（施加力）
-	static void CRigidbody2D_ApplyLinearImpulse(UUID entityID, glm::vec2* impluse, glm::vec2* point, bool wake)
+	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impluse, glm::vec2* point, bool wake)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
 		NS_CORE_ASSERT(scene);
@@ -109,7 +109,7 @@ namespace Nous
 	}
 
 	// Rigidbody2D：应用线性冲量（施加力）
-	static void CRigidbody2D_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impluse, bool wake)
+	static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impluse, bool wake)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
 		NS_CORE_ASSERT(scene);
@@ -121,7 +121,7 @@ namespace Nous
 		body->ApplyLinearImpulseToCenter(b2Vec2(impluse->x, impluse->y), wake);
 	}
 
-	static void CRigidbody2D_GetLinearVelocity(UUID entityID, glm::vec2* outLinearVelocity)
+	static void Rigidbody2DComponent_GetLinearVelocity(UUID entityID, glm::vec2* outLinearVelocity)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
 		NS_CORE_ASSERT(scene);
@@ -134,7 +134,19 @@ namespace Nous
 		*outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
 	}
 
-	static CRigidbody2D::BodyType CRigidbody2D_GetType(UUID entityID)
+	static void Rigidbody2DComponent_SetLinearVelocity(UUID entityID, glm::vec2* inLinearVelocity)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		NS_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		NS_CORE_ASSERT(entity);
+
+		auto& rb2d = entity.GetComponent<CRigidbody2D>();
+		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		body->SetLinearVelocity({inLinearVelocity->x, inLinearVelocity->y});
+	}
+
+	static CRigidbody2D::BodyType Rigidbody2DComponent_GetType(UUID entityID)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
 		NS_CORE_ASSERT(scene);
@@ -146,7 +158,7 @@ namespace Nous
 		return Utils::Rigidbody2DTypeFromBox2DBody(body->GetType());
 	}
 
-	static void CRigidbody2D_SetType(UUID entityID, CRigidbody2D::BodyType bodyType)
+	static void Rigidbody2DComponent_SetType(UUID entityID, CRigidbody2D::BodyType bodyType)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
 		NS_CORE_ASSERT(scene);
@@ -210,8 +222,12 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
 
-		NS_ADD_INTERNAL_CALL(CRigidbody2D_ApplyLinearImpulse);
-		NS_ADD_INTERNAL_CALL(CRigidbody2D_ApplyLinearImpulseToCenter);
+		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
+		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetLinearVelocity);
+		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetLinearVelocity);
+		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetType);
+		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetType);
 
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}
