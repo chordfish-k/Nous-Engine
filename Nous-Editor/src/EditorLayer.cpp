@@ -1,6 +1,7 @@
 ﻿#include "EditorLayer.h"
 
 #include "Nous/Utils/PlatformUtils.h"
+#include "Nous/Script/ScriptEngine.h"
 
 #include "Panel/DockingSpace.h"
 #include "Event/EditorEvent.h"
@@ -149,9 +150,16 @@ namespace Nous {
 
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Exit", ""))
+                if (ImGui::MenuItem("Exit"))
                     Application::Get().Close();
 
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Script", m_ActiveScene && !m_ActiveScene->IsRunning()))
+            {
+                if (ImGui::MenuItem("Reload", "Crtl+R"))
+                    ScriptEngine::ReloadAssembly();
                 ImGui::EndMenu();
             }
 
@@ -288,6 +296,15 @@ namespace Nous {
                         SaveSceneAs();
                     else
                         SaveScene();
+                }
+                break;
+            }
+            case Key::R:
+            {
+                if (control)
+                {
+                    if (m_ActiveScene && !m_ActiveScene->IsRunning())
+                        ScriptEngine::ReloadAssembly();
                 }
                 break;
             }

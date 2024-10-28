@@ -154,8 +154,8 @@ namespace Nous
 
 	void ScriptGlue::RegisterComponents()
 	{
+		s_EntityHasComponentFuncs.clear();
 		RegisterComponent(AllComponents{});
-		//RegisterComponent(ComponentGroup<CTransform, CRigidbody2D>{});
 	}
 
 	void ScriptGlue::RegisterFunctions()

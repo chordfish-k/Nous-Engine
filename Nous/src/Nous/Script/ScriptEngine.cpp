@@ -129,6 +129,9 @@ namespace Nous
 		MonoAssembly* AppAssembly = nullptr;
 		MonoImage* AppAssemblyImage = nullptr;
 
+		std::filesystem::path CoreAssemblyFilePath;
+		std::filesystem::path AppAssemblyFilePath;
+
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
@@ -146,13 +149,13 @@ namespace Nous
 		s_Data = new ScriptEngineData();
 
 		InitMono();
+		ScriptGlue::RegisterFunctions();
+
 		LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
-		
 		LoadAppAssembly("SandboxProject/Assets/Script/Binaries/Sandbox.dll");
 		LoadAppAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
-		ScriptGlue::RegisterFunctions();
 	
 		s_Data->EntityClass = ScriptClass("Nous", "Entity", true);
 	}
@@ -191,14 +194,31 @@ namespace Nous
 		s_Data->AppDomain = mono_domain_create_appdomain("NousScriptDomain", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
+		s_Data->CoreAssemblyFilePath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath.string());
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 	}
 
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
+		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+	}
+
+	void ScriptEngine::ReloadAssembly()
+	{
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_Data->AppDomain);
+
+		LoadAssembly(s_Data->CoreAssemblyFilePath);
+		LoadAppAssembly(s_Data->AppAssemblyFilePath);
+		LoadAppAssemblyClasses();
+
+		ScriptGlue::RegisterComponents();
+
+		s_Data->EntityClass = ScriptClass("Nous", "Entity", true);
 	}
 
 	MonoImage* ScriptEngine::GetCoreAssmblyImage()
