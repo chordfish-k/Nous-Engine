@@ -5,6 +5,8 @@
 
 #include <map>
 
+#define MAX_FIELD_DATA_SIZE 16
+
 // 向前声明
 extern "C" {
 	typedef struct _MonoClass MonoClass;
@@ -48,18 +50,18 @@ namespace Nous
 		template<typename T>
 		T GetValue()
 		{
-			static_assert(sizeof(T) <= 16, "Type too large!");
+			static_assert(sizeof(T) <= MAX_FIELD_DATA_SIZE, "Type too large!");
 			return *(T*)m_Buffer;
 		}
 
 		template<typename T>
 		void SetValue(T value)
 		{
-			static_assert(sizeof(T) <= 16, "Type too large!");
+			static_assert(sizeof(T) <= MAX_FIELD_DATA_SIZE, "Type too large!");
 			memcpy(m_Buffer, &value, sizeof(T));
 		}
 	private:
-		uint8_t m_Buffer[16]; // 最大存储16个字节 
+		uint8_t m_Buffer[MAX_FIELD_DATA_SIZE]; // 最大存储MAX_FIELD_DATA_SIZE个字节 
 
 		friend class ScriptEngine;
 		friend class ScriptInstance;
@@ -102,7 +104,7 @@ namespace Nous
 		template<typename T>
 		T GetFieldValue(const std::string& name)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large!");
+			static_assert(sizeof(T) <= MAX_FIELD_DATA_SIZE, "Type too large!");
 
 			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
 			if (!success)
@@ -113,10 +115,12 @@ namespace Nous
 		template<typename T>
 		void SetFieldValue(const std::string& name, const T& value)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large!");
+			static_assert(sizeof(T) <= MAX_FIELD_DATA_SIZE, "Type too large!");
 
 			SetFieldValueInternal(name, &value);
 		}
+
+		MonoObject* GetManagedObject() { return m_Instance; }
 	private:
 		bool GetFieldValueInternal(const std::string& name, void* buffer);
 		bool SetFieldValueInternal(const std::string& name, const void* value);
@@ -159,6 +163,8 @@ namespace Nous
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
 		static MonoImage* GetCoreAssmblyImage();
+
+		static MonoObject* GetManagedInstance(UUID uuid);
 	private:
 		static void InitMono();
 		static void ShutdownMono();

@@ -322,6 +322,9 @@ namespace Nous {
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
     {
+        if (m_ViewportWidth == width && m_ViewportHeight == height)
+            return;
+
         if (width > 0 && height > 0)
         {
             m_ViewportWidth = width;
@@ -348,6 +351,18 @@ namespace Nous {
     {
         if (m_EntityMap.find(uuid) != m_EntityMap.end())
             return {m_EntityMap.at(uuid), this};
+        return {};
+    }
+
+    Entity Scene::GetEntityByName(std::string_view name)
+    {
+        auto view = m_Registry.view<CTag>();
+        for (auto entity : view)
+        {
+            const CTag& tc = view.get<CTag>(entity);
+            if (tc.Tag == name)
+                return Entity{ entity, this };
+        }
         return {};
     }
 

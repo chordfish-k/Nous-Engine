@@ -43,15 +43,13 @@ Entities:
       RestitutionThreshold: 5.19000006
   - Entity: 7440336366702553677
     CTag:
-      Tag: BoxSprite
+      Tag: Player
     CTransform:
       Translation: [-1.8460412, 1.59866309, -2.95864382e-08]
       Rotation: [0, 0, 0.882575333]
       Scale: [0.5, 0.5, 1]
     CMonoScript:
       ClassName: Sandbox.Player
-      ScriptFields:
-        []
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
       TexturePath: assets\textures\Mario.png
@@ -75,7 +73,7 @@ Entities:
       Scale: [1, 1, 1]
     CCamera:
       Camera:
-        ProjectionType: 1
+        ProjectionType: 0
         PerspFOV: 0.785398185
         PerspNear: 0.00999999978
         PerspFar: 1000
@@ -87,7 +85,7 @@ Entities:
     CMonoScript:
       ClassName: Sandbox.Camera
       ScriptFields:
-        - Name: Speed
+        - Name: DistanceFromPlayer
           Type: Float
           Data: 20
   - Entity: 7410354370059520324

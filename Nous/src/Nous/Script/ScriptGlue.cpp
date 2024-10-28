@@ -20,6 +20,7 @@ namespace Nous
 
 #define NS_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Nous.InternalCalls::" #Name, Name)
 
+	// Log
 	static void NativeLog(MonoString* text, int parameter)
 	{
 		char* cStr = mono_string_to_utf8(text);
@@ -28,12 +29,20 @@ namespace Nous
 		std::cout << str << ", " << parameter << std::endl;
 	}
 
+	// Log
 	static void NativeLog_Vector(glm::vec3* parameter, glm::vec3* outResult)
 	{
 		NS_CORE_WARN("Value: {0}", *parameter);
 		*outResult = glm::cross(*parameter, glm::vec3(parameter->x, parameter->y, -parameter->z));
 	}
 
+	// 获取脚本实例
+	static MonoObject* GetScriptInstance(UUID entityID)
+	{
+		return ScriptEngine::GetManagedInstance(entityID);
+	}
+
+	// 实体：是否持有组件
 	static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -46,6 +55,23 @@ namespace Nous
 		return s_EntityHasComponentFuncs.at(managedType)(entity);
 	}
 
+	// 实体：根据名称找实体
+	static uint64_t Entity_FindEntityByName(MonoString* name)
+	{
+		char* nameCStr = mono_string_to_utf8(name);
+
+		Scene* scene = ScriptEngine::GetSceneContext();
+		NS_CORE_ASSERT(scene);
+		Entity entity = scene->GetEntityByName(nameCStr);
+		mono_free(nameCStr);
+
+		if (!entity)
+			return 0;
+
+		return entity.GetUUID();
+	}
+
+	// Transform：获取位移
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -56,6 +82,7 @@ namespace Nous
 		*outTranslation = entity.GetComponent<CTransform>().Translation;
 	}
 
+	// Transform：设置位移
 	static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* translation)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -66,6 +93,7 @@ namespace Nous
 		entity.GetComponent<CTransform>().Translation = *translation;
 	}
 
+	// Rigidbody2D：应用线性冲量（施加力）
 	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impluse, glm::vec2* point, bool wake)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -78,6 +106,7 @@ namespace Nous
 		body->ApplyLinearImpulse(b2Vec2(impluse->x, impluse->y), b2Vec2(point->x, point->y), wake);
 	}
 
+	// Rigidbody2D：应用线性冲量（施加力）
 	static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impluse, bool wake)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -90,11 +119,13 @@ namespace Nous
 		body->ApplyLinearImpulseToCenter(b2Vec2(impluse->x, impluse->y), wake);
 	}
 
+	// 输入：键盘按键按下
 	static bool Input_IsKeyDown(KeyCode keycode)
 	{
 		return Input::IsKeyPressed(keycode);
 	}
 
+	// 注册组件
 	template<typename... Component>
 	static void RegisterComponent()
 	{
@@ -123,8 +154,8 @@ namespace Nous
 
 	void ScriptGlue::RegisterComponents()
 	{
-		//RegisterComponent(AllComponents{});
-		RegisterComponent(ComponentGroup<CTransform, CRigidbody2D>{});
+		RegisterComponent(AllComponents{});
+		//RegisterComponent(ComponentGroup<CTransform, CRigidbody2D>{});
 	}
 
 	void ScriptGlue::RegisterFunctions()
@@ -132,7 +163,10 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(NativeLog);
 		NS_ADD_INTERNAL_CALL(NativeLog_Vector);
 
+		NS_ADD_INTERNAL_CALL(GetScriptInstance);
+
 		NS_ADD_INTERNAL_CALL(Entity_HasComponent);
+		NS_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

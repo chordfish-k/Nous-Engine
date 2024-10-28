@@ -217,21 +217,6 @@ namespace Nous {
         return false;
     }
 
-    void ViewportPanel::CheckAndResize()
-    {
-        if (!m_Context || ! m_Framebuffer) return;
-
-        auto spec = m_Framebuffer->GetSpecification();
-        auto viewportSize = GetSize();
-        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
-            (spec.Width != (uint32_t) viewportSize.x ||
-             spec.Height != (uint32_t) viewportSize.y))
-        {
-            m_Framebuffer->Resize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
-            m_Context->OnViewportResize((uint32_t) viewportSize.x, (uint32_t) viewportSize.y);
-        }
-    }
-
     void ViewportPanel::CheckHoveredEntity()
     {
         auto [mx, my] = ImGui::GetMousePos();

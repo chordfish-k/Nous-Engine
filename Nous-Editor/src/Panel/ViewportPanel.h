@@ -31,7 +31,6 @@ namespace Nous
 
         EditorCamera* GetEditorCamera() const { return m_EditorCamera; }
 
-        void CheckAndResize();
         void CheckHoveredEntity();
         void OnImGuiRender();
         void OnEvent(Event& event);

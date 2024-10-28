@@ -66,10 +66,20 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
+        auto viewportSize = m_ViewportPanel.GetSize();
+        m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+
         fps = 1.0f / dt;
 
         // Resize
-        m_ViewportPanel.CheckAndResize();
+        auto spec = m_Framebuffer->GetSpecification();
+        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
+            (spec.Width != (uint32_t)viewportSize.x ||
+                spec.Height != (uint32_t)viewportSize.y))
+        {
+            m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+            m_EditorCamera.SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        }
 
         // Update
         m_EditorCamera.OnUpdate(dt);
@@ -364,8 +374,8 @@ namespace Nous {
     {
         m_ActiveScene = CreateRef<Scene>();
         m_EditorScene = CreateRef<Scene>();
-        auto viewportSize = m_ViewportPanel.GetSize();
-        m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        //auto viewportSize = m_ViewportPanel.GetSize();
+        //m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         m_ViewportPanel.SetContext(m_ActiveScene);
 
@@ -395,8 +405,8 @@ namespace Nous {
         if (serializer.Deserialize(path.string()))
         {
             m_EditorScene = newScene;
-            auto viewportSize = m_ViewportPanel.GetSize();
-            m_EditorScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+            //auto viewportSize = m_ViewportPanel.GetSize();
+            //m_EditorScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_SceneHierarchyPanel.SetContext(m_EditorScene);
             m_ViewportPanel.SetContext(m_EditorScene);
 

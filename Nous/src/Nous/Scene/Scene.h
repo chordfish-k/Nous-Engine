@@ -43,6 +43,7 @@ namespace Nous {
         void DuplicateEntity(Entity entity);
 
         Entity GetEntityByUUID(UUID uuid);
+        Entity GetEntityByName(std::string_view name);
 
         Entity GetPrimaryCameraEntity();
         Entity GetSelectedEntity();
