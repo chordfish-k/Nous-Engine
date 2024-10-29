@@ -7,16 +7,13 @@
 namespace Nous {
 
 
-    Ref <Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+    Ref <Texture2D> Texture2D::Create(const TextureSpecification& specification)
     {
         switch (Renderer::GetAPI())
         {
-            case RendererAPI::API::None: NS_CORE_ASSERT(false, "RendererAPI 未选择");
-                return nullptr;
-            case RendererAPI::API::OpenGL:
-                return CreateRef<OpenGLTexture2D>(width, height);
+            case RendererAPI::API::None: NS_CORE_ASSERT(false, "RendererAPI 未选择"); return nullptr;
+            case RendererAPI::API::OpenGL: return CreateRef<OpenGLTexture2D>(specification);
         }
-
         NS_CORE_ASSERT(false, "RendererAPI 未知")
         return nullptr;
     }
@@ -25,12 +22,9 @@ namespace Nous {
     {
         switch (Renderer::GetAPI())
         {
-            case RendererAPI::API::None: NS_CORE_ASSERT(false, "RendererAPI 未选择");
-                return nullptr;
-            case RendererAPI::API::OpenGL:
-                return CreateRef<OpenGLTexture2D>(path);
+            case RendererAPI::API::None: NS_CORE_ASSERT(false, "RendererAPI 未选择"); return nullptr;
+            case RendererAPI::API::OpenGL: return CreateRef<OpenGLTexture2D>(path);
         }
-
         NS_CORE_ASSERT(false, "RendererAPI 未知")
         return nullptr;
     }

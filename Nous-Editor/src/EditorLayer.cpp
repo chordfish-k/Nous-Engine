@@ -11,12 +11,14 @@
 
 namespace Nous 
 {
+    static Font* s_Font;
+
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
     {
         EditorEventRepeater::AddObserver(this);
 
-        Font font("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf");
+        s_Font = new Font("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf");
     }
 
     void EditorLayer::OnAttached()
@@ -194,6 +196,9 @@ namespace Nous
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+        
+        ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512, 512 }, { 0, 1 }, { 1, 0 });
+
         ImGui::End();
 
         // Properties
