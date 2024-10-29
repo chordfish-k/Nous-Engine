@@ -13,7 +13,7 @@ namespace Sandbox
         private CTransform m_Transform = null;
         private CRigidbody2D m_Rigidbody = null;
 
-
+        public float Speed = 1.0f;
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate = {ID}");
@@ -24,10 +24,9 @@ namespace Sandbox
 
         void OnUpdate(float dt)
         {
-            Console.WriteLine($"Player.OnUpdate: {dt}");
+            // Console.WriteLine($"Player.OnUpdate: {dt}");
 
-            float speed = 1.0f;
-            Vector3 velocity = Vector3.Zero;
+            Vector2 velocity = Vector2.Zero;
 
             if (Input.IsKeyDown(KeyCode.W))
                 velocity.Y = 1.0f;
@@ -39,20 +38,9 @@ namespace Sandbox
             else if (Input.IsKeyDown(KeyCode.D))
                 velocity.X = 1.0f;
 
-            Entity cameraEntity = FindEntityByName("Camera");
-            if (cameraEntity != null)
-            {
-                Camera camera = cameraEntity.As<Camera>();
+            velocity *= Speed;
 
-                if (Input.IsKeyDown(KeyCode.Q))
-                    camera.DistanceFromPlayer += speed * 2.0f * dt;
-                else if (Input.IsKeyDown(KeyCode.E))
-                    camera.DistanceFromPlayer -= speed * 2.0f * dt;
-            }
-
-            velocity *= speed;
-
-            m_Rigidbody?.ApplyLinearImpulse(velocity.XY, true);
+            m_Rigidbody.LinearVelocity = velocity;
         }
     }
 }

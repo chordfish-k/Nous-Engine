@@ -24,7 +24,7 @@ Entities:
     CTag:
       Tag: Circle
     CTransform:
-      Translation: [0.360000014, 0.951340556, 0]
+      Translation: [6.55887222, -3.2764864, 0]
       Rotation: [0, 0, 0]
       Scale: [2.5, 2.70000005, 1]
     CCircleRenderer:
@@ -45,17 +45,21 @@ Entities:
     CTag:
       Tag: Player
     CTransform:
-      Translation: [-1.8460412, 1.59866309, -2.95864382e-08]
-      Rotation: [0, 0, 0.882575333]
+      Translation: [-5.13038635, -3.26569796, -2.95864417e-08]
+      Rotation: [0, 0, 0]
       Scale: [0.5, 0.5, 1]
     CMonoScript:
       ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 3
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
       TexturePath: Assets\Textures\Mario.png
       TilingFactor: 1
     CRigidbody2D:
-      BodyType: Dynamic
+      BodyType: Kinematic
       FixedRotation: false
     CBoxCollider2D:
       Offset: [0, 0]
@@ -68,7 +72,7 @@ Entities:
     CTag:
       Tag: Camera
     CTransform:
-      Translation: [0, 0, 1]
+      Translation: [0, 0, 18.6000004]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CCamera:

@@ -343,7 +343,7 @@ namespace Nous
 		}
 		else
 		{
-			NS_CORE_ERROR("[ScriptEngine] 找不到 entity {} 的 ScriptInstance", entityUUID);
+			NS_CORE_ERROR("[ScriptEngine] 找不到 {0}(id={1}) 的 ScriptInstance", entity.GetName(), entityUUID);
 		}
 	}
 
