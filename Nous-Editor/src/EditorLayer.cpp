@@ -2,6 +2,7 @@
 
 #include "Nous/Utils/PlatformUtils.h"
 #include "Nous/Script/ScriptEngine.h"
+#include "Nous/Renderer/Font.h"
 
 #include "Panel/DockingSpace.h"
 #include "Event/EditorEvent.h"
@@ -14,6 +15,8 @@ namespace Nous
         : Layer("EditorLayer")
     {
         EditorEventRepeater::AddObserver(this);
+
+        Font font("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf");
     }
 
     void EditorLayer::OnAttached()

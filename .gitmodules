@@ -19,3 +19,6 @@ url=https://github.com/chordfish-k/ImGuizmo.git
 [submodule "Nous/vendor/glfw"]
 	path = Nous/vendor/glfw
 url=https://github.com/chordfish-k/glfw.git
+[submodule "Nous/vendor/msdf-atlas-gen"]
+	path = Nous/vendor/msdf-atlas-gen
+	url = https://github.com/chordfish-k/msdf-atlas-gen.git

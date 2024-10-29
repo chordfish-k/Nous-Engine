@@ -8,7 +8,7 @@ project "Nous"
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "pch.h"
-	pchsource "src/spch.cpp"
+	pchsource "src/pch.cpp"
 
 	files
 	{
@@ -43,6 +43,8 @@ project "Nous"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.msdf_atlas_gen}",
+		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.VulkanSDK}"
 	}
@@ -55,6 +57,7 @@ project "Nous"
 		"ImGui",
 		"yaml-cpp",
 		"opengl32.lib",
+		"msdf-atlas-gen",
 		"%{Library.mono}",
 	}
 

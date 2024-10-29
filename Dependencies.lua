@@ -18,8 +18,9 @@ IncludeDir["mono"] = "%{wks.location}/Nous/vendor/mono/include"
 IncludeDir["shaderc"] = "%{wks.location}/Nous/vendor/shaderc/include"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/Nous/vendor/SPIRV-Cross"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
--- IncludeDir["msdfgen"] = "%{wks.location}/Nous/vendor/msdf-atlas-gen/msdfgen"
--- IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Nous/vendor/msdf-atlas-gen/msdf-atlas-gen"
+IncludeDir["msdfgen"] = "%{wks.location}/Nous/vendor/msdf-atlas-gen/msdfgen"
+IncludeDir["artery_font_format"] = "%{wks.location}/Nous/vendor/msdf-atlas-gen/artery-font-format"
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Nous/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 

@@ -31,6 +31,7 @@ group "Dependencies"
 	include "Nous/vendor/glad"
 	include "Nous/vendor/imgui"
 	include "Nous/vendor/yaml-cpp"
+	include "Nous/vendor/msdf-atlas-gen"
 group ""
 
 group "Core"
