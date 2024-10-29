@@ -13,10 +13,10 @@ namespace Nous {
           RED_INTEGER, // 只有一个红色通道的整数，相对于int
 
           // Depth/stencil 模板深度 深度测试+模板缓冲
-          DEPTH25STENCIL8,
+          DEPTH24STENCIL8,
 
           // Default
-          Depth = DEPTH25STENCIL8
+          Depth = DEPTH24STENCIL8
     };
 
     struct FramebufferTextureSpecification

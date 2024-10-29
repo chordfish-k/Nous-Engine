@@ -11,14 +11,14 @@
 
 namespace Nous 
 {
-    static Font* s_Font;
+    static Ref<Font> s_Font;
 
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
     {
         EditorEventRepeater::AddObserver(this);
 
-        s_Font = new Font("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf");
+        s_Font = Font::GetDefault();
     }
 
     void EditorLayer::OnAttached()
@@ -31,14 +31,11 @@ namespace Nous
         m_IconPause = Texture2D::Create("Resources/Icons/PauseButton.png");
         m_IconStep = Texture2D::Create("Resources/Icons/StepButton.png");
 
-        FramebufferSpecification fbSpec = {};
-        fbSpec.Attachments = {
-            FramebufferTextureFormat::RGBA8,            // 颜色缓冲
-            FramebufferTextureFormat::RED_INTEGER,      // 实体ID
-            FramebufferTextureFormat::Depth           // 深度缓冲
-        };
+        FramebufferSpecification fbSpec;
+        fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
+        //fbSpec.Samples = 4;
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
         m_EditorScene = CreateRef<Scene>();

@@ -4,6 +4,8 @@
 #include "Nous/Renderer/OrthoCamera.h"
 #include "Nous/Renderer/Texture.h"
 #include "Nous/Renderer/EditorCamera.h"
+#include "Nous/Renderer/Font.h"
+
 #include "Nous/Scene/Component.h"
 
 namespace Nous {
@@ -41,6 +43,8 @@ namespace Nous {
         static void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
 
         static void DrawSprite(const glm::mat4& transform, CSpriteRenderer& src, int entityID = -1);
+
+        static void DrawString(const std::string& str, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color);
 
         static float GetLineWidth();
         static void SetLineWidth(float width);

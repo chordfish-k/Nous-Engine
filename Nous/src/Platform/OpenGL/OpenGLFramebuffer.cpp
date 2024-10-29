@@ -70,7 +70,7 @@ namespace Nous {
         {
             switch (format)
             {
-                case FramebufferTextureFormat::DEPTH25STENCIL8: return true;
+                case FramebufferTextureFormat::DEPTH24STENCIL8: return true;
             }
             return false;
         }
@@ -155,7 +155,7 @@ namespace Nous {
             Utils::BindTexture(multisample, m_DepthAttachment);
             switch (m_DepthAttachmentSpecification.TextureFormat)
             {
-                case FramebufferTextureFormat::DEPTH25STENCIL8:
+                case FramebufferTextureFormat::DEPTH24STENCIL8:
                     Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
                     break;
             }
@@ -175,11 +175,6 @@ namespace Nous {
         NS_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "帧缓冲创建失败！");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    const FramebufferSpecification& OpenGLFramebuffer::GetSpecification() const
-    {
-        return m_Specification;
     }
 
     void OpenGLFramebuffer::Bind()
@@ -223,6 +218,6 @@ namespace Nous {
 
         auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
         glClearTexImage(m_ColorAttachments[attachmentIndex], 0,
-                        Utils::FramebufferTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
+        Utils::FramebufferTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
     }
 }
