@@ -282,8 +282,14 @@ namespace Nous
 
 	MonoObject* ScriptEngine::GetManagedInstance(UUID uuid)
 	{
-		NS_CORE_ASSERT(s_Data->EntityInstances.find(uuid) != s_Data->EntityInstances.end());
-		return s_Data->EntityInstances.at(uuid)->GetManagedObject();
+		if(s_Data->EntityInstances.find(uuid) != s_Data->EntityInstances.end())
+			return s_Data->EntityInstances.at(uuid)->GetManagedObject();
+		return nullptr;
+	}
+
+	MonoString* ScriptEngine::CreateString(const char* string)
+	{
+		return mono_string_new(s_Data->AppDomain, string);
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)

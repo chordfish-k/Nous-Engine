@@ -54,7 +54,7 @@ namespace Nous
 
 		public T As<T>() where T : Entity, new()
         {
-			object instance = InternalCalls.GetScriptInstance(ID);
+			object instance = InternalCalls.Entity_GetScriptInstance(ID);
 			return instance as T;
         }
 	}

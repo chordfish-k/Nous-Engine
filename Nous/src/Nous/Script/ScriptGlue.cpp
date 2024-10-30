@@ -18,16 +18,32 @@
 
 namespace Nous
 {
+	namespace Utils
+	{
+		std::string MonnoStringToString(MonoString* string)
+		{
+			char* cStr = mono_string_to_utf8(string);
+			std::string str(cStr);
+			mono_free(cStr);
+			return str;
+		}
+	}
+
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
 
 #define NS_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Nous.InternalCalls::" #Name, Name)
 
+#define NS_CORE_ASSERT_ENTITYID(entityID)				\
+	Scene* scene = ScriptEngine::GetSceneContext();		\
+	NS_CORE_ASSERT(scene);								\
+	Entity entity = scene->GetEntityByUUID(entityID);	\
+	NS_CORE_ASSERT(entity)
+
+#define NS_CORE_ASSERT_COMPONENT(componentClass) NS_CORE_ASSERT(entity.HasComponent<componentClass>())
 	// Log
 	static void NativeLog(MonoString* text, int parameter)
 	{
-		char* cStr = mono_string_to_utf8(text);
-		std::string str(cStr);
-		mono_free(cStr);
+		std::string str = Utils::MonnoStringToString(text);
 		std::cout << str << ", " << parameter << std::endl;
 	}
 
@@ -39,7 +55,7 @@ namespace Nous
 	}
 
 	// 获取脚本实例
-	static MonoObject* GetScriptInstance(UUID entityID)
+	static MonoObject* Entity_GetScriptInstance(UUID entityID)
 	{
 		return ScriptEngine::GetManagedInstance(entityID);
 	}
@@ -47,10 +63,7 @@ namespace Nous
 	// 实体：是否持有组件
 	static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID)
 
 		MonoType* managedType = mono_reflection_type_get_type(componentType);
 		NS_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end());
@@ -76,10 +89,7 @@ namespace Nous
 	// Transform：获取位移
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
 
 		*outTranslation = entity.GetComponent<CTransform>().Translation;
 	}
@@ -87,10 +97,7 @@ namespace Nous
 	// Transform：设置位移
 	static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* translation)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
 
 		entity.GetComponent<CTransform>().Translation = *translation;
 	}
@@ -98,10 +105,8 @@ namespace Nous
 	// Rigidbody2D：应用线性冲量（施加力）
 	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impluse, glm::vec2* point, bool wake)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CRigidbody2D);
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body * body = (b2Body*)rb2d.RuntimeBody;
@@ -111,10 +116,8 @@ namespace Nous
 	// Rigidbody2D：应用线性冲量（施加力）
 	static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impluse, bool wake)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CRigidbody2D);
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -123,10 +126,8 @@ namespace Nous
 
 	static void Rigidbody2DComponent_GetLinearVelocity(UUID entityID, glm::vec2* outLinearVelocity)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CRigidbody2D);
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -136,10 +137,8 @@ namespace Nous
 
 	static void Rigidbody2DComponent_SetLinearVelocity(UUID entityID, glm::vec2* inLinearVelocity)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CRigidbody2D);
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -148,10 +147,8 @@ namespace Nous
 
 	static CRigidbody2D::BodyType Rigidbody2DComponent_GetType(UUID entityID)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CRigidbody2D);
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -160,14 +157,84 @@ namespace Nous
 
 	static void Rigidbody2DComponent_SetType(UUID entityID, CRigidbody2D::BodyType bodyType)
 	{
-		Scene* scene = ScriptEngine::GetSceneContext();
-		NS_CORE_ASSERT(scene);
-		Entity entity = scene->GetEntityByUUID(entityID);
-		NS_CORE_ASSERT(entity);
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CRigidbody2D);
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
 		body->SetType(Utils::Rigidbody2DTypeToBox2DBody(bodyType));
+	}
+
+	static MonoString* TextRendererComponent_GetText(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		return ScriptEngine::CreateString(tc.TextString.c_str());
+	}
+
+	static void TextRendererComponent_SetText(UUID entityID, MonoString* textString)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		tc.TextString = Utils::MonnoStringToString(textString);
+	}
+
+	static void TextRendererComponent_GetColor(UUID entityID, glm::vec4* color)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		*color = tc.Color;
+	}
+
+	static void TextRendererComponent_SetColor(UUID entityID, glm::vec4* color)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		tc.Color = *color;
+	}
+
+	static float TextRendererComponent_GetKerning(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		return tc.Kerning;
+	}
+
+	static void TextRendererComponent_SetKerning(UUID entityID, float kerning)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		tc.Kerning = kerning;
+	}
+
+	static float TextRendererComponent_GetLineSpacing(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		return tc.LineSpacing;
+	}
+
+	static void TextRendererComponent_SetLineSpacing(UUID entityID, float lineSpacing)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
+
+		auto& tc = entity.GetComponent<CTextRenderer>();
+		tc.LineSpacing = lineSpacing;
 	}
 
 	// 输入：键盘按键按下
@@ -214,7 +281,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(NativeLog);
 		NS_ADD_INTERNAL_CALL(NativeLog_Vector);
 
-		NS_ADD_INTERNAL_CALL(GetScriptInstance);
+		NS_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		NS_ADD_INTERNAL_CALL(Entity_HasComponent);
 		NS_ADD_INTERNAL_CALL(Entity_FindEntityByName);
@@ -228,6 +295,15 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetLinearVelocity);
 		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetType);
 		NS_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetType);
+
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_GetText);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_SetText);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_GetColor);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_SetColor);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_GetKerning);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_SetKerning);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_GetLineSpacing);
+		NS_ADD_INTERNAL_CALL(TextRendererComponent_SetLineSpacing);
 
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}

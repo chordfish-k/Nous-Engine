@@ -13,7 +13,10 @@ namespace Sandbox
         private CTransform m_Transform = null;
         private CRigidbody2D m_Rigidbody = null;
 
+        private TheText m_Text = null;
+
         public float Speed = 1.0f;
+
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate = {ID}");
@@ -39,6 +42,12 @@ namespace Sandbox
                 velocity.X = 1.0f;
 
             velocity *= Speed;
+
+            if (m_Text == null)
+                m_Text = FindEntityByName("Text")?.As<TheText>();
+
+            if (m_Text != null)
+                m_Text.Text = "" + dt;
 
             m_Rigidbody.LinearVelocity = velocity;
         }

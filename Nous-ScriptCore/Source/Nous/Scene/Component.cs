@@ -60,4 +60,41 @@ namespace Nous
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(Entity.ID, ref impulse, wake);
         }
     }
+
+    public class CTextRenderer : Component
+    {
+
+        public string Text
+        {
+            get => InternalCalls.TextRendererComponent_GetText(Entity.ID);
+            set => InternalCalls.TextRendererComponent_SetText(Entity.ID, value);
+        }
+
+        public Vector4 Color
+        {
+            get
+            {
+                InternalCalls.TextRendererComponent_GetColor(Entity.ID, out Vector4 color);
+                return color;
+            }
+
+            set
+            {
+                InternalCalls.TextRendererComponent_SetColor(Entity.ID, ref value);
+            }
+        }
+
+        public float Kerning
+        {
+            get => InternalCalls.TextRendererComponent_GetKerning(Entity.ID);
+            set => InternalCalls.TextRendererComponent_SetKerning(Entity.ID, value);
+        }
+
+        public float LineSpacing
+        {
+            get => InternalCalls.TextRendererComponent_GetLineSpacing(Entity.ID);
+            set => InternalCalls.TextRendererComponent_SetLineSpacing(Entity.ID, value);
+        }
+
+    }
 }
