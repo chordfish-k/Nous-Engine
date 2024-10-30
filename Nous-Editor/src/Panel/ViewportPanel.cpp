@@ -121,9 +121,12 @@ namespace Nous
                 float snapValues[3] = {snapValue, snapValue, snapValue};
 
                 if (m_ShowGizmo)
+                {
+                    ImGuizmo::SetOrthographic(m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic);
                     ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                                         (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
-                                         nullptr, snap ? snapValues : nullptr);
+                        (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+                        nullptr, snap ? snapValues : nullptr);
+                }
 
                 if (ImGuizmo::IsUsing())
                 {

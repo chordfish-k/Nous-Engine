@@ -20,9 +20,9 @@ namespace Nous {
         void OnEvent(Event& e);
 
         float GetDistance() const { return m_Distance; }
-        void SetDistance(float distance) {m_Distance = distance; }
+        void SetDistance(float distance) { m_Distance = distance; }
 
-        void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; RecalculateProjection(); }
+        void SetViewportSize(float width, float height);
 
         const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
         glm::mat4 GetViewProjectionMatrix() const { return m_Projection * m_ViewMatrix; }
@@ -37,6 +37,8 @@ namespace Nous {
 
         float GetPitch() const { return m_Pitch; }
         float GetYaw() const { return m_Yaw; }
+
+        ProjectionType GetProjectionType() const { return m_ProjectionType; }
 
         void Reset();
     private:
@@ -69,7 +71,7 @@ namespace Nous {
         float m_Pitch = 0.0f, m_Yaw = 0.0f; // 俯仰角， 水平角
         float m_ViewportWidth = 1280, m_ViewportHeight = 720;
 
-        enum class ProjectionType {Perspective = 0, Orthographic = 1};
+        
         ProjectionType m_ProjectionType = ProjectionType::Orthographic;
     };
 

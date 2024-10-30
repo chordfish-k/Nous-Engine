@@ -96,6 +96,15 @@ namespace Nous {
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(EditorCamera::OnKeyPressed));
     }
 
+    void EditorCamera::SetViewportSize(float width, float height)
+    {
+        if (m_ViewportWidth == width && m_ViewportHeight == height)
+            return;
+        m_ViewportWidth = width; 
+        m_ViewportHeight = height; 
+        RecalculateProjection(); 
+    }
+
     bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e)
     {
         float delta = e.GetYOffset() * 0.1f;
