@@ -98,6 +98,7 @@ namespace Nous
 		ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity);
 
 		void InvokeOnCreate();
+		void InvokeOnStart();
 		void InvokeOnUpdate(float dt);
 
 		Ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
@@ -131,6 +132,7 @@ namespace Nous
 		MonoObject* m_Instance = nullptr;
 		MonoMethod* m_Constructor = nullptr;
 		MonoMethod* m_OnCreateMethod = nullptr;
+		MonoMethod* m_OnStartMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
 
 		inline static char s_FieldValueBuffer[8];
@@ -156,6 +158,7 @@ namespace Nous
 		static bool EntityClassExists(const std::string& fullClassName);
 
 		static void OnCreateEntity(Entity entity);
+		static void OnStartEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
 
 		static Scene* GetSceneContext();

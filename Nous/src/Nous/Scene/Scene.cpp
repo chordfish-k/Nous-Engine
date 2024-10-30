@@ -168,6 +168,13 @@ namespace Nous {
                 Entity entity = { e, this };
                 ScriptEngine::OnCreateEntity(entity);
             }
+
+            // 全部实例化之后再调用 OnStart
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnStartEntity(entity);
+            }
         }
         
     }

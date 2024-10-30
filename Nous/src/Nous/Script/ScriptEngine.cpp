@@ -339,6 +339,20 @@ namespace Nous
 		}
 	}
 
+	void ScriptEngine::OnStartEntity(Entity entity)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnStart();
+		}
+		else
+		{
+			NS_CORE_ERROR("[ScriptEngine] ÕÒ²»µ½ {0}(id={1}) µÄ ScriptInstance", entity.GetName(), entityUUID);
+		}
+	}
+
 	void ScriptEngine::OnUpdateEntity(Entity entity, Timestep dt)
 	{
 		UUID entityUUID = entity.GetUUID();
@@ -468,6 +482,7 @@ namespace Nous
 
 		m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
+		m_OnStartMethod = scriptClass->GetMethod("OnStart", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
 
 		{
@@ -481,6 +496,12 @@ namespace Nous
 	{
 		if (m_OnCreateMethod)
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod, nullptr);
+	}
+
+	void ScriptInstance::InvokeOnStart()
+	{
+		if (m_OnStartMethod)
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnStartMethod, nullptr);
 	}
 
 	void ScriptInstance::InvokeOnUpdate(float dt)

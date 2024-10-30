@@ -25,6 +25,11 @@ namespace Sandbox
             m_Rigidbody = GetComponent<CRigidbody2D>();
         }
 
+        void OnStart()
+        {
+            m_Text = FindEntityByName("Text")?.As<TheText>();
+        }
+
         void OnUpdate(float dt)
         {
             // Console.WriteLine($"Player.OnUpdate: {dt}");
@@ -43,11 +48,8 @@ namespace Sandbox
 
             velocity *= Speed;
 
-            if (m_Text == null)
-                m_Text = FindEntityByName("Text")?.As<TheText>();
-
-            if (m_Text != null)
-                m_Text.Text = "" + dt;
+            //if (m_Text != null)
+            m_Text.Text = "" + dt;
 
             m_Rigidbody.LinearVelocity = velocity;
         }
