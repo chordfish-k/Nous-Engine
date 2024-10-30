@@ -2,6 +2,7 @@
 
 #include "Nous/Scene/SceneCamera.h"
 #include "Nous/Renderer/Texture.h"
+#include "Nous/Renderer/Font.h"
 #include "Nous/Core/UUID.h"
 
 #include <glm/glm.hpp>
@@ -72,6 +73,15 @@ namespace Nous {
 
         CCircleRenderer() = default;
         CCircleRenderer(const CCircleRenderer&) = default;
+    };
+
+    struct CTextRenderer
+    {
+        std::string TextString;
+        Ref<Font> FontAsset = Font::GetDefault();
+        glm::vec4 Color{ 1.0f };
+        float Kerning = 0.0f; // 字距
+        float LineSpacing = 0.0f; // 行距
     };
 
     struct CCamera
@@ -166,7 +176,7 @@ namespace Nous {
     };
 
     using AllComponents =
-        ComponentGroup<CTransform, CSpriteRenderer,
-            CCircleRenderer, CCamera, CNativeScript, CMonoScript,
-            CRigidbody2D, CBoxCollider2D, CCircleCollider2D>;
+        ComponentGroup<CTransform, CSpriteRenderer, CCircleRenderer, 
+        CCamera, CNativeScript, CMonoScript, CRigidbody2D, 
+        CBoxCollider2D, CCircleCollider2D, CTextRenderer>;
 }

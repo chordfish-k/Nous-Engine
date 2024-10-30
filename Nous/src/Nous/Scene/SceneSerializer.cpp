@@ -355,6 +355,21 @@ namespace Nous {
             out << YAML::EndMap; // CCircleCollider2D
         }
 
+        if (entity.HasComponent<CTextRenderer>())
+        {
+            out << YAML::Key << "CTextRenderer";
+            out << YAML::BeginMap; // CTextRenderer
+
+            auto& textComponent = entity.GetComponent<CTextRenderer>();
+            out << YAML::Key << "TextString" << YAML::Value << textComponent.TextString;
+            // TODO: FontAsset
+            out << YAML::Key << "Color" << YAML::Value << textComponent.Color;
+            out << YAML::Key << "Kerning" << YAML::Value << textComponent.Kerning;
+            out << YAML::Key << "LineSpacing" << YAML::Value << textComponent.LineSpacing;
+
+            out << YAML::EndMap; // CTextRenderer
+        }
+
         out << YAML::EndMap; // Entity
     }
 
@@ -553,6 +568,16 @@ namespace Nous {
                 cc2d.Friction = circleCollider2D["Friction"].as<float>();
                 cc2d.Restitution = circleCollider2D["Restitution"].as<float>();
                 cc2d.RestitutionThreshold = circleCollider2D["RestitutionThreshold"].as<float>();
+            }
+
+            auto textRenderer = entity["CTextRenderer"];
+            if (textRenderer)
+            {
+                auto& tc = deserializedEntity.AddComponent<CTextRenderer>();
+                tc.TextString = textRenderer["TextString"].as<std::string>();
+                tc.Color = textRenderer["Color"].as<glm::vec4>();
+                tc.Kerning = textRenderer["Kerning"].as<float>();
+                tc.LineSpacing = textRenderer["LineSpacing"].as<float>();
             }
         }
         return true;

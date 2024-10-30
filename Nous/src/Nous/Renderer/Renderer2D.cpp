@@ -566,7 +566,7 @@ namespace Nous {
             DrawQuad(transform, src.Color, entityID);
     }
 
-    void Renderer2D::DrawString(const std::string& str, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color)
+    void Renderer2D::DrawString(const glm::mat4& transform, const std::string& str, Ref<Font> font, const TextParams& textParams, int entityID)
     {
         const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
         const auto& metrics = fontGeometry.getMetrics();
@@ -576,7 +576,8 @@ namespace Nous {
 
         double x = 0.0, y = 0.0;
         double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
-        float lineHeightOffset = 0.0f;
+
+        const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
 
         for (size_t i = 0; i < str.size(); i++)
         {
@@ -589,7 +590,28 @@ namespace Nous {
             if (character == '\n')
             {
                 x = 0;
-                y -= fsScale * metrics.lineHeight + lineHeightOffset;
+                y -= fsScale * metrics.lineHeight + textParams.LineSpacing;
+                continue;
+            }
+
+            if (character == ' ')
+            {
+                float advance = spaceGlyphAdvance;
+                if (i < str.size() - 1)
+                {
+                    char nextCharacter = str[i + 1];
+                    double dAdvance;
+                    fontGeometry.getAdvance(dAdvance, character, nextCharacter);
+                    advance = (float)dAdvance;
+                }
+                x += fsScale * advance + textParams.Kerning;
+                continue;
+            }
+
+            if (character == '\t')
+            {
+                // 1tab = 4空格，可能有问题
+                x += 4.0f * (fsScale * spaceGlyphAdvance + textParams.Kerning);
                 continue;
             }
 
@@ -598,9 +620,6 @@ namespace Nous {
                 glyph = fontGeometry.getGlyph('?'); // 未知字符
             if (!glyph)
                 return;
-
-            if (character == '\t')
-                glyph = fontGeometry.getGlyph(' ');
 
             double al, ab, ar, at;
             glyph->getQuadAtlasBounds(al, ab, ar, at);
@@ -634,9 +653,9 @@ namespace Nous {
             for (size_t i = 0; i < 4; i++)
             {
                 s_Data.TextVertexBufferPtr->Position = transform * quadVertexs[i];
-                s_Data.TextVertexBufferPtr->Color = color;
+                s_Data.TextVertexBufferPtr->Color = textParams.Color;
                 s_Data.TextVertexBufferPtr->TexCoord = textureCoords[i];
-                s_Data.TextVertexBufferPtr->EntityID = 0; // TODO
+                s_Data.TextVertexBufferPtr->EntityID = entityID; // TODO
                 s_Data.TextVertexBufferPtr++;
             }
             s_Data.TextIndexCount += 6;
@@ -649,10 +668,14 @@ namespace Nous {
                 char nextCharacter = str[i + 1];
                 fontGeometry.getAdvance(advance, character, nextCharacter);
 
-                float kerningOffset = 0.0f;
-                x += fsScale * advance + kerningOffset;
+                x += fsScale * advance + textParams.Kerning;
             }
         }
+    }
+
+    void Renderer2D::DrawString(const glm::mat4& transform, const std::string& str, const CTextRenderer& component, const glm::vec4& color, int entityID)
+    {
+        DrawString(transform, str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing }, entityID);
     }
 
     float Renderer2D::GetLineWidth()

@@ -6,6 +6,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <cstring>
@@ -176,6 +177,7 @@ namespace Nous {
             DisplayAddComponentEntry<CRigidbody2D>("Rigidbody 2D");
             DisplayAddComponentEntry<CBoxCollider2D>("Box Collider 2D");
             DisplayAddComponentEntry<CCircleCollider2D>("Circle Collider 2D");
+            DisplayAddComponentEntry<CTextRenderer>("Text Renderer");
 
             ImGui::EndPopup();
         }
@@ -372,6 +374,14 @@ namespace Nous {
             UI::DrawFloatControl("Friction", &component.Friction, 0.01f, 0.0f, 1.0f);
             UI::DrawFloatControl("Restitution", &component.Restitution, 0.01f, 0.0f, 1.0f);
             UI::DrawFloatControl("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
+        });
+
+        DrawComponent<CTextRenderer>("Text Renderer", entity, [](auto& component)
+        {
+            UI::DrawInputTextMultiline("Text String", &component.TextString);
+            UI::DrawColor4Control("Color", component.Color);
+            UI::DrawFloatControl("Kerning", &component.Kerning, 0.025f);
+            UI::DrawFloatControl("Line Spacing", &component.LineSpacing, 0.025f);
         });
     }
 

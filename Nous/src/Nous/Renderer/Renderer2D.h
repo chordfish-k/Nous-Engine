@@ -44,7 +44,14 @@ namespace Nous {
 
         static void DrawSprite(const glm::mat4& transform, CSpriteRenderer& src, int entityID = -1);
 
-        static void DrawString(const std::string& str, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color);
+        struct TextParams
+        {
+            glm::vec4 Color{ 1.0f };
+            float Kerning = 0.0f; // 字距
+            float LineSpacing = 0.0f; // 行距
+        };
+        static void DrawString(const glm::mat4& transform, const std::string& str, Ref<Font> font, const TextParams& textParams, int entityID = -1);
+        static void DrawString(const glm::mat4& transform, const std::string& str, const CTextRenderer& component, const glm::vec4& color, int entityID = -1);
 
         static float GetLineWidth();
         static void SetLineWidth(float width);

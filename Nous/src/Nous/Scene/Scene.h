@@ -68,7 +68,7 @@ namespace Nous {
         void OnPhysics2DStart();
         void OnPhysics2DStop();
 
-        void RenderScene(EditorCamera& camera);
+        void RenderScene();
     private:
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;

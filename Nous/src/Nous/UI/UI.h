@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
@@ -267,6 +268,21 @@ namespace Nous::UI
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
         changed = ImGui::InputText("##inputText", buf, buf_size);
+        ImGui::PopItemWidth();
+
+        NS_IMGUI_FIELD_END;
+
+        return changed;
+    }
+
+    static bool DrawInputTextMultiline(const std::string& label, std::string* buf, float columnWidth = 100.0f)
+    {
+        bool changed = false;
+
+        NS_IMGUI_FIELD_BEGIN;
+
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+        changed = ImGui::InputTextMultiline("##inputText", buf);
         ImGui::PopItemWidth();
 
         NS_IMGUI_FIELD_END;
