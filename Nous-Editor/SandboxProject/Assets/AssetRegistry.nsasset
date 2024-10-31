@@ -1,5 +1,8 @@
 AssetRegistry:
-  - Handle: 9073738476510511611
+  - Handle: 3813795801237644536
+    FilePath: Scenes/PhysicsExample.nous
+    Type: AssetType::Scene
+  - Handle: 5215514554843654355
     FilePath: Textures/Mario.png
     Type: AssetType::Texture2D
   - Handle: 12275135097561593367
@@ -7,13 +10,4 @@ AssetRegistry:
     Type: AssetType::Texture2D
   - Handle: 15044703600172437370
     FilePath: Scenes/3DExample.nous
-    Type: AssetType::Scene
-  - Handle: 15931407459184208857
-    FilePath: Scenes/Test.nous
-    Type: AssetType::Scene
-  - Handle: 16276543036030461258
-    FilePath: Scenes/Example.nous
-    Type: AssetType::Scene
-  - Handle: 17546005893865107657
-    FilePath: Scenes/PhysicsExample.nous
     Type: AssetType::Scene

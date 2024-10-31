@@ -10,7 +10,9 @@ namespace Nous
 	{
 		NS_PROFILE_FUNCTION();
 
-		return LoadScene(Project::GetAssetsDirectory() / metadata.FilePath);
+		auto res = LoadScene(Project::GetAssetsDirectory() / metadata.FilePath);
+		res->Handle = handle;
+		return res;
 	}
 
 	Ref<Scene> SceneImporter::LoadScene(const std::filesystem::path& path)

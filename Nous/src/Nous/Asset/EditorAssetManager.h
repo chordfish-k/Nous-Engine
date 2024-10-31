@@ -20,6 +20,7 @@ namespace Nous
 
 		void ImportAsset(const std::filesystem::path& filepath);
 		void RemoveAsset(AssetHandle handle);
+		void ReloadAsset(AssetHandle handle);
 
 		const AssetMetadata& GetMetadata(AssetHandle handle) const;
 		const std::filesystem::path& GetFilePath(AssetHandle handle) const;

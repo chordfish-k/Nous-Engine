@@ -535,19 +535,37 @@ namespace Nous
     void EditorLayer::SaveScene()
     {
         if (!m_EditorScenePath.empty())
+        {
             SerializeScene(m_EditorScene, m_EditorScenePath);
+
+            // 保存后马上作为资源加载
+            Project::GetActive()->GetEditorAssetManager()->ReloadAsset(m_EditorScene->Handle);
+
+            // 更新资源面板
+            m_ResourceBrowserPanel->RefreshAssetTree();
+        }
         else
+        {
             SaveSceneAs();
+        }
     }
 
     void EditorLayer::SaveSceneAs()
     {
-        std::string filepath = FileDialogs::SaveFile("Nous Scene (*Nous)\0*.nous\0");
+        std::filesystem::path filepath = FileDialogs::SaveFile("Nous Scene (*Nous)\0*.nous\0");
+        filepath = std::filesystem::relative(filepath, Project::GetAssetsDirectory());
+        std::string pathString = filepath.generic_string();
 
-        if (!filepath.empty())
+        if (!pathString.empty())
         {
-            SerializeScene(m_ActiveScene, filepath);
-            m_EditorScenePath = filepath;
+            SerializeScene(m_ActiveScene, pathString);
+            m_EditorScenePath = pathString;
+
+            // 保存后马上作为资源加载
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(filepath);
+
+            // 更新资源面板
+            m_ResourceBrowserPanel->RefreshAssetTree();
         }
     }
 

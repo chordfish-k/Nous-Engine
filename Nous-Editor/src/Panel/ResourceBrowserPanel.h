@@ -14,7 +14,7 @@ namespace Nous {
         ResourceBrowserPanel();
 
         void OnImGuiRender();
-    private:
+
         void RefreshAssetTree();
         void ClearAssetTree();
     private:

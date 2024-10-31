@@ -94,6 +94,8 @@ namespace Nous {
     {
         Ref<Scene> newScene = CreateRef<Scene>();
 
+        newScene->Handle = other->Handle;
+
         newScene->m_ViewportHeight = other->m_ViewportWidth;
         newScene->m_ViewportHeight = other->m_ViewportHeight;
 

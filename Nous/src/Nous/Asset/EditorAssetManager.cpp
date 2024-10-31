@@ -109,6 +109,14 @@ namespace Nous
         SerializeAssetRegistry();
     }
 
+    void EditorAssetManager::ReloadAsset(AssetHandle handle)
+    {
+        if (m_LoadedAssets.find(handle) != m_LoadedAssets.end())
+        {
+            m_LoadedAssets[handle] = AssetImporter::ImportAsset(handle, m_AssetRegistry[handle]);
+        }
+    }
+
     const AssetMetadata& EditorAssetManager::GetMetadata(AssetHandle handle) const
     {
         static AssetMetadata s_NullMetadata;

@@ -4,7 +4,7 @@ Entities:
     CTag:
       Tag: Bar
     CTransform:
-      Translation: [0.578536987, -4.02919436, 0]
+      Translation: [0.578536987, -3.85929108, 0]
       Rotation: [0, 0, 0]
       Scale: [13.8000002, 0.400000006, 1]
     CSpriteRenderer:
@@ -36,7 +36,7 @@ Entities:
           Data: 3
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
-      TextureHandle: 7347239531987631821
+      TextureHandle: 5215514554843654355
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Kinematic

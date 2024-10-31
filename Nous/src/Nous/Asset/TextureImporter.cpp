@@ -11,7 +11,10 @@ namespace Nous
 	{
 		NS_PROFILE_FUNCTION();
 
-		return LoadTexture2D(Project::GetAssetsDirectory() / metadata.FilePath);
+		auto res = LoadTexture2D(Project::GetAssetsDirectory() / metadata.FilePath);
+		res->Handle = handle;
+
+		return res;
 	}
 
 	Ref<Texture2D> TextureImporter::LoadTexture2D(const std::filesystem::path& path)
