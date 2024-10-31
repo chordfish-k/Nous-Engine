@@ -3,6 +3,7 @@
 #include "Nous/Utils/PlatformUtils.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Renderer/Font.h"
+#include "Nous/Asset/TextureImporter.h"
 
 #include "Panel/DockingSpace.h"
 #include "Event/EditorEvent.h"
@@ -25,11 +26,11 @@ namespace Nous
     {
         NS_PROFILE_FUNCTION();
 
-        m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
-        m_IconSimulate = Texture2D::Create("Resources/Icons/SimulateButton.png");
-        m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
-        m_IconPause = Texture2D::Create("Resources/Icons/PauseButton.png");
-        m_IconStep = Texture2D::Create("Resources/Icons/StepButton.png");
+        m_IconPlay = TextureImporter::LoadTexture2D("resources/icons/PlayButton.png");
+        m_IconSimulate = TextureImporter::LoadTexture2D("resources/icons/SimulateButton.png");
+        m_IconStop = TextureImporter::LoadTexture2D("resources/icons/StopButton.png");
+        m_IconPause = TextureImporter::LoadTexture2D("resources/icons/PauseButton.png");
+        m_IconStep = TextureImporter::LoadTexture2D("resources/icons/StepButton.png");
 
         FramebufferSpecification fbSpec;
         fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };

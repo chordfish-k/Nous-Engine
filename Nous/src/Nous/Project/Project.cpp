@@ -20,6 +20,10 @@ namespace Nous
 		{
 			project->m_ProjectDirectory = path.parent_path();
 			s_ActiveProject = project;
+			// 载入资源管理器的数据
+			Ref<EditorAssetManager> editorAssetManager = CreateRef<EditorAssetManager>();
+			s_ActiveProject->m_AssetManager = editorAssetManager;
+			editorAssetManager->DeserializeAssetRegistry();
 			return s_ActiveProject;
 		}
 		return nullptr;

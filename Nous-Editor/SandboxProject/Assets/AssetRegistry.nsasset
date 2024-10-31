@@ -1,0 +1,7 @@
+AssetRegistry:
+  - Handle: 3560622407722856679
+    FilePath: Textures/Checkerboard.png
+    Type: AssetType::Texture
+  - Handle: 10548005792465007447
+    FilePath: Textures/Mario.png
+    Type: AssetType::Texture

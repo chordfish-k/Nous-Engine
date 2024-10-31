@@ -222,7 +222,7 @@ namespace Nous::UI
         return changed;
     }
 
-    static bool DrawResourceDragDropBox(const std::string& label, const std::string& type, std::string& path, float columnWidth = 100.0f)
+    static bool DrawAssetDragDropBox(const std::string& label, const std::string& text, AssetHandle* handle, AssetType requireType, float columnWidth = 100.0f)
     {
         bool changed = false;
 
@@ -231,25 +231,33 @@ namespace Nous::UI
         //ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
         float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.f;
 
-        std::filesystem::path path1 = path;
-        std::string name = path1.filename().string();
-        if (ImGui::Button(name.c_str(), { ImGui::GetContentRegionAvail().x, lineHeight })) {
+        if (ImGui::Button(text.c_str(), { ImGui::GetContentRegionAvail().x, lineHeight })) {
             //FileSystemWindow::localPath = path1.parent_path().string();
         }
 
-        if (ImGui::IsItemHovered() && !name.empty()) {
-            ImGui::SetTooltip("%s", name.c_str());
+        if (ImGui::IsItemHovered() && !text.empty()) {
+            ImGui::SetTooltip("%s", text.c_str());
         }
 
         if (ImGui::BeginDragDropTarget())
         {
             // TODO 添加类别判断
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(type.c_str()))
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
             {
-                const wchar_t* path_ = (const wchar_t*)payload->Data;
-                std::filesystem::path filepath(path_);
-                path = filepath.string();
-                changed = true;
+                AssetHandle handle_ = *(AssetHandle*)payload->Data;
+                if (AssetManager::GetAssetType(handle_) == requireType)
+                {
+                    if (*handle != handle_)
+                    {
+                        changed = true;
+                        *handle = handle_;
+                    }
+                }
+                else
+                {
+                    NS_CORE_WARN("错误的资源类型！");
+                }
+                
             }
             ImGui::EndDragDropTarget();
         }

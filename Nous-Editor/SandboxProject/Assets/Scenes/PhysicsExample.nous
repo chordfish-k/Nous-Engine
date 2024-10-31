@@ -9,6 +9,7 @@ Entities:
       Scale: [13.8000002, 0.400000006, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Static
@@ -45,7 +46,7 @@ Entities:
     CTag:
       Tag: Player
     CTransform:
-      Translation: [-5.13038635, -3.26569796, -2.95864417e-08]
+      Translation: [-5.14656782, -3.26569796, 0]
       Rotation: [0, 0, 0]
       Scale: [0.5, 0.5, 1]
     CMonoScript:
@@ -56,7 +57,7 @@ Entities:
           Data: 3
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
-      TexturePath: Assets\Textures\Mario.png
+      TextureHandle: 10548005792465007447
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Kinematic
@@ -101,6 +102,7 @@ Entities:
       Scale: [13.8000002, 0.400000006, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Static
@@ -121,6 +123,7 @@ Entities:
       Scale: [9, 0.400000006, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Static
@@ -141,6 +144,7 @@ Entities:
       Scale: [9, 0.400000006, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Static

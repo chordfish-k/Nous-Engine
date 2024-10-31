@@ -33,6 +33,10 @@
     #define NS_DEBUGBREAK()
 #endif
 
+#ifndef NS_DIST
+    #define NS_ENABLE_VERIFY
+#endif
+
 #define NS_EXPAND_MACRO(x) x
 #define NS_STRINGIFY_MACRO(x) #x
 

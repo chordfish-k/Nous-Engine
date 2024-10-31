@@ -16,3 +16,19 @@
     #define NS_ASSERT(...)
     #define NS_CORE_ASSERT(...)
 #endif
+
+// 资源验证
+#ifdef NS_ENABLE_VERIFY
+	#define NS_INTERNAL_VERIFY_IMPL(type, check, msg, ...) { if(!(check)) { NS##type##ERROR(msg, __VA_ARGS__); NS_DEBUGBREAK(); } }
+	#define NS_INTERNAL_VERIFY_WITH_MSG(type, check, ...) NS_INTERNAL_VERIFY_IMPL(type, check,  "断言失败: {0}", __VA_ARGS__)
+	#define NS_INTERNAL_VERIFY_NO_MSG(type, check) NS_INTERNAL_VERIFY_IMPL(type, check, "断言 '{0}' 失败于 {1}:{2}", NS_STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string(), __LINE__)
+
+	#define NS_INTERNAL_VERIFY_GET_MACRO_NAME(arg1, arg2, macro, ...) macro
+	#define NS_INTERNAL_VERIFY_GET_MACRO(...) NS_EXPAND_MACRO( NS_INTERNAL_VERIFY_GET_MACRO_NAME(__VA_ARGS__, NS_INTERNAL_VERIFY_WITH_MSG, NS_INTERNAL_VERIFY_NO_MSG) )
+
+	#define NS_VERIFY(...) NS_EXPAND_MACRO( NS_INTERNAL_VERIFY_GET_MACRO(__VA_ARGS__)(_, __VA_ARGS__) )
+	#define NS_CORE_VERIFY(...) NS_EXPAND_MACRO( NS_INTERNAL_VERIFY_GET_MACRO(__VA_ARGS__)(_CORE_, __VA_ARGS__) )
+#else
+	#define NS_VERIFY(...)
+	#define NS_CORE_VERIFY(...)
+#endif

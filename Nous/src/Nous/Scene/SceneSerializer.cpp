@@ -5,6 +5,7 @@
 #include "Nous/Scene/Component.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Core/UUID.h"
+#include "Nous/Project/Project.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -290,8 +291,7 @@ namespace Nous {
             auto& spriteRendererComponent = entity.GetComponent<CSpriteRenderer>();
             out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
 
-            if (spriteRendererComponent.Texture)
-                out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.Texture->GetPath();
+            out << YAML::Key << "TextureHandle" << YAML::Value << spriteRendererComponent.Texture;
 
             out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
 
@@ -523,7 +523,14 @@ namespace Nous {
                 src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 
                 if (spriteRendererComponent["TexturePath"])
-                    src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+                {
+                    /*std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+                    auto path = Project::GetAssetsFileSystemPath(texturePath);
+                    src.Texture = Texture2D::Create(path);*/
+                }
+
+                if (spriteRendererComponent["TextureHandle"])
+                    src.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
 
                 if (spriteRendererComponent["TilingFactor"])
                     src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();

@@ -1,7 +1,10 @@
-#include "SceneHierarchyPanel.h"
-#include "Nous/Core/Application.h"
+﻿#include "SceneHierarchyPanel.h"
 
+#include "Nous/Core/Application.h"
+#include "Nous/Asset/AssetManager.h"
+#include "Nous/Asset/AssetMetadata.h"
 #include "Nous/Script/ScriptEngine.h"
+#include "Nous/Asset/TextureImporter.h"
 #include "Nous/UI/UI.h"
 
 #include <imgui.h>
@@ -320,19 +323,35 @@ namespace Nous {
         {
             UI::DrawColor4Control("Color", component.Color);
             
-            std::string path;
-            if (component.Texture) 
-                path = component.Texture->GetPath();
-
-            if (UI::DrawResourceDragDropBox("Texture", "RESOURCE_BROWSER_ITEM", path))
+            std::string btnLabel = "None";
+            bool isTextureValid = false;
+            if (component.Texture != 0)
             {
-                NS_WARN(path);
-                Ref<Texture2D> texture = Texture2D::Create(path);
-                if (texture->IsLoaded())
-                    component.Texture = texture;
+                if (AssetManager::IsAssetHandleValid(component.Texture)
+                    && AssetManager::GetAssetType(component.Texture) == AssetType::Texture2D)
+                {
+                    const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetMetadata(component.Texture);
+                    btnLabel = metadata.FilePath.filename().string();
+                    isTextureValid = true;
+                }
                 else
-                    NS_WARN("无法加载纹理 {0}", path);
+                {
+                    btnLabel = "Invalid";
+                }
             }
+
+            AssetHandle handle = component.Texture;
+            if (UI::DrawAssetDragDropBox("Texture", btnLabel, &handle, AssetType::Texture2D))
+            {
+                component.Texture = handle;
+            }
+
+            // 删除按钮
+            //if (isTextureValid)
+            //{
+            //    ImGui::SameLine();
+            //    ImGui
+            //}
 
             UI::DrawFloatControl("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
         });

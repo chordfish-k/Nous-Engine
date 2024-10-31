@@ -5,6 +5,7 @@
 #include "Nous/Renderer/Shader.h"
 #include "Nous/Renderer/UniformBuffer.h"
 #include "Nous/Renderer/RenderCommand.h"
+#include "Nous/Asset/AssetManager.h"
 
 #include "Nous/Renderer/MSDFData.h"
 
@@ -207,7 +208,7 @@ namespace Nous {
         // 生成白色纹理
         s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
         uint32_t whiteTextureData = 0xffffffff;
-        s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+        s_Data.WhiteTexture->SetData(Buffer(& whiteTextureData, sizeof(uint32_t)));
 
         int32_t samplers[s_Data.MaxTextureSlots];
         for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -445,6 +446,9 @@ namespace Nous {
 
     void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref <Texture2D>& texture, float tilingFactor, const glm::vec4& color, int entityID)
     {
+        NS_PROFILE_FUNCTION();
+        NS_CORE_VERIFY(texture);
+
         if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
             NextBatch();
 
@@ -561,7 +565,10 @@ namespace Nous {
     void Renderer2D::DrawSprite(const glm::mat4& transform, CSpriteRenderer& src, int entityID)
     {
         if (src.Texture)
-            DrawQuad(transform, src.Texture, src.TilingFactor, src.Color, entityID);
+        {
+            Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(src.Texture);
+            DrawQuad(transform, texture, src.TilingFactor, src.Color, entityID);
+        }
         else
             DrawQuad(transform, src.Color, entityID);
     }
