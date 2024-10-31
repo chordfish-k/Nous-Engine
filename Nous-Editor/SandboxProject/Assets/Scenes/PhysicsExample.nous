@@ -21,27 +21,6 @@ Entities:
       Friction: 0.5
       Restitution: 1
       RestitutionThreshold: 7.1500001
-  - Entity: 1017223792134808028
-    CTag:
-      Tag: Circle
-    CTransform:
-      Translation: [6.55887222, -3.2764864, 0]
-      Rotation: [0, 0, 0]
-      Scale: [2.5, 2.70000005, 1]
-    CCircleRenderer:
-      Color: [0.229948938, 0.955674946, 0.964412808, 1]
-      Thickness: 0.100000001
-      Fade: 0.0270000007
-    CRigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    CCircleCollider2D:
-      Offset: [0, 0]
-      Radius: 0.5
-      Density: 1
-      Friction: 0.5
-      Restitution: 1
-      RestitutionThreshold: 5.19000006
   - Entity: 7440336366702553677
     CTag:
       Tag: Player
@@ -57,7 +36,7 @@ Entities:
           Data: 3
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
-      TextureHandle: 10548005792465007447
+      TextureHandle: 7347239531987631821
       TilingFactor: 1
     CRigidbody2D:
       BodyType: Kinematic

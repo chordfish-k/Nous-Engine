@@ -95,6 +95,20 @@ namespace Nous
         }
     }
 
+    void EditorAssetManager::RemoveAsset(AssetHandle handle)
+    {
+        NS_CORE_ASSERT(m_AssetRegistry.find(handle) != m_AssetRegistry.end());
+        m_AssetRegistry.erase(handle);
+
+        if (m_LoadedAssets.find(handle) != m_LoadedAssets.end())
+        {
+            m_LoadedAssets[handle]->Handle = 0;
+            m_LoadedAssets.erase(handle);
+        }
+        
+        SerializeAssetRegistry();
+    }
+
     const AssetMetadata& EditorAssetManager::GetMetadata(AssetHandle handle) const
     {
         static AssetMetadata s_NullMetadata;

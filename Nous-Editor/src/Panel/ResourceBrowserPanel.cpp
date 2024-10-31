@@ -91,12 +91,18 @@ namespace Nous
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
                 ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
             
+                bool isDelete = false;
+
                 if (ImGui::BeginPopupContextItem())
                 {
                     if (ImGui::MenuItem("Delete"))
                     {
                         // TODO
+                        Project::GetActive()->GetEditorAssetManager()->RemoveAsset(m_TreeNodes[treeNodeIndex].Handle);
+                        ClearAssetTree();
                         RefreshAssetTree();
+
+                        isDelete = true;
                     }
                     ImGui::EndPopup();
                 }
@@ -104,6 +110,7 @@ namespace Nous
                 if (ImGui::BeginDragDropSource())
                 {
                     AssetHandle handle = m_TreeNodes[treeNodeIndex].Handle;
+                    ImGui::Text(itemStr.c_str());
                     ImGui::SetDragDropPayload("RESOURCE_BROWSER_ITEM", &handle, sizeof(handle));
                     ImGui::EndDragDropSource();
                 }
@@ -118,6 +125,9 @@ namespace Nous
                 ImGui::TextWrapped("%s", itemStr.c_str()); // 显示在底部的文件名
                 ImGui::NextColumn();
                 ImGui::PopID();
+
+                if (isDelete)
+                    break;
             }
         }
         else
@@ -160,6 +170,11 @@ namespace Nous
         ImGui::End();
     }
 
+    void ResourceBrowserPanel::ClearAssetTree()
+    {
+        m_TreeNodes.clear();
+        m_TreeNodes.push_back(TreeNode(".", 0));
+    }
 
     void ResourceBrowserPanel::RefreshAssetTree()
     {

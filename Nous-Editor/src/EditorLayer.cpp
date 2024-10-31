@@ -535,7 +535,7 @@ namespace Nous
     void EditorLayer::SaveScene()
     {
         if (!m_EditorScenePath.empty())
-            SerializeScene(m_ActiveScene, m_EditorScenePath);
+            SerializeScene(m_EditorScene, m_EditorScenePath);
         else
             SaveSceneAs();
     }

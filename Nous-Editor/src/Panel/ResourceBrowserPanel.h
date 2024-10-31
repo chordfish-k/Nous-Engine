@@ -16,6 +16,7 @@ namespace Nous {
         void OnImGuiRender();
     private:
         void RefreshAssetTree();
+        void ClearAssetTree();
     private:
         std::filesystem::path m_BaseDirectory;
         std::filesystem::path m_CurrentDirectory;

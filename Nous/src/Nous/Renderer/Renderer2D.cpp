@@ -301,7 +301,9 @@ namespace Nous {
 
             // 纹理绑定
             for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+            {
                 s_Data.TextureSlots[i]->Bind(i);
+            }
 
             s_Data.QuadShader->Bind();
             RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
@@ -447,7 +449,7 @@ namespace Nous {
     void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref <Texture2D>& texture, float tilingFactor, const glm::vec4& color, int entityID)
     {
         NS_PROFILE_FUNCTION();
-        NS_CORE_VERIFY(texture);
+        //NS_CORE_VERIFY(texture);
 
         if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
             NextBatch();
@@ -460,17 +462,21 @@ namespace Nous {
 
         float textureIndex = 0.0f;
         // 找出当前纹理的id
-        for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+        if (texture)
         {
-            if (*s_Data.TextureSlots[i] == *texture.get())
+            for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
             {
-                textureIndex = (float) i;
-                break;
+                if (*s_Data.TextureSlots[i] == *texture.get())
+                {
+                    textureIndex = (float) i;
+                    break;
+                }
             }
         }
+        
 
         // 如果是新纹理，则添加到纹理槽
-        if (textureIndex == 0.0f)
+        if (texture && textureIndex == 0.0f)
         {
             // TODO 待优化，可能应该同一张纹理一批
             if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
