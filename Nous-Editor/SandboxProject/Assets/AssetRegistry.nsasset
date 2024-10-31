@@ -5,6 +5,12 @@ AssetRegistry:
   - Handle: 5215514554843654355
     FilePath: Textures/Mario.png
     Type: AssetType::Texture2D
+  - Handle: 6354818317365426658
+    FilePath: Scenes/Test.nous
+    Type: AssetType::Scene
+  - Handle: 11289935122047927156
+    FilePath: Scenes/Example.nous
+    Type: AssetType::Scene
   - Handle: 12275135097561593367
     FilePath: Textures/Checkerboard.png
     Type: AssetType::Texture2D

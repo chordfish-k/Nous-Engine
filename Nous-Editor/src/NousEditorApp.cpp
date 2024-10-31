@@ -23,7 +23,7 @@ namespace Nous {
         ApplicationSpecification spec;
         spec.Name = "Nous Editor";
         spec.CommandLineArgs = args;
-
+        Console::Init();
         return new NousEditor(spec);
     }
 }

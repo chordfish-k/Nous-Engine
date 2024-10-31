@@ -192,6 +192,8 @@ namespace Nous
         // Resource
         m_ResourceBrowserPanel->OnImGuiRender();
 
+        m_ConsolePanel.OnImGuiRender();
+
         // Viewport
         m_ViewportPanel.OnImGuiRender();
 

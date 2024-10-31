@@ -4,6 +4,7 @@
 #include "Panel/SceneHierarchyPanel.h"
 #include "Panel/ResourceBrowserPanel.h"
 #include "Panel/ViewportPanel.h"
+#include "Panel/ConsolePanel.h"
 
 #include "Nous/Renderer/EditorCamera.h"
 
@@ -66,6 +67,7 @@ namespace Nous {
         // 面板窗口
         SceneHierarchyPanel m_SceneHierarchyPanel;
         Scope<ResourceBrowserPanel> m_ResourceBrowserPanel;
+        Console m_ConsolePanel;
         ViewportPanel m_ViewportPanel;
 
         bool m_ShowPhysicsColliders = false;
