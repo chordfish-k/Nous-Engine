@@ -54,12 +54,17 @@ namespace Nous
 		{
 			return (bool)Data;
 		}
+
+		operator char* () const
+		{
+			return (char*)Data;
+		}
 	};
 
 	struct ScopedBuffer
 	{
 		ScopedBuffer(Buffer buffer)
-			: m_Buffer(buffer)
+			: m_Buffer(std::move(buffer))
 		{
 		}
 

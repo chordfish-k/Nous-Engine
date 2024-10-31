@@ -197,9 +197,9 @@ namespace Nous
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
-        
+#if 0
         ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512, 512 }, { 0, 1 }, { 1, 0 });
-
+#endif
         ImGui::End();
 
         // Properties

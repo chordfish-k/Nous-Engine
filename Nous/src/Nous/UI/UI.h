@@ -6,8 +6,10 @@
 
 #include "Nous/Asset/Asset.h"
 #include "Nous/Asset/AssetManager.h"
+#include "Nous/Core/Buffer.h"
 
 #include <filesystem>
+#include <codecvt>
 
 namespace Nous::UI
 {
@@ -37,6 +39,22 @@ namespace Nous::UI
 	private:
 		bool m_Set = false;
 	};
+
+	/// <summary>
+	/// Õ­×Ö·û×ª¿í×Ö·û
+	/// </summary>
+	/// <param name="str"></param>
+	/// <returns></returns>
+	static std::string TBS(const std::string& str)
+	{
+		typedef std::codecvt_byname<wchar_t, char, std::mbstate_t>F;
+		static std::wstring_convert<F>strC(new F("Chinese"));
+		static std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+		return strCnv.to_bytes(strC.from_bytes(str));
+	}
+
+#define NS_TEXT_S(str) u8##str
+#define NS_TEXT(str) ::Nous::UI::TBS(str).c_str()
 
 #define NS_IMGUI_FIELD_BEGIN                    \
     ImGui::PushID(label.c_str());               \

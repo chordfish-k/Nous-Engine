@@ -8,6 +8,8 @@
 
 #include "Nous/Core/Application.h"
 
+#include "Nous/Renderer/Texture.h"
+
 #include <GLFW/glfw3.h>
 
 #include <ImGuizmo.h>
@@ -41,9 +43,21 @@ namespace Nous {
         //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
         float fontSize = 20.0f;
-        auto chineseSupport = io.Fonts->GetGlyphRangesChineseSimplifiedCommon();
+        auto chineseSupport = io.Fonts->GetGlyphRangesChineseFull();
         io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansSC/NotoSansSC-Bold.ttf", fontSize, nullptr, chineseSupport);
         io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf", fontSize, nullptr, chineseSupport);
+
+        // 创建并上传新的字体纹理
+        //unsigned char* tex_pixels = nullptr;
+        //int tex_width, tex_height;
+        //io.Fonts->GetTexDataAsRGBA32(&tex_pixels, &tex_width, &tex_height);
+
+        //// 创建纹理
+        //const static auto fontTex = Texture2D::Create({ (uint32_t) tex_width, (uint32_t) tex_height }, Buffer(tex_pixels, tex_width * tex_height * 4));
+
+        //// 将纹理设置为 ImGui 使用的字体纹理
+        //io.Fonts->TexID = (void*)(intptr_t)fontTex->GetRendererID();
+
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
