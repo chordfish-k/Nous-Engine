@@ -4,6 +4,8 @@
 #include "Nous/Project/Project.h"
 #include "Nous/Asset/TextureImporter.h"
 
+#include "Event/EditorEvent.h"
+
 #include <imgui.h>
 
 namespace Nous 
@@ -93,7 +95,7 @@ namespace Nous
             
                 bool isDelete = false;
 
-                if (ImGui::BeginPopupContextItem())
+                if (!isDirectory && ImGui::BeginPopupContextItem())
                 {
                     if (ImGui::MenuItem("Delete"))
                     {
@@ -107,7 +109,7 @@ namespace Nous
                     ImGui::EndPopup();
                 }
 
-                if (ImGui::BeginDragDropSource())
+                if (!isDirectory && ImGui::BeginDragDropSource())
                 {
                     AssetHandle handle = m_TreeNodes[treeNodeIndex].Handle;
                     ImGui::Text(itemStr.c_str());
@@ -120,6 +122,12 @@ namespace Nous
                 {
                     if (isDirectory)
                         m_CurrentDirectory /= item.filename();
+                    else
+                    {
+                        // 发送资源双击事件
+                        AssetFileDoubleClickEvent event{ m_TreeNodes[treeNodeIndex].Handle };
+                        EditorEventRepeater::Emit(event);
+                    }
                 }
 
                 ImGui::TextWrapped("%s", itemStr.c_str()); // 显示在底部的文件名
@@ -137,15 +145,15 @@ namespace Nous
                 const auto& path = directoryEntry.path();
                 std::string fileNameString = path.filename().string();
 
-                Ref<Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
+                bool isDirectory = directoryEntry.is_directory();
+                Ref<Texture2D> icon = isDirectory ? m_DirectoryIcon : m_FileIcon;
                 ImGui::PushID(fileNameString.c_str());
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
                 ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, {0, 1}, {1, 0});
                 
                 if (ImGui::BeginPopupContextItem())
                 {
-                    
-                    if (ImGui::MenuItem("Import"))
+                    if (!isDirectory && ImGui::MenuItem("Import"))
                     {
                         auto relativePath = std::filesystem::relative(path, Project::GetAssetsDirectory());
                         Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);

@@ -29,7 +29,8 @@ namespace Nous {
         bool OnKeyPressed(KeyPressedEvent& e);
 
         void OnOpenScene(OpenSceneEvent& e);
-
+        void OnAssetFileDoubleClick(AssetFileDoubleClickEvent& e);
+        
         void OnOverlayRender(); // 覆盖层绘制
 
         void NewProject();

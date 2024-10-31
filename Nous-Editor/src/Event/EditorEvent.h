@@ -6,7 +6,8 @@ namespace Nous {
 
     enum class EditorEventType
     {
-        OpenScene = 0
+        OpenScene = 0,
+        AssetFileDoubleClick
     };
 
     struct EditorEvent
@@ -19,6 +20,7 @@ namespace Nous {
 								virtual EditorEventType GetEventType() const override { return GetStaticType(); } \
 								virtual const char* GetName() const override { return #type; }
 
+    // EVENT
     struct OpenSceneEvent : public EditorEvent
     {
         AssetHandle Handle;
@@ -26,6 +28,15 @@ namespace Nous {
 
         EDITOR_EVENT_CLASS_TYPE(OpenScene);
     };
+
+    struct AssetFileDoubleClickEvent : public EditorEvent
+    {
+        AssetHandle Handle;
+        AssetFileDoubleClickEvent(const AssetHandle& handle) : Handle(handle) {};
+
+        EDITOR_EVENT_CLASS_TYPE(AssetFileDoubleClick);
+    };
+    // EVENT
 
     class Observer;
 

@@ -578,12 +578,21 @@ namespace Nous
     {
         EditorEventDispatcher dispatcher(e);
         dispatcher.Dispatch<OpenSceneEvent>(NS_BIND_EVENT_FN(EditorLayer::OnOpenScene));
+        dispatcher.Dispatch<AssetFileDoubleClickEvent>(NS_BIND_EVENT_FN(EditorLayer::OnAssetFileDoubleClick));
     }
 
     void EditorLayer::OnOpenScene(OpenSceneEvent& e)
     {
         if (e.Handle)
             OpenScene(e.Handle);
+    }
+
+    void EditorLayer::OnAssetFileDoubleClick(AssetFileDoubleClickEvent& e)
+    {
+        if (AssetManager::GetAssetType(e.Handle) == AssetType::Scene)
+        {
+            OpenScene(e.Handle);
+        }
     }
 
     void EditorLayer::OnScenePlay()
