@@ -5,6 +5,8 @@
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Entity.h"
 #include "Nous/Event/KeyEvent.h"
+#include "Nous/Event/MouseEvent.h"
+#include "Nous/Event/ApplicationEvent.h"
 #include "Nous/Renderer/Texture.h"
 
 #include <glm/glm.hpp>
@@ -44,6 +46,8 @@ namespace Nous
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+        bool OnWindowDrop(WindowDropEvent& e); // 文件拖放
+
     private:
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_Context;

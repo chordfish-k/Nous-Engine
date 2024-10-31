@@ -166,6 +166,7 @@ namespace Nous
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(NS_BIND_EVENT_FN(ViewportPanel::OnKeyPressed));
         dispatcher.Dispatch<MouseButtonPressedEvent>(NS_BIND_EVENT_FN(ViewportPanel::OnMouseButtonPressed));
+        dispatcher.Dispatch<WindowDropEvent>(NS_BIND_EVENT_FN(ViewportPanel::OnWindowDrop));
 
     }
 
@@ -221,6 +222,15 @@ namespace Nous
             }
         }
         return false;
+    }
+
+    bool ViewportPanel::OnWindowDrop(WindowDropEvent& e)
+    {
+        for (auto& filepath : e.GetPaths())
+        {
+            NS_INFO("Drop file: {}", filepath.string());
+        }
+        return true;
     }
 
     void ViewportPanel::CheckHoveredEntity()

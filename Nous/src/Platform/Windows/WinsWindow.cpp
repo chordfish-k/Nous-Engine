@@ -156,6 +156,19 @@ namespace Nous {
             MouseMovedEvent event((float)xpos, (float)ypos);
             data.EventCallback(event);
         });
+
+        glfwSetDropCallback(m_Window, [](GLFWwindow* win, int pathCount, const char* paths[])
+        {
+            WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
+
+            std::vector<std::filesystem::path> filepaths(pathCount);
+            for (int i = 0; i < pathCount; i++)
+                filepaths[i] = std::filesystem::u8path(paths[i]);
+            
+
+            WindowDropEvent event(std::move(filepaths));
+            data.EventCallback(event);
+        });
     }
 
     void WinsWindow::SetVSync(bool enabled)

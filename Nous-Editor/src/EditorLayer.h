@@ -27,6 +27,7 @@ namespace Nous {
         virtual void OnEditorEvent(EditorEvent& e) override;
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
+
         void OnOpenScene(OpenSceneEvent& e);
 
         void OnOverlayRender(); // 覆盖层绘制
