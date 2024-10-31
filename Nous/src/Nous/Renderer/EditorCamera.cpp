@@ -27,23 +27,43 @@ namespace Nous {
         }
         else
         {
-            float orthoLeft = -m_Distance * m_AspectRatio * 0.5f;
-            float orthoRight = m_Distance * m_AspectRatio * 0.5f;
+            // 使用 m_Distance 控制正交范围
+            float orthoLeft = -m_AspectRatio * m_Distance * 0.5f;
+            float orthoRight = m_AspectRatio * m_Distance * 0.5f;
             float orthoBottom = -m_Distance * 0.5f;
             float orthoTop = m_Distance * 0.5f;
-            m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_NearClip, m_FarClip);
+
+            float orthoNear = -m_FarClip;
+            float orthoFar = m_FarClip;
+
+            m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
         }
     }
 
+
     void EditorCamera::RecalculateView()
     {
-        m_Position = CalculatePosition();
+        if (m_ProjectionType == ProjectionType::Perspective)
+        {
+            // 透视模式下，根据距离计算摄像机位置
+            m_Position = CalculatePosition();
+            glm::quat orientation = GetOrientation();
+            m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
+            m_ViewMatrix = glm::inverse(m_ViewMatrix);
+        }
+        else
+        {
+            // 正交模式下，摄像机位置固定，通过旋转来对准焦点
+            glm::quat orientation = GetOrientation();
+            glm::mat4 rotation = glm::toMat4(orientation);
 
-        glm::quat orientation = GetOrientation();
-        m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
-        m_ViewMatrix = glm::inverse(m_ViewMatrix);
+            // 使视图矩阵保持固定，不随距离改变位置
+            glm::mat4 translation = glm::translate(glm::mat4(1.0f), -m_FocalPoint);
 
+            m_ViewMatrix = rotation * translation;
+        }
     }
+
 
     std::pair<float, float> EditorCamera::PanSpeed() const
     {
@@ -84,9 +104,9 @@ namespace Nous {
                 MouseRotate(delta);
             else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
                 MouseZoom(delta.y);
-        }
 
-        RecalculateView();
+            RecalculateView();
+        }
     }
 
     void EditorCamera::OnEvent(Event& e)
@@ -133,7 +153,8 @@ namespace Nous {
                 Reset();
                 break;
         }
-
+        RecalculateProjection();
+        RecalculateView();
         return false;
     }
 
@@ -154,11 +175,22 @@ namespace Nous {
 
     void EditorCamera::MouseZoom(float delta)
     {
-        m_Distance -= delta * ZoomSpeed();
-        if (m_Distance < 1.0f)
+        if (m_ProjectionType == ProjectionType::Perspective)
         {
-            m_FocalPoint += GetForwardDirection();
-            m_Distance = 1.0f;
+            // 透视模式下的缩放，影响摄像机距离
+            m_Distance -= delta * ZoomSpeed();
+            if (m_Distance < 1.0f)
+            {
+                m_FocalPoint += GetForwardDirection();
+                m_Distance = 1.0f;
+            }
+        }
+        else
+        {
+            // 正交模式下的缩放，影响 m_Distance 来控制视图范围
+            m_Distance -= delta * ZoomSpeed();
+            if (m_Distance < 0.1f)
+                m_Distance = 0.1f;
         }
     }
 
@@ -195,7 +227,7 @@ namespace Nous {
 
         m_InitialMousePosition = {0.0f, 0.0f};
 
-        m_Distance = 10.0f;
+        m_Distance = 15.0f;
         m_Pitch = 0.0f;
         m_Yaw = 0.0f; // 俯仰角， 水平角
 

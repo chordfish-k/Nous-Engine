@@ -12,6 +12,20 @@
 
 namespace Nous 
 {
+    namespace Utils
+    {
+        static bool IsCameraAlignedWithAxis(const glm::quat& cameraOrientation, const glm::vec3& axis) {
+            // 获取摄像机的前向量，即方向向量
+            glm::vec3 cameraForward = cameraOrientation * glm::vec3(0.0f, 0.0f, -1.0f);
+
+            // 计算摄像机方向和指定轴的夹角
+            float dotProduct = glm::dot(glm::normalize(cameraForward), glm::normalize(axis));
+
+            // 检查点积是否接近 1 或 -1（与轴平行或反向平行）
+            return glm::abs(dotProduct) > 0.999f;
+        }
+    }
+
     ViewportPanel::ViewportPanel(const Ref<Framebuffer>& framebuffer)
     {
         SetFramebuffer(framebuffer);
@@ -120,6 +134,7 @@ namespace Nous
 
                 float snapValues[3] = {snapValue, snapValue, snapValue};
 
+                glm::mat4 delta(1.0f);
                 if (m_ShowGizmo)
                 {
                     ImGuizmo::SetOrthographic(m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic);
@@ -128,7 +143,13 @@ namespace Nous
                         nullptr, snap ? snapValues : nullptr);
                 }
 
-                if (ImGuizmo::IsUsing())
+                auto orientation = m_EditorCamera->GetOrientation();
+                // Gizmo 的 X、Y 和 Z 轴
+                static constexpr glm::vec3 xAxis(1.0f, 0.0f, 0.0f);
+                static constexpr glm::vec3 yAxis(0.0f, 1.0f, 0.0f);
+                static constexpr glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
+
+                if (ImGuizmo::IsUsing() && m_ShowGizmo)
                 {
                     glm::vec3 translation, rotation, scale;
                     glm::mat4 tr = transform;
