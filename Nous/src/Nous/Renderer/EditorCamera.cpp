@@ -192,6 +192,7 @@ namespace Nous {
             if (m_Distance < 0.1f)
                 m_Distance = 0.1f;
         }
+        RecalculateProjection();
     }
 
     glm::vec3 EditorCamera::GetUpDirection() const

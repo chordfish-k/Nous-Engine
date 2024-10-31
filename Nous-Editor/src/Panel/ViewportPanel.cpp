@@ -85,14 +85,9 @@ namespace Nous
         {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
             {
-                const wchar_t* path = (const wchar_t*)payload->Data;
-                // TODO 检测文件类型为.nous
-                auto ext = std::filesystem::path(path).extension();
-                if (ext == ".nous")
-                {
-                    OpenSceneEvent event {path};
-                    EditorEventRepeater::Emit(event);
-                }
+                AssetHandle handle = *(AssetHandle*)payload->Data;
+                OpenSceneEvent event {handle};
+                EditorEventRepeater::Emit(event);
             }
             ImGui::EndDragDropTarget();
         }

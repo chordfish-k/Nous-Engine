@@ -11,7 +11,7 @@ namespace Nous
 	{
 		std::string Name = "Untitled";
 
-		std::filesystem::path StartScene;
+		AssetHandle StartScene;
 
 		std::filesystem::path AssetDirectory;
 		std::filesystem::path AssetRegistryPath; // Ïà¶ÔÓÚ AssetDirectory

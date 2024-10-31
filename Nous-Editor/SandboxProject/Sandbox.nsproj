@@ -1,6 +1,6 @@
 Project:
     Name: Sandbox
-    StartScene: Scenes\PhysicsExample.nous
+    StartScene: 17546005893865107657
     AssetDirectory: Assets
     AssetRegistryPath: AssetRegistry.nsasset
     ScriptModulePath: Scripts\Binaries\Sandbox.dll

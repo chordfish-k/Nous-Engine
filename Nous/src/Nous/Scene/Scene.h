@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Nous/Asset/Asset.h"
 #include "Nous/Core/Timestep.h"
 #include "Nous/Core/UUID.h"
 #include "Nous/Renderer/EditorCamera.h"
@@ -14,13 +15,15 @@ namespace Nous {
 
     class Entity;
 
-    class Scene
+    class Scene : public Asset
     {
     public:
         Scene();
         ~Scene();
 
         static Ref<Scene> Copy(Ref<Scene> other);
+
+        virtual AssetType GetType() const { return AssetType::Scene; }
 
         Entity CreateEntity(const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});

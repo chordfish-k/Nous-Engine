@@ -39,9 +39,11 @@ namespace Nous {
 
         void NewScene();
         void OpenScene();
-        void OpenScene(const std::filesystem::path& path);
+        void OpenScene(AssetHandle handle);
         void SaveScene();
         void SaveSceneAs();
+
+        void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 
         void OnScenePlay();
         void OnSceneSimulate();

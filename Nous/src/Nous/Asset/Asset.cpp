@@ -9,7 +9,7 @@ namespace Nous
         {
         case Nous::AssetType::None:         return "AssetType::None";
         case Nous::AssetType::Scene:        return "AssetType::Scene";
-        case Nous::AssetType::Texture2D:    return "AssetType::Texture";
+        case Nous::AssetType::Texture2D:    return "AssetType::Texture2D";
         }
         return "AssetType::<Invalid>";
     }
@@ -19,7 +19,7 @@ namespace Nous
 
         if (assetType == "AssetType::None")         return Nous::AssetType::None;
         if (assetType == "AssetType::Scene")        return Nous::AssetType::Scene;
-        if (assetType == "AssetType::Texture")    return Nous::AssetType::Texture2D;
+        if (assetType == "AssetType::Texture2D")    return Nous::AssetType::Texture2D;
         
         return AssetType::None;
     }

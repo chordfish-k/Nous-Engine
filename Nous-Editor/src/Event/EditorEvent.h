@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Nous/Asset/Asset.h"
 
 namespace Nous {
 
@@ -20,8 +21,8 @@ namespace Nous {
 
     struct OpenSceneEvent : public EditorEvent
     {
-        std::filesystem::path FilePath;
-        OpenSceneEvent(const std::filesystem::path& filePath) : FilePath(filePath) {};
+        AssetHandle Handle;
+        OpenSceneEvent(const AssetHandle& handle) : Handle(handle) {};
 
         EDITOR_EVENT_CLASS_TYPE(OpenScene);
     };

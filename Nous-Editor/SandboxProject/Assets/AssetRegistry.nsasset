@@ -1,7 +1,19 @@
 AssetRegistry:
   - Handle: 3560622407722856679
     FilePath: Textures/Checkerboard.png
-    Type: AssetType::Texture
+    Type: AssetType::Texture2D
   - Handle: 10548005792465007447
     FilePath: Textures/Mario.png
-    Type: AssetType::Texture
+    Type: AssetType::Texture2D
+  - Handle: 15044703600172437370
+    FilePath: Scenes/3DExample.nous
+    Type: AssetType::Scene
+  - Handle: 15931407459184208857
+    FilePath: Scenes/Test.nous
+    Type: AssetType::Scene
+  - Handle: 16276543036030461258
+    FilePath: Scenes/Example.nous
+    Type: AssetType::Scene
+  - Handle: 17546005893865107657
+    FilePath: Scenes/PhysicsExample.nous
+    Type: AssetType::Scene

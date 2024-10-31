@@ -3,7 +3,10 @@
 #include "Nous/Utils/PlatformUtils.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Renderer/Font.h"
+
+#include "Nous/Asset/AssetManager.h"
 #include "Nous/Asset/TextureImporter.h"
+#include "Nous/Asset/SceneImporter.h"
 
 #include "Panel/DockingSpace.h"
 #include "Event/EditorEvent.h"
@@ -479,8 +482,9 @@ namespace Nous
         {
             ScriptEngine::Init();
 
-            auto startScenePath = Project::GetAssetsFileSystemPath(Project::GetActive()->GetConfig().StartScene);
-            OpenScene(startScenePath);
+            AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
+            if (startScene)
+                OpenScene(startScene);
             m_ResourceBrowserPanel = CreateScope<ResourceBrowserPanel>();
         }
     }
@@ -502,42 +506,36 @@ namespace Nous
 
     void EditorLayer::OpenScene()
     {
-        std::string filepath = FileDialogs::OpenFile("Nous Scene (*nous)\0*.nous\0");
+        // TODO
+        /*std::string filepath = FileDialogs::OpenFile("Nous Scene (*nous)\0*.nous\0");
         if (!filepath.empty())
-            OpenScene(filepath);
+            OpenScene(filepath);*/
     }
 
-    void EditorLayer::OpenScene(const std::filesystem::path& path)
+    void EditorLayer::OpenScene(AssetHandle handle)
     {
+        NS_CORE_ASSERT(handle);
+
         if (m_SceneState != SceneState::Edit)
             OnSceneStop();
 
-        if (path.extension().string() != ".nous")
-        {
-            NS_WARN("无法加载 {0} - 不是一个场景(*.nous)文件", path.filename().string());
-            return;
-        }
+        Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(handle);
+        Ref<Scene> newScene = Scene::Copy(readOnlyScene);
 
-        Ref<Scene> newScene = CreateRef<Scene>();
-        SceneSerializer serializer(newScene);
-        if (serializer.Deserialize(path.string()))
-        {
-            m_EditorScene = newScene;
-            m_SceneHierarchyPanel.SetContext(m_EditorScene);
-            m_ViewportPanel.SetContext(m_EditorScene);
+        m_EditorScene = newScene;
+        m_SceneHierarchyPanel.SetContext(m_EditorScene);
+        m_ViewportPanel.SetContext(m_EditorScene);
 
-            m_ActiveScene = m_EditorScene;
-            m_EditorScenePath = path;
+        m_ActiveScene = m_EditorScene;
+        m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetFilePath(handle);
 
-            m_EditorCamera.Reset();
-        }
+        m_EditorCamera.Reset();
     }
 
     void EditorLayer::SaveScene()
     {
-        SceneSerializer serializer(m_EditorScene); // 应该保存运行前在编辑器的版本
         if (!m_EditorScenePath.empty())
-            serializer.Serialize(m_EditorScenePath.string());
+            SerializeScene(m_ActiveScene, m_EditorScenePath);
         else
             SaveSceneAs();
     }
@@ -548,11 +546,14 @@ namespace Nous
 
         if (!filepath.empty())
         {
-            SceneSerializer serializer(m_EditorScene); // 应该保存运行前在编辑器的版本
-            serializer.Serialize(filepath);
-
+            SerializeScene(m_ActiveScene, filepath);
             m_EditorScenePath = filepath;
         }
+    }
+
+    void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path)
+    {
+        SceneImporter::SaveScene(scene, path);
     }
 
     void EditorLayer::OnEditorEvent(EditorEvent& e)
@@ -563,10 +564,8 @@ namespace Nous
 
     void EditorLayer::OnOpenScene(OpenSceneEvent& e)
     {
-        if (e.FilePath.empty())
-            OpenScene();
-        else
-            OpenScene(e.FilePath);
+        if (e.Handle)
+            OpenScene(e.Handle);
     }
 
     void EditorLayer::OnScenePlay()
