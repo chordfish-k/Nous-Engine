@@ -32,9 +32,11 @@ namespace Nous
         static std::deque<Line>& GetConsoleLines() { return m_ConsoleLines; }
 
         static bool IsAfterAddLog() { return m_AfterAddLog; }
+        static bool IsInited() { return m_IsInited; }
         static void ResetAfterAddLog() { m_AfterAddLog = false; }
 
     private:
+        static bool m_IsInited;
         static std::mutex m_Mutex;
         static std::deque<Line> m_ConsoleLines;
         static uint32_t m_MaxLines;

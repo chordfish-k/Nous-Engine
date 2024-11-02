@@ -41,6 +41,8 @@ project "Nous-Editor"
 
 	filter "configurations:Release"
 		defines "NS_RELEASE"
+		kind "WindowedApp"
+		entrypoint "mainCRTStartup"
 		runtime "Release"
 		optimize "on"
 

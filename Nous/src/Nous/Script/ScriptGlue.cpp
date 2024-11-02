@@ -3,6 +3,7 @@
 #include "ScriptEngine.h"
 
 #include "Nous/Core/UUID.h"
+#include "Nous/Core/Console.h"
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Entity.h"
 
@@ -47,7 +48,10 @@ namespace Nous
 		std::string cText = Utils::MonnoStringToString(text);
 		std::string cFilepath = Utils::MonnoStringToString(filepath);
 		
-		NS_TRACE("{0} {{{1},{2}}}", cText, cFilepath, lineNumber);
+		if (Console::IsInited())
+			NS_TRACE("{0} {{{1},{2}}}", cText, cFilepath, lineNumber);
+		else
+			NS_TRACE(cText);
 	}
 
 	// 获取脚本实例

@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 // 预编译头
 #include <iostream>
 #include <memory>

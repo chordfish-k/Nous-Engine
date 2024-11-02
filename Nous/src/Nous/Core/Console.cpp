@@ -7,6 +7,8 @@
 namespace Nous
 {
     std::deque<Console::Line> Console::m_ConsoleLines;
+
+    bool Console::m_IsInited = false;
     std::mutex Console::m_Mutex;
     uint32_t Console::m_MaxLines = 9999;
     bool Console::m_AfterAddLog = false;
@@ -21,6 +23,9 @@ namespace Nous
         m_ConsoleLines.clear();
     }
 
+    /// <summary>
+    /// 一旦调用这个函数，所有Log将不再输出到控制台
+    /// </summary>
     void Console::Init()
     {
         auto console_sink = std::make_shared<ConsoleSink<std::mutex>>();
@@ -34,6 +39,8 @@ namespace Nous
         loggerClient = std::make_shared<spdlog::logger>("APP", console_sink);
         spdlog::set_default_logger(loggerClient);
         spdlog::set_level(spdlog::level::trace);
+
+        m_IsInited = true;
     }
 
     void Console::AddLog(const Console::Line& log)
