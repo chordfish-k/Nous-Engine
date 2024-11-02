@@ -482,7 +482,7 @@ namespace Nous
     {
         if (Project::Load(path))
         {
-            ScriptEngine::Init();
+            ScriptEngine::InitApp();
 
             AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
             if (startScene)

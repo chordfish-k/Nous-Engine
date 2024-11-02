@@ -164,28 +164,6 @@ namespace Nous
 		s_Data = new ScriptEngineData();
 
 		InitMono();
-		ScriptGlue::RegisterFunctions();
-
-		bool status = LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
-		if (!status)
-		{
-			NS_CORE_ERROR("[ScriptEngine] 无法加载 Nous-ScriptCore.dll");
-			return;
-		}
-
-		auto scriptModulePath = Project::GetActiveAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
-		status = LoadAppAssembly(scriptModulePath);
-		if (!status)
-		{
-			NS_CORE_ERROR("[ScriptEngine] 无法加载脚本二进制文件");
-			return;
-		}
-		
-		LoadAppAssemblyClasses();
-
-		ScriptGlue::RegisterComponents();
-	
-		s_Data->EntityClass = ScriptClass("Nous", "Entity", true);
 	}
 
 	void ScriptEngine::Shutdown()
@@ -227,11 +205,55 @@ namespace Nous
 	{
 		mono_domain_set(mono_get_root_domain(), false);
 
-		mono_domain_unload(s_Data->AppDomain);
+		if (s_Data->AppDomain)
+			mono_domain_unload(s_Data->AppDomain);
 		s_Data->AppDomain = nullptr;
 
-		mono_jit_cleanup(s_Data->RootDomain);
+		if (s_Data->RootDomain)
+			mono_jit_cleanup(s_Data->RootDomain);
 		s_Data->RootDomain = nullptr;
+	}
+
+	void ScriptEngine::InitApp()
+	{
+		if (!s_Data || !s_Data->RootDomain)
+			Init();
+
+		mono_domain_set(mono_get_root_domain(), false);
+
+		//if (s_Data->EnableDebugging)
+		//{
+		//	mono_debug_domain_unload(s_Data->RootDomain);
+		//	mono_debug_cleanup();
+		//}
+
+		if (s_Data && s_Data->AppDomain)
+		{
+			mono_domain_unload(s_Data->AppDomain);
+			s_Data->AppDomain = nullptr;
+		}
+		
+		bool status = LoadAssembly("resources/Scripts/Nous-ScriptCore.dll");
+		if (!status)
+		{
+			NS_CORE_ERROR("[ScriptEngine] 无法加载 Nous-ScriptCore.dll");
+			return;
+		}
+
+		auto scriptModulePath = Project::GetActiveAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+		status = LoadAppAssembly(scriptModulePath);
+		if (!status)
+		{
+			NS_CORE_ERROR("[ScriptEngine] 无法加载脚本二进制文件");
+			return;
+		}
+
+		LoadAppAssemblyClasses();
+
+		s_Data->EntityClass = ScriptClass("Nous", "Entity", true);
+
+		ScriptGlue::RegisterFunctions();
+		ScriptGlue::RegisterComponents();
 	}
 
 	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)

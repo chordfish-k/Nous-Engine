@@ -145,6 +145,7 @@ namespace Nous
 	{
 	public:
 		static void Init();
+		static void InitApp();
 		static void Shutdown();
 
 		static bool LoadAssembly(const std::filesystem::path& filepath);
