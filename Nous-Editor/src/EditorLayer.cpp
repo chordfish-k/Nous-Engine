@@ -284,9 +284,9 @@ namespace Nous
         if (hasPauseButton)
         {
             bool isPaused = m_ActiveScene->IsPaused();
+            Ref<Texture2D> icon = isPaused ? m_IconPlay : m_IconPause;
             ImGui::SameLine();
             {
-                Ref<Texture2D> icon = m_IconPause;
                 if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
                 {
                     m_ActiveScene->SetPaused(!isPaused);
