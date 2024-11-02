@@ -1,4 +1,4 @@
-local RootDir = "../../../../"
+local RootDir = "../../"
 include (RootDir .. "/vendor/premake/premake_customization/solution_items.lua")
 
 workspace "Sandbox"
@@ -29,13 +29,12 @@ project "Sandbox"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("Binaries")
-	objdir ("Intermediates")
+	targetdir ("Bin/App")
+	objdir ("Bin/Temp")
 
 	files
 	{
-		"Source/**.cs",
-		"Properties/**.cs",
+		"./**.cs"
 	}
 
 	links

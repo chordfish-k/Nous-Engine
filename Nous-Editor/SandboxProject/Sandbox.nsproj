@@ -1,6 +1,6 @@
 Project:
     Name: Sandbox
     StartScene: 3813795801237644536
-    AssetDirectory: Assets
+    AssetDirectory: .
     AssetRegistryPath: AssetRegistry.nsasset
-    ScriptModulePath: Scripts\Binaries\Sandbox.dll
+    ScriptModulePath: Bin\App\Sandbox.dll
