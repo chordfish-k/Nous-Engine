@@ -40,18 +40,14 @@ namespace Nous
 	NS_CORE_ASSERT(entity)
 
 #define NS_CORE_ASSERT_COMPONENT(componentClass) NS_CORE_ASSERT(entity.HasComponent<componentClass>())
-	// Log
-	static void NativeLog(MonoString* text, int parameter)
-	{
-		std::string str = Utils::MonnoStringToString(text);
-		std::cout << str << ", " << parameter << std::endl;
-	}
 
 	// Log
-	static void NativeLog_Vector(glm::vec3* parameter, glm::vec3* outResult)
+	static void NousConsole_Log(MonoString* text, MonoString* filepath, int lineNumber)
 	{
-		NS_CORE_WARN("Value: {0}", *parameter);
-		*outResult = glm::cross(*parameter, glm::vec3(parameter->x, parameter->y, -parameter->z));
+		std::string cText = Utils::MonnoStringToString(text);
+		std::string cFilepath = Utils::MonnoStringToString(filepath);
+		
+		NS_TRACE("{0} {{{1},{2}}}", cText, cFilepath, lineNumber);
 	}
 
 	// 获取脚本实例
@@ -278,8 +274,7 @@ namespace Nous
 
 	void ScriptGlue::RegisterFunctions()
 	{
-		NS_ADD_INTERNAL_CALL(NativeLog);
-		NS_ADD_INTERNAL_CALL(NativeLog_Vector);
+		NS_ADD_INTERNAL_CALL(NousConsole_Log);
 
 		NS_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 

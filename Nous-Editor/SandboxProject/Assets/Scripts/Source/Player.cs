@@ -19,7 +19,7 @@ namespace Sandbox
 
         void OnCreate()
         {
-            Console.WriteLine($"Player.OnCreate = {ID}");
+            NousConsole.Log($"Player.OnCreate = {ID}");
 
             m_Transform = GetComponent<CTransform>();
             m_Rigidbody = GetComponent<CRigidbody2D>();
@@ -32,7 +32,7 @@ namespace Sandbox
 
         void OnUpdate(float dt)
         {
-            // Console.WriteLine($"Player.OnUpdate: {dt}");
+            NousConsole.Log($"Player.OnUpdate: {dt}");
 
             Vector2 velocity = Vector2.Zero;
 

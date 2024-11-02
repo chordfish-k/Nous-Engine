@@ -5,14 +5,14 @@
 
 namespace Nous {
 
-    std::vector<Observer*> EditorEventRepeater::observers;
+    std::vector<Observer*> EditorEventEmitter::observers;
 
-    void EditorEventRepeater::AddObserver(Observer* observer)
+    void EditorEventEmitter::AddObserver(Observer* observer)
     {
         observers.push_back(observer);
     }
 
-    void EditorEventRepeater::Emit(EditorEvent& e)
+    void EditorEventEmitter::Emit(EditorEvent& e)
     {
         for (auto& obs : observers)
         {

@@ -5,6 +5,11 @@ namespace Nous
 {
 	public static class InternalCalls
 	{
+		#region NousConsole
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool NousConsole_Log(string log, string filepath, int lineNumber);
+		#endregion
+
 		#region Entity
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);

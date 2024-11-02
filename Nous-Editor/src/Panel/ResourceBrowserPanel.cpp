@@ -126,7 +126,7 @@ namespace Nous
                     {
                         // 发送资源双击事件
                         AssetFileDoubleClickEvent event{ m_TreeNodes[treeNodeIndex].Handle };
-                        EditorEventRepeater::Emit(event);
+                        EditorEventEmitter::Emit(event);
                     }
                 }
 

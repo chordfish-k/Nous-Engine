@@ -4,6 +4,7 @@
 #include "Nous/Core/Application.h"
 #include "Nous/Core/Layer.h"
 #include "Nous/Core/Log.h"
+#include "Nous/Core/Console.h"
 #include "Nous/Core/Assert.h"
 
 #include "Nous/Core/Timestep.h"

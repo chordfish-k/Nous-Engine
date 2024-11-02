@@ -14,6 +14,7 @@
 #include "Nous/Core/Application.h"
 #include "Nous/Core/Timer.h"
 #include "Nous/Core/Buffer.h"
+#include "Nous/Core/Console.h"
 #include "Nous/Core/FileSystem.h"
 #include "Nous/Project/Project.h"
 
@@ -124,6 +125,8 @@ namespace Nous
 		std::filesystem::path AppAssemblyFilePath;
 
 		ScriptClass EntityClass;
+		
+		MonoObject* ConsoleTextWriterInstance = nullptr;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;

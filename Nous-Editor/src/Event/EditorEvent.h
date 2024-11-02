@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "Nous/Asset/Asset.h"
 
 namespace Nous {
@@ -7,7 +9,8 @@ namespace Nous {
     enum class EditorEventType
     {
         OpenScene = 0,
-        AssetFileDoubleClick
+        AssetFileDoubleClick,
+        ConsoleClear
     };
 
     struct EditorEvent
@@ -29,6 +32,13 @@ namespace Nous {
         EDITOR_EVENT_CLASS_TYPE(OpenScene);
     };
 
+    struct ConsoleClearEvent : public EditorEvent
+    {
+        ConsoleClearEvent() {}
+
+        EDITOR_EVENT_CLASS_TYPE(ConsoleClear);
+    };
+
     struct AssetFileDoubleClickEvent : public EditorEvent
     {
         AssetHandle Handle;
@@ -40,7 +50,7 @@ namespace Nous {
 
     class Observer;
 
-    class EditorEventRepeater
+    class EditorEventEmitter
     {
     public:
         static void AddObserver(Observer* observer);

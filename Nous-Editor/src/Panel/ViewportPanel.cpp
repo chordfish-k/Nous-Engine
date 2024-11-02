@@ -87,7 +87,7 @@ namespace Nous
             {
                 AssetHandle handle = *(AssetHandle*)payload->Data;
                 OpenSceneEvent event {handle};
-                EditorEventRepeater::Emit(event);
+                EditorEventEmitter::Emit(event);
             }
             ImGui::EndDragDropTarget();
         }

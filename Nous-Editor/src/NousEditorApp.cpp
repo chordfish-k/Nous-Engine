@@ -1,5 +1,6 @@
 ﻿#include "Nous.h"
 #include "Nous/Core/EntryPoint.h"
+#include "Nous/Core/Console.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
 

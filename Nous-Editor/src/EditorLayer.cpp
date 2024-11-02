@@ -20,7 +20,7 @@ namespace Nous
     EditorLayer::EditorLayer()
         : Layer("EditorLayer")
     {
-        EditorEventRepeater::AddObserver(this);
+        EditorEventEmitter::AddObserver(this);
 
         s_Font = Font::GetDefault();
     }
@@ -601,6 +601,9 @@ namespace Nous
     {
         if (m_SceneState == SceneState::Simulate)
             OnSceneStop();
+
+        ConsoleClearEvent e;
+        EditorEventEmitter::Emit(e);
 
         m_SceneState = SceneState::Play;
 

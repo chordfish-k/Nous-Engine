@@ -67,7 +67,7 @@ namespace Nous {
         // 面板窗口
         SceneHierarchyPanel m_SceneHierarchyPanel;
         Scope<ResourceBrowserPanel> m_ResourceBrowserPanel;
-        Console m_ConsolePanel;
+        ConsolePanel m_ConsolePanel;
         ViewportPanel m_ViewportPanel;
 
         bool m_ShowPhysicsColliders = false;
