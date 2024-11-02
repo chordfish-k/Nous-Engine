@@ -20,6 +20,8 @@
 
 ### 项目系统
 
+1. 一个启动程序页面，显示打开或新建项目
+1. 新建项目会创建.nsproj & .nsasset，不需要创建premake5.lua & WinGen.bat，这两个在编辑器程序上执行
 1. 打包成可游玩的游戏，具体操作是修改Sandbox子项目，让它只保留runtime并将framebuffer进行渲染
 
 ### 其它
