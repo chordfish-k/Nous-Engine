@@ -134,7 +134,7 @@ namespace Nous
 
     void EditorAssetManager::SerializeAssetRegistry()
     {
-        auto path = Project::GetAssetsRegistryPath();
+        auto path = Project::GetActiveAssetRegistryPath();
 
         YAML::Emitter out;
         {
@@ -161,7 +161,7 @@ namespace Nous
 
     bool EditorAssetManager::DeserializeAssetRegistry()
     {
-        auto path = Project::GetAssetsRegistryPath();
+        auto path = Project::GetActiveAssetRegistryPath();
         YAML::Node data;
         try
         {

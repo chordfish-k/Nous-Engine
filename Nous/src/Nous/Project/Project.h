@@ -21,31 +21,40 @@ namespace Nous
 	class Project
 	{
 	public:
-		static const std::filesystem::path& GetProjectDirectory()
+		const std::filesystem::path& GetProjectDirectory() { return m_ProjectDirectory; }
+		std::filesystem::path GetAssetDirectory() { return GetProjectDirectory() / s_ActiveProject->m_Config.AssetDirectory; }
+		std::filesystem::path GetAssetRegistryPath() { return GetAssetDirectory() / s_ActiveProject->m_Config.AssetRegistryPath; }
+		// 将来移动到资产管理器
+		std::filesystem::path GetAssetFileSystemPath(const std::filesystem::path& path) { return GetAssetDirectory() / path; }
+
+		std::filesystem::path GetAssetAbsolutePath(const std::filesystem::path& path) { return GetAssetDirectory() / path; }
+
+		static const std::filesystem::path& GetActiveProjectDirectory()
 		{
 			NS_CORE_ASSERT(s_ActiveProject);
-			return s_ActiveProject->m_ProjectDirectory;
+			return s_ActiveProject->GetProjectDirectory();
 		}
 
-		static std::filesystem::path GetAssetsDirectory()
+		static std::filesystem::path GetActiveAssetDirectory()
 		{
 			NS_CORE_ASSERT(s_ActiveProject);
-			return GetProjectDirectory() / s_ActiveProject->m_Config.AssetDirectory;
+			return s_ActiveProject->GetAssetDirectory();
 		}
 
-		static std::filesystem::path GetAssetsRegistryPath()
+		static std::filesystem::path GetActiveAssetRegistryPath()
 		{
 			NS_CORE_ASSERT(s_ActiveProject);
-			return GetAssetsDirectory() / s_ActiveProject->m_Config.AssetRegistryPath;
+			return s_ActiveProject->GetAssetRegistryPath();
 		}
 
 		// 将来移动到资产管理器
-		static std::filesystem::path GetAssetsFileSystemPath(const std::filesystem::path& path)
+		static std::filesystem::path GetActiveAssetFileSystemPath(const std::filesystem::path& path)
 		{
 			NS_CORE_ASSERT(s_ActiveProject);
-			return GetAssetsDirectory() / path;
+			return s_ActiveProject->GetAssetFileSystemPath(path);
 		}
-		
+
+
 		ProjectConfig& GetConfig() { return m_Config; }
 
 		static Ref<Project> GetActive() { return s_ActiveProject; }

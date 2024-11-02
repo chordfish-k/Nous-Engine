@@ -11,7 +11,7 @@ namespace Nous
 	{
 		NS_PROFILE_FUNCTION();
 
-		auto res = LoadTexture2D(Project::GetAssetsDirectory() / metadata.FilePath);
+		auto res = LoadTexture2D(Project::GetActiveAssetDirectory() / metadata.FilePath);
 		res->Handle = handle;
 
 		return res;
@@ -28,7 +28,10 @@ namespace Nous
 		{
 			NS_PROFILE_SCOPE("stbi_load - TextureImporter::ImportTexture2D");
 			std::string pathStr = path.string();
-			data.Data = stbi_load(pathStr.c_str(), &width, &height, &channels, 0);
+
+			// 暂时只支持png
+			data.Data = stbi_load(pathStr.c_str(), &width, &height, &channels, 4);
+			channels = 4;
 		}
 
 		if (data.Data == nullptr)

@@ -10,7 +10,7 @@ namespace Nous
 	{
 		NS_PROFILE_FUNCTION();
 
-		auto res = LoadScene(Project::GetAssetsDirectory() / metadata.FilePath);
+		auto res = LoadScene(Project::GetActiveAssetDirectory() / metadata.FilePath);
 		res->Handle = handle;
 		return res;
 	}
@@ -28,6 +28,6 @@ namespace Nous
 	void SceneImporter::SaveScene(Ref<Scene> scene, const std::filesystem::path& path)
 	{
 		SceneSerializer serializer(scene);
-		serializer.Serialize(Project::GetAssetsDirectory() / path);
+		serializer.Serialize(Project::GetActiveAssetDirectory() / path);
 	}
 }

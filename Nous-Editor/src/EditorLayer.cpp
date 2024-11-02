@@ -487,7 +487,7 @@ namespace Nous
             AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
             if (startScene)
                 OpenScene(startScene);
-            m_ResourceBrowserPanel = CreateScope<ResourceBrowserPanel>();
+            m_ResourceBrowserPanel = CreateScope<ResourceBrowserPanel>(Project::GetActive());
         }
     }
 
@@ -555,7 +555,7 @@ namespace Nous
     void EditorLayer::SaveSceneAs()
     {
         std::filesystem::path filepath = FileDialogs::SaveFile("Nous Scene (*Nous)\0*.nous\0");
-        filepath = std::filesystem::relative(filepath, Project::GetAssetsDirectory());
+        filepath = std::filesystem::relative(filepath, Project::GetActiveAssetDirectory());
         std::string pathString = filepath.generic_string();
 
         if (!pathString.empty())

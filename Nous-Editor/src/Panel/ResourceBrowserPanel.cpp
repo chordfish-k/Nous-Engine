@@ -10,8 +10,8 @@
 
 namespace Nous 
 {
-    ResourceBrowserPanel::ResourceBrowserPanel()
-        : m_BaseDirectory(Project::GetAssetsDirectory()), m_CurrentDirectory(m_BaseDirectory)
+    ResourceBrowserPanel::ResourceBrowserPanel(Ref<Project> project)
+        : m_Project(project), m_ThumbnailCache(CreateRef<ThumbnailCache>(project)), m_BaseDirectory(Project::GetActiveAssetDirectory()),  m_CurrentDirectory(m_BaseDirectory)
     {
         m_TreeNodes.push_back(TreeNode(".", 0));
 
@@ -59,11 +59,11 @@ namespace Nous
 
         ImGui::Columns(columnCount, 0, false);
 
-        if (m_Mode == Mode::Asset && m_TreeNodes.size())
+        if (m_Mode == Mode::Asset)
         {
             TreeNode* node = &m_TreeNodes[0];
 
-            auto currentDir = std::filesystem::relative(m_CurrentDirectory, Project::GetAssetsDirectory());
+            auto currentDir = std::filesystem::relative(m_CurrentDirectory, Project::GetActiveAssetDirectory());
             for (const auto& p : currentDir)
             {
                 // 如果只有一级目录
@@ -84,17 +84,27 @@ namespace Nous
 
             for (const auto& [item, treeNodeIndex] : node->Children)
             {
-                bool isDirectory = std::filesystem::is_directory(Project::GetAssetsDirectory() / item);
-                
+                // 非正确路径，待修复
                 std::string itemStr = item.generic_string();
 
-                ImGui::PushID(itemStr.c_str());
-                Ref<Texture2D> icon = isDirectory ? m_DirectoryIcon : m_FileIcon;
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-                ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-            
-                bool isDelete = false;
+                std::filesystem::path path = Project::GetActiveAssetDirectory() / currentDir / item;
+                bool isDirectory = std::filesystem::is_directory(path);
 
+                // 缩略图 Thumbnail
+                auto relativePath = std::filesystem::relative(path, Project::GetActiveAssetDirectory());
+                Ref<Texture2D> thumbnail = m_DirectoryIcon;
+                if (!isDirectory)
+                {
+                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(relativePath);
+                    if (!thumbnail)
+                        thumbnail = m_FileIcon;
+                }
+
+                ImGui::PushID(itemStr.c_str());
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                ImGui::ImageButton((ImTextureID)thumbnail->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+                bool isDelete = false;
                 if (!isDirectory && ImGui::BeginPopupContextItem())
                 {
                     if (ImGui::MenuItem("Delete"))
@@ -146,16 +156,25 @@ namespace Nous
                 std::string fileNameString = path.filename().string();
 
                 bool isDirectory = directoryEntry.is_directory();
-                Ref<Texture2D> icon = isDirectory ? m_DirectoryIcon : m_FileIcon;
+
+                // 缩略图 Thumbnail
+                auto relativePath = std::filesystem::relative(path, Project::GetActiveAssetDirectory());
+                Ref<Texture2D> thumbnail = m_DirectoryIcon;
+                if (!directoryEntry.is_directory())
+                {
+                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(relativePath);
+                    if (!thumbnail)
+                        thumbnail = m_FileIcon;
+                }
+                
                 ImGui::PushID(fileNameString.c_str());
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-                ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, {0, 1}, {1, 0});
+                ImGui::ImageButton((ImTextureID)(uint64_t)thumbnail->GetRendererID(), { thumbnailSize, thumbnailSize }, {0, 1}, {1, 0});
                 
                 if (ImGui::BeginPopupContextItem())
                 {
                     if (!isDirectory && ImGui::MenuItem("Import"))
                     {
-                        auto relativePath = std::filesystem::relative(path, Project::GetAssetsDirectory());
                         Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);
                         RefreshAssetTree();
                     }
@@ -193,7 +212,8 @@ namespace Nous
 
             for (const auto& p : metadata.FilePath)
             {
-                auto it = m_TreeNodes[currentNodeIndex].Children.find(p.generic_string());
+                std::string key = std::filesystem::absolute(p).string();
+                auto it = m_TreeNodes[currentNodeIndex].Children.find((p.generic_string()));
                 if (it != m_TreeNodes[currentNodeIndex].Children.end())
                 {
                     currentNodeIndex = it->second;
