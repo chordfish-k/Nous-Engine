@@ -11,11 +11,14 @@ Entities:
       Color: [0.300000012, 0.699999988, 0.200000003, 1]
       TextureHandle: 0
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
   - Entity: 5410312597052315420
     CTag:
       Tag: Red Square
     CTransform:
-      Translation: [0, 0, 0]
+      Translation: [9.31322575e-10, -3.7252903e-09, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CMonoScript:
@@ -24,8 +27,11 @@ Entities:
         []
     CSpriteRenderer:
       Color: [1, 0.629893243, 0.629893243, 1]
-      TextureHandle: 10548005792465007447
+      TextureHandle: 5215514554843654355
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
   - Entity: 1037540523201154259
     CTag:
       Tag: Ortho Camera

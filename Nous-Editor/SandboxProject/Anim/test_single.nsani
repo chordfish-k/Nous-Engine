@@ -1,0 +1,11 @@
+Name: TestSingle
+Type: Single
+Frames:
+  - Handle: 8863621358159051246
+    Duration: 0.25
+  - Handle: 17969972638127828694
+    Duration: 0.25
+  - Handle: 2907078287622620602
+    Duration: 0.25
+  - Handle: 9064584609031623573
+    Duration: 0.25

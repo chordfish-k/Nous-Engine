@@ -10,6 +10,7 @@
 #include "Nous/Scene/System/RenderSystem.h"
 #include "Nous/Scene/System/PhysicsSystem.h"
 #include "Nous/Scene/System/ScriptSystem.h"
+#include "Nous/Scene/System/AnimSystem.h"
 
 #include <glm/glm.hpp>
 
@@ -131,6 +132,7 @@ namespace Nous {
 
         ScriptSystem::Start(this);
         PhysicsSystem::Start(this);
+        AnimSystem::Start(this);
         RenderSystem::Start(this);
     }
 
@@ -140,6 +142,7 @@ namespace Nous {
 
         ScriptSystem::Stop();
         PhysicsSystem::Stop();
+        AnimSystem::Stop();
         RenderSystem::Stop();
     }
 
@@ -159,6 +162,7 @@ namespace Nous {
         {
             ScriptSystem::Update(dt);
             PhysicsSystem::Update(dt);
+            AnimSystem::Update(dt);
         }
 
         RenderSystem::Update(dt);
@@ -289,6 +293,11 @@ namespace Nous {
 
     template<>
     void Scene::OnComponentAdded<CSpriteRenderer>(Entity entity, CSpriteRenderer& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CAnimPlayer>(Entity entity, CAnimPlayer& component)
     {
     }
 

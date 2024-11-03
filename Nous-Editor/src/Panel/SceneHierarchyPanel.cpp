@@ -5,6 +5,7 @@
 #include "Nous/Asset/AssetMetadata.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Asset/TextureImporter.h"
+#include "Nous/Anim/AnimClip.h"
 #include "Nous/UI/UI.h"
 
 #include <imgui.h>
@@ -173,19 +174,20 @@ namespace Nous {
 
         if (ImGui::BeginPopup("AddComponent"))
         {
-            DisplayAddComponentEntry<CCamera>("Camera");
-            DisplayAddComponentEntry<CMonoScript>("Script");
-            DisplayAddComponentEntry<CSpriteRenderer>("Sprite Renderer");
-            DisplayAddComponentEntry<CCircleRenderer>("Circle Renderer");
-            DisplayAddComponentEntry<CRigidbody2D>("Rigidbody 2D");
-            DisplayAddComponentEntry<CBoxCollider2D>("Box Collider 2D");
-            DisplayAddComponentEntry<CCircleCollider2D>("Circle Collider 2D");
-            DisplayAddComponentEntry<CTextRenderer>("Text Renderer");
+            DisplayAddComponentEntry<CCamera>("CCamera");
+            DisplayAddComponentEntry<CMonoScript>("CMonoScript");
+            DisplayAddComponentEntry<CSpriteRenderer>("CSpriteRenderer");
+            DisplayAddComponentEntry<CCircleRenderer>("CCircleRenderer");
+            DisplayAddComponentEntry<CRigidbody2D>("CRigidbody2D");
+            DisplayAddComponentEntry<CBoxCollider2D>("CBoxCollider2D");
+            DisplayAddComponentEntry<CCircleCollider2D>("CCircleCollider2D");
+            DisplayAddComponentEntry<CTextRenderer>("CTextRenderer");
+            DisplayAddComponentEntry<CAnimPlayer>("CAnimPlayer");
 
             ImGui::EndPopup();
         }
 
-        DrawComponent<CTransform>("Transform", entity, [](auto& component)
+        DrawComponent<CTransform>("CTransform", entity, [](auto& component)
         {
             UI::DrawVec3Control("Position", component.Translation);
             glm::vec3 rotation = glm::degrees(component.Rotation);
@@ -194,7 +196,7 @@ namespace Nous {
             UI::DrawVec3Control("Scale", component.Scale, 1.0f);
         });
 
-        DrawComponent<CCamera>("Camera", entity, [](auto& component){
+        DrawComponent<CCamera>("CCamera", entity, [](auto& component){
             auto& camera = component.Camera;
             UI::DrawCheckbox("Primary", &component.Primary);
 
@@ -238,7 +240,7 @@ namespace Nous {
             }
         });
 
-        DrawComponent<CMonoScript>("Script", entity, [entity, scene = m_Context](auto& component) mutable // mutable:允许修改捕获的变量
+        DrawComponent<CMonoScript>("CMonoScript", entity, [entity, scene = m_Context](auto& component) mutable // mutable:允许修改捕获的变量
         {
             bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
@@ -319,7 +321,7 @@ namespace Nous {
             }
         });
 
-        DrawComponent<CSpriteRenderer>("Sprite Renderer", entity, [](auto& component)
+        DrawComponent<CSpriteRenderer>("CSpriteRenderer", entity, [](auto& component)
         {
             UI::DrawColor4Control("Color", component.Color);
             
@@ -353,14 +355,14 @@ namespace Nous {
 
         });
 
-        DrawComponent<CCircleRenderer>("Circle Renderer", entity, [](auto& component)
+        DrawComponent<CCircleRenderer>("CCircleRenderer", entity, [](auto& component)
         {
             UI::DrawColor4Control("Color", component.Color);
             UI::DrawFloatControl("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
             UI::DrawFloatControl("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
         });
 
-        DrawComponent<CRigidbody2D>("Rigidbody 2D", entity, [](auto& component)
+        DrawComponent<CRigidbody2D>("CRigidbody2D", entity, [](auto& component)
         {
             const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
             uint32_t currentIndex = (int) component.Type;
@@ -372,7 +374,7 @@ namespace Nous {
             UI::DrawCheckbox("Fixed Rotation", &component.FixedRotation);
         });
 
-        DrawComponent<CBoxCollider2D>("Box Collider 2D", entity, [](auto& component)
+        DrawComponent<CBoxCollider2D>("CBoxCollider2D", entity, [](auto& component)
         {
             UI::DrawVec2Control("Offset", component.Offset);
             UI::DrawVec2Control("Size", component.Size);
@@ -382,7 +384,7 @@ namespace Nous {
             UI::DrawFloatControl("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
         });
 
-        DrawComponent<CCircleCollider2D>("Circle Collider 2D", entity, [](auto& component)
+        DrawComponent<CCircleCollider2D>("CCircleCollider2D", entity, [](auto& component)
         {
             UI::DrawVec2Control("Offset", component.Offset);
             UI::DrawFloatControl("Radius", &component.Radius);
@@ -392,12 +394,38 @@ namespace Nous {
             UI::DrawFloatControl("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
         });
 
-        DrawComponent<CTextRenderer>("Text Renderer", entity, [](auto& component)
+        DrawComponent<CTextRenderer>("CTextRenderer", entity, [](auto& component)
         {
             UI::DrawInputTextMultiline("Text String", &component.TextString);
             UI::DrawColor4Control("Color", component.Color);
             UI::DrawFloatControl("Kerning", &component.Kerning, 0.025f);
             UI::DrawFloatControl("Line Spacing", &component.LineSpacing, 0.025f);
+        });
+
+        DrawComponent<CAnimPlayer>("CAnimPlayer", entity, [](auto& component)
+        {
+            std::string btnLabel = "None";
+            bool isTextureValid = false;
+            if (component.AnimClip != 0)
+            {
+                if (AssetManager::IsAssetHandleValid(component.AnimClip)
+                    && AssetManager::GetAssetType(component.AnimClip) == AssetType::AnimClip)
+                {
+                    const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetMetadata(component.AnimClip);
+                    btnLabel = AssetManager::GetAsset<AnimClip>(component.AnimClip)->Name;
+                    isTextureValid = true;
+                }
+                else
+                {
+                    btnLabel = "Invalid";
+                }
+            }
+
+            AssetHandle handle = component.AnimClip;
+            if (UI::DrawAssetDragDropBox("Clip", btnLabel, &handle, AssetType::AnimClip))
+            {
+                component.AnimClip = handle;
+            }
         });
     }
 

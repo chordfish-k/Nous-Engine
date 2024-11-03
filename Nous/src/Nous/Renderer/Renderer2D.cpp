@@ -467,32 +467,33 @@ namespace Nous {
                                     {1.0f, 1.0f},
                                     {0.0f, 1.0f} };
 
-        float tW = (float) texture->GetWidth();
-        float tH = (float) texture->GetHeight();
-        int gridCols = 1;
-        int gridRows = 1;
-        if (sheetWidth > 0)
-            gridCols = std::max((int)tW / sheetWidth, 1);
-        if (sheetHeight > 0)
-            gridRows = std::max((int)tH / sheetHeight, 1);
-
-        if (gridCols > 1 || gridRows > 1)
+        if (texture)
         {
-            int j = sheetIndex % gridCols;
-            int i = gridRows - sheetIndex / gridCols - 1;
+            float tW = (float) texture->GetWidth();
+            float tH = (float) texture->GetHeight();
+            int gridCols = 1;
+            int gridRows = 1;
+            if (sheetWidth > 0)
+                gridCols = std::max((int)tW / sheetWidth, 1);
+            if (sheetHeight > 0)
+                gridRows = std::max((int)tH / sheetHeight, 1);
 
-            float xMin = j / (float)gridCols;
-            float xMax = (j + 1) / (float)gridCols;
-            float yMin = i / (float)gridRows;
-            float yMax = (i+1) / (float)gridRows;
+            if (gridCols > 1 || gridRows > 1)
+            {
+                int j = sheetIndex % gridCols;
+                int i = gridRows - sheetIndex / gridCols - 1;
 
-            textureCoords[0] = { xMin, yMin };
-            textureCoords[1] = { xMax, yMin };
-            textureCoords[2] = { xMax, yMax };
-            textureCoords[3] = { xMin, yMax };
+                float xMin = j / (float)gridCols;
+                float xMax = (j + 1) / (float)gridCols;
+                float yMin = i / (float)gridRows;
+                float yMax = (i+1) / (float)gridRows;
+
+                textureCoords[0] = { xMin, yMin };
+                textureCoords[1] = { xMax, yMin };
+                textureCoords[2] = { xMax, yMax };
+                textureCoords[3] = { xMin, yMax };
+            }
         }
-
-        
 
         float textureIndex = 0.0f;
         // 找出当前纹理的id

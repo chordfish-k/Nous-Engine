@@ -68,6 +68,14 @@ namespace Nous {
         operator const glm::vec4&() const { return Color; }
     };
 
+    struct CAnimPlayer
+    {
+        AssetHandle AnimClip = 0;
+
+        CAnimPlayer() = default;
+        CAnimPlayer(const CAnimPlayer&) = default;
+    };
+
     struct CCircleRenderer
     {
         glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -181,5 +189,6 @@ namespace Nous {
     using AllComponents =
         ComponentGroup<CTransform, CSpriteRenderer, CCircleRenderer, 
         CCamera, CNativeScript, CMonoScript, CRigidbody2D, 
-        CBoxCollider2D, CCircleCollider2D, CTextRenderer>;
+        CBoxCollider2D, CCircleCollider2D, CTextRenderer,
+        CAnimPlayer>;
 }

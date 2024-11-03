@@ -3,6 +3,7 @@
 
 #include "TextureImporter.h"
 #include "SceneImporter.h"
+#include "AnimClipImporter.h"
 
 #include <map>
 
@@ -12,7 +13,8 @@ namespace Nous
 	// 装载不同资源类型的导入器
 	static std::map<AssetType, AssetImportFunction> s_AssetImportFunctions = {
 		{ AssetType::Texture2D, TextureImporter::ImportTexture2D },
-		{ AssetType::Scene, SceneImporter::ImportScene }
+		{ AssetType::Scene, SceneImporter::ImportScene },
+		{ AssetType::AnimClip, AnimClipImporter::ImportAnimClip }
 	};
 
 	Ref<Asset> AssetImporter::ImportAsset(AssetHandle handle, const AssetMetadata& metadata)

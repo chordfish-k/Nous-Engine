@@ -1,15 +1,30 @@
 AssetRegistry:
+  - Handle: 2907078287622620602
+    FilePath: Textures/kid/player_idle_2.png
+    Type: AssetType::Texture2D
   - Handle: 3813795801237644536
     FilePath: Scenes/PhysicsExample.nous
     Type: AssetType::Scene
   - Handle: 5215514554843654355
     FilePath: Textures/Mario.png
     Type: AssetType::Texture2D
+  - Handle: 5452335139868395504
+    FilePath: Anim/test.nsani
+    Type: AssetType::AnimClip
+  - Handle: 6301804288407615871
+    FilePath: Anim/test_single.nsani
+    Type: AssetType::AnimClip
   - Handle: 6354818317365426658
     FilePath: Scenes/Test.nous
     Type: AssetType::Scene
   - Handle: 6485004313021763567
     FilePath: Textures/character_idle_left.png
+    Type: AssetType::Texture2D
+  - Handle: 8863621358159051246
+    FilePath: Textures/kid/player_idle_0.png
+    Type: AssetType::Texture2D
+  - Handle: 9064584609031623573
+    FilePath: Textures/kid/player_idle_3.png
     Type: AssetType::Texture2D
   - Handle: 11289935122047927156
     FilePath: Scenes/Example.nous
@@ -20,3 +35,6 @@ AssetRegistry:
   - Handle: 15044703600172437370
     FilePath: Scenes/3DExample.nous
     Type: AssetType::Scene
+  - Handle: 17969972638127828694
+    FilePath: Textures/kid/player_idle_1.png
+    Type: AssetType::Texture2D

@@ -374,6 +374,17 @@ namespace Nous {
             out << YAML::EndMap; // CTextRenderer
         }
 
+        if (entity.HasComponent<CAnimPlayer>())
+        {
+            out << YAML::Key << "CAnimPlayer";
+            out << YAML::BeginMap; // CAnimPlayer
+
+            auto& textComponent = entity.GetComponent<CAnimPlayer>();
+            out << YAML::Key << "AnimClip" << YAML::Value << textComponent.AnimClip;
+
+            out << YAML::EndMap; // CAnimPlayer
+        }
+
         out << YAML::EndMap; // Entity
     }
 
@@ -598,6 +609,13 @@ namespace Nous {
                 tc.Color = textRenderer["Color"].as<glm::vec4>();
                 tc.Kerning = textRenderer["Kerning"].as<float>();
                 tc.LineSpacing = textRenderer["LineSpacing"].as<float>();
+            }
+
+            auto animPlayer = entity["CAnimPlayer"];
+            if (animPlayer)
+            {
+                auto& ap = deserializedEntity.AddComponent<CAnimPlayer>();
+                ap.AnimClip = animPlayer["AnimClip"].as<AssetHandle>();
             }
         }
         return true;
