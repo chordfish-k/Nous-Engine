@@ -97,4 +97,12 @@ namespace Nous
         }
 
     }
+
+    public class CAnimPlayer : Component
+    {
+        public void SetFloat(string key, float value)
+        {
+            InternalCalls.AnimPlayerComponent_SetFloat(Entity.ID, key, value);
+        }
+    }
 }

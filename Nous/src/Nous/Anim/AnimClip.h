@@ -30,8 +30,13 @@ namespace Nous
 	public:
 		AnimClipType Type = AnimClipType::Single;
 		std::vector<AnimFrame> Frames;
-		int CurrentFrame = 0;
-		float CurrentFrameTimeUsed = 0;
+
+		struct Current
+		{
+			int Frame = 0;
+			float FrameTimeUsed = 0.0f;
+		};
+		std::unordered_map<UUID, Current> Data;
 		// Single
 		std::string Name = "None";
 		// SpriteSheet

@@ -42,7 +42,7 @@ Entities:
       Scale: [4, 4, 1]
     CSpriteRenderer:
       Color: [1, 1, 1, 1]
-      TextureHandle: 8863621358159051246
+      TextureHandle: 9535293915289877611
       TilingFactor: 1
       SheetWidth: 48
       SheetHeight: 48
@@ -58,8 +58,8 @@ Entities:
       Restitution: 0
       RestitutionThreshold: 0.5
     CAnimPlayer:
-      AnimClip: 6301804288407615871
-      Type: 0
+      AnimClip: 3517851791646336134
+      Type: 1
   - Entity: 5042216685119532454
     CTag:
       Tag: Bar

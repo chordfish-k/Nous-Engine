@@ -51,24 +51,32 @@ namespace Nous
 	class AnimMachine : public Asset
 	{
 	public:
-		void SetFloat(const std::string& key, float value);
-		void SetBool(const std::string& key, bool value);
-		float GetFloat(const std::string& key);
-		bool GetBool(const std::string& key);
-		Ref<AnimClip> GetCurrentClip();
+		void SetFloat(UUID entity, const std::string& key, float value);
+		void SetBool(UUID entity, const std::string& key, bool value);
+		float GetFloat(UUID entity, const std::string& key);
+		bool GetBool(UUID entity, const std::string& key);
+		Ref<AnimClip> GetCurrentClip(UUID entity);
+
+		void SetCurrentClipIndex(UUID entity, int index);
 
 		virtual AssetType GetType() const { return AssetType::AnimMachine; }
 	private:
-		void UpdateState(const std::string& key);
+		void UpdateState(UUID entity, const std::string& key);
 	private:
-		std::unordered_map<std::string, float> m_FloatMap;
-		std::unordered_map<std::string, bool> m_BoolMap;
-
 		std::vector<AnimState> m_AllStates;
 
-		int m_CurrentIndex = 0;
+		struct Current
+		{
+			std::unordered_map<std::string, float> FloatMap;
+			std::unordered_map<std::string, bool> BoolMap;
+			int CurrentIndex;
+		};
+		std::unordered_map<UUID, Current> m_Data;
+	public:
+		int DefaultIndex = 0;
 
 		friend class AnimMachineSerializer;
+		
 	};
 }
 

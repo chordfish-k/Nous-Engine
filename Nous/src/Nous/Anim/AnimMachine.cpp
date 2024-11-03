@@ -3,37 +3,43 @@
 
 namespace Nous
 {
-    void AnimMachine::SetFloat(const std::string& key, float value)
+    void AnimMachine::SetFloat(UUID entity, const std::string& key, float value)
     {
-        m_FloatMap[key] = value;
-        UpdateState(key);
+        m_Data[entity].FloatMap[key] = value;
+        UpdateState(entity, key);
     }
 
-    void AnimMachine::SetBool(const std::string& key, bool value)
+    void AnimMachine::SetBool(UUID entity, const std::string& key, bool value)
     {
-        m_BoolMap[key] = value;
-        UpdateState(key);
+        m_Data[entity].BoolMap[key] = value;
+        UpdateState(entity, key);
     }
-    float AnimMachine::GetFloat(const std::string& key)
+    float AnimMachine::GetFloat(UUID entity, const std::string& key)
     {
-        return 0.0f;
-    }
-
-    bool AnimMachine::GetBool(const std::string& key)
-    {
-        return false;
+        return m_Data[entity].FloatMap[key];
     }
 
-    Ref<AnimClip> AnimMachine::GetCurrentClip()
+    bool AnimMachine::GetBool(UUID entity, const std::string& key)
+    {
+        return m_Data[entity].BoolMap[key];
+    }
+
+    Ref<AnimClip> AnimMachine::GetCurrentClip(UUID entity)
     {
         if (!m_AllStates.size())
             return nullptr;
-        return AssetManager::GetAsset<AnimClip>(m_AllStates[m_CurrentIndex].Clip);
+        return AssetManager::GetAsset<AnimClip>(m_AllStates[m_Data[entity].CurrentIndex].Clip);
     };
 
-    void AnimMachine::UpdateState(const std::string& key)
+    void AnimMachine::SetCurrentClipIndex(UUID entity, int index)
     {
-        for (auto& con : m_AllStates[m_CurrentIndex].Conditions)
+        m_Data[entity].CurrentIndex = index;
+    }
+
+    void AnimMachine::UpdateState(UUID entity, const std::string& key)
+    {
+        auto& cur = m_Data[entity];
+        for (auto& con : m_AllStates[cur.CurrentIndex].Conditions)
         {
             if (con.VarName != key)
                 continue;
@@ -42,8 +48,8 @@ namespace Nous
 
             if (con.ValueType == ValueType::Float)
             {
-                auto value = m_FloatMap[key];
-                auto target = con.TargetValue.FloatValue;
+                float value = cur.FloatMap[key];
+                float target = con.TargetValue.FloatValue;
 
                 switch (con.Compare)
                 {
@@ -57,8 +63,8 @@ namespace Nous
             }
             else if (con.ValueType == ValueType::Bool)
             {
-                auto value = m_BoolMap[key];
-                auto target = con.TargetValue.BoolValue;
+                bool value = cur.BoolMap[key];
+                bool target = con.TargetValue.BoolValue;
 
                 switch (con.Compare)
                 {
@@ -69,7 +75,7 @@ namespace Nous
 
             if (shouldChange)
             {
-                m_CurrentIndex = con.StateIndex;
+                cur.CurrentIndex = con.StateIndex;
             }
         }
     }

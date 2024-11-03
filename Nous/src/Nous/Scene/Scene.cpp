@@ -6,6 +6,8 @@
 #include "Nous/Renderer/Renderer2D.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Physics/Physics2D.h"
+#include "Nous/Asset/AssetManager.h"
+#include "Nous/Anim/AnimMachine.h"
 
 #include "Nous/Scene/System/RenderSystem.h"
 #include "Nous/Scene/System/PhysicsSystem.h"

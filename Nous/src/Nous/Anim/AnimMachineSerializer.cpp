@@ -91,7 +91,7 @@ namespace Nous
 			for (auto& con : state.Conditions)
 			{
 				out << YAML::BeginMap;
-				out << YAML::Key << "StateIndex" << YAML::Value << con.StateIndex;
+				out << YAML::Key << "NextIndex" << YAML::Value << con.StateIndex;
 				out << YAML::Key << "VarName" << YAML::Value << con.VarName;
 				out << YAML::Key << "Compare" << YAML::Value << Utils::CompareTypeToString(con.Compare);
 				out << YAML::Key << "ValueType" << YAML::Value << Utils::ValueTypeToString(con.ValueType);
@@ -109,7 +109,7 @@ namespace Nous
 			out << YAML::EndSeq;
 			out << YAML::EndMap;
 		}
-		out << YAML::Key << "CurrentIndex" << YAML::Value << m_AnimMachine->m_CurrentIndex;
+		out << YAML::Key << "DefaultIndex" << YAML::Value << m_AnimMachine->DefaultIndex;
 		out << YAML::EndSeq;
 
 		std::ofstream fout(filepath);
@@ -144,7 +144,7 @@ namespace Nous
 			for (auto& con : state["Conditions"])
 			{
 				AnimStateCondition asc;
-				asc.StateIndex = con["StateIndex"].as<int>();
+				asc.StateIndex = con["NextIndex"].as<int>();
 				asc.VarName = con["VarName"].as<std::string>();
 				asc.Compare = Utils::CompareTypeFromString(con["Compare"].as<std::string>());
 				asc.ValueType = Utils::ValueTypeFromString(con["ValueType"].as<std::string>());
@@ -161,7 +161,7 @@ namespace Nous
 			m_AnimMachine->m_AllStates.emplace_back(st);
 		}
 
-		m_AnimMachine->m_CurrentIndex = data["CurrentIndex"].as<int>();
+		m_AnimMachine->DefaultIndex = data["DefaultIndex"].as<int>();
 
 		return true;
 	}

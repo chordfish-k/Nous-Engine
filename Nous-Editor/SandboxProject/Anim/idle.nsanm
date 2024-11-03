@@ -1,16 +1,50 @@
 States:
-  - Clip: 6627634050650639938
+  - Clip: 3457499385604933362
     Conditions:
-      - StateIndex: 1
+      - NextIndex: 1
         VarName: x
         Compare: gt
         ValueType: Float
         TargetValue: 0
-  - Clip: 18119325843901715227
+      - NextIndex: 2
+        VarName: x
+        Compare: eq
+        ValueType: Float
+        TargetValue: 0
+  - Clip: 14605462766273728014
     Conditions:
-      - StateIndex: 0
+      - NextIndex: 0
         VarName: x
         Compare: lt
         ValueType: Float
         TargetValue: 0
-CurrentIndex: 0
+      - NextIndex: 3
+        VarName: x
+        Compare: eq
+        ValueType: Float
+        TargetValue: 0
+  - Clip: 18119325843901715227
+    Conditions:
+      - NextIndex: 0
+        VarName: x
+        Compare: lt
+        ValueType: Float
+        TargetValue: 0
+      - NextIndex: 1
+        VarName: x
+        Compare: gt
+        ValueType: Float
+        TargetValue: 0
+  - Clip: 6627634050650639938
+    Conditions:
+      - NextIndex: 0
+        VarName: x
+        Compare: lt
+        ValueType: Float
+        TargetValue: 0
+      - NextIndex: 1
+        VarName: x
+        Compare: gt
+        ValueType: Float
+        TargetValue: 0
+DefaultIndex: 2

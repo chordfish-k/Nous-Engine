@@ -12,6 +12,7 @@ namespace Sandbox
     {
         private CTransform m_Transform = null;
         private CRigidbody2D m_Rigidbody = null;
+        private CAnimPlayer m_AnimPlayer = null;
 
         private TheText m_Text = null;
 
@@ -23,6 +24,7 @@ namespace Sandbox
 
             m_Transform = GetComponent<CTransform>();
             m_Rigidbody = GetComponent<CRigidbody2D>();
+            m_AnimPlayer = GetComponent<CAnimPlayer>();
         }
 
         void OnStart()
@@ -32,7 +34,7 @@ namespace Sandbox
 
         void OnUpdate(float dt)
         {
-            NousConsole.Log($"Player.OnUpdate: {dt}");
+            
 
             Vector2 velocity = Vector2.Zero;
 
@@ -52,6 +54,10 @@ namespace Sandbox
             m_Text.Text = "" + dt;
 
             m_Rigidbody.LinearVelocity = velocity;
+
+            m_AnimPlayer.SetFloat("x", velocity.X);
+
+            NousConsole.Log($"x: {velocity.X}");
         }
     }
 }

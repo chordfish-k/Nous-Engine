@@ -12,6 +12,9 @@
 
 #include "Nous/Physics/Physics2D.h"
 
+#include "Nous/Asset/AssetManager.h"
+#include "Nous/Anim/AnimMachine.h"
+
 #include "mono/metadata/object.h"
 #include "mono/metadata/reflection.h"
 
@@ -237,6 +240,32 @@ namespace Nous
 		tc.LineSpacing = lineSpacing;
 	}
 
+	static void AnimPlayerComponent_SetFloat(UUID entityID, MonoString* key, float value)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CAnimPlayer);
+
+		auto& c = entity.GetComponent<CAnimPlayer>();
+		if (c.Type == AssetType::AnimMachine)
+		{
+			Ref<AnimMachine> m = AssetManager::GetAsset<AnimMachine>(c.AnimClip);
+			m->SetFloat(entityID, Utils::MonnoStringToString(key), value);
+		}
+	}
+
+	static void AnimPlayerComponent_SetBool(UUID entityID, MonoString* key, bool value)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CAnimPlayer);
+
+		auto& c = entity.GetComponent<CAnimPlayer>();
+		if (c.Type == AssetType::AnimMachine)
+		{
+			Ref<AnimMachine> m = AssetManager::GetAsset<AnimMachine>(c.AnimClip);
+			m->SetBool(entityID, Utils::MonnoStringToString(key), value);
+		}
+	}
+
 	// 输入：键盘按键按下
 	static bool Input_IsKeyDown(KeyCode keycode)
 	{
@@ -303,6 +332,9 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(TextRendererComponent_SetKerning);
 		NS_ADD_INTERNAL_CALL(TextRendererComponent_GetLineSpacing);
 		NS_ADD_INTERNAL_CALL(TextRendererComponent_SetLineSpacing);
+
+		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetFloat);
+		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetBool);
 
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}

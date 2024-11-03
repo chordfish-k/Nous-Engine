@@ -52,21 +52,36 @@ namespace Nous
         #region TextComponent
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string TextRendererComponent_GetText(ulong entityID);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TextRendererComponent_SetText(ulong entityID, string text);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TextRendererComponent_GetColor(ulong entityID, out Vector4 color);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TextRendererComponent_SetColor(ulong entityID, ref Vector4 color);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static float TextRendererComponent_GetKerning(ulong entityID);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TextRendererComponent_SetKerning(ulong entityID, float kerning);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static float TextRendererComponent_GetLineSpacing(ulong entityID);
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TextRendererComponent_SetLineSpacing(ulong entityID, float lineSpacing);
 		#endregion
+
+		#region AnimPlayerComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AnimPlayerComponent_SetFloat(ulong entityID, string key, float value);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void AnimPlayerComponent_SetBool(ulong entityID, string key, bool value);
+		#endregion AnimPlayerComponent
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);
