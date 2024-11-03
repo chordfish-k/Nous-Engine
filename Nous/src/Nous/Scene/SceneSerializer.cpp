@@ -295,6 +295,10 @@ namespace Nous {
 
             out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
 
+            out << YAML::Key << "SheetWidth" << YAML::Value << spriteRendererComponent.SheetWidth;
+            out << YAML::Key << "SheetHeight" << YAML::Value << spriteRendererComponent.SheetHeight;
+            out << YAML::Key << "Index" << YAML::Value << spriteRendererComponent.Index;
+
             out << YAML::EndMap; // CSpriteRenderer
         }
 
@@ -534,6 +538,15 @@ namespace Nous {
 
                 if (spriteRendererComponent["TilingFactor"])
                     src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+
+                if (spriteRendererComponent["SheetWidth"])
+                    src.SheetWidth = spriteRendererComponent["SheetWidth"].as<int>();
+
+                if (spriteRendererComponent["SheetHeight"])
+                    src.SheetHeight = spriteRendererComponent["SheetHeight"].as<int>();
+
+                if (spriteRendererComponent["Index"])
+                    src.Index = spriteRendererComponent["Index"].as<int>();
             }
 
             auto circleRendererComponent = entity["CCircleRenderer"];

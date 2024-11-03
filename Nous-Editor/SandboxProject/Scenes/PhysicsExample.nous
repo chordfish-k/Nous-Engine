@@ -1,5 +1,19 @@
 Scene: Untitled
 Entities:
+  - Entity: 1870787110829827085
+    CTag:
+      Tag: Charactor
+    CTransform:
+      Translation: [-1.56408608, -1.69972062, 0]
+      Rotation: [0, 0, 0]
+      Scale: [4, 4, 1]
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+      TextureHandle: 6485004313021763567
+      TilingFactor: 1
+      SheetWidth: 48
+      SheetHeight: 48
+      Index: 0
   - Entity: 5042216685119532454
     CTag:
       Tag: Bar
@@ -11,6 +25,9 @@ Entities:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
     CRigidbody2D:
       BodyType: Static
       FixedRotation: false
@@ -38,6 +55,9 @@ Entities:
       Color: [0.999989986, 1, 0.999990046, 1]
       TextureHandle: 5215514554843654355
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
     CRigidbody2D:
       BodyType: Kinematic
       FixedRotation: false
@@ -83,6 +103,9 @@ Entities:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
     CRigidbody2D:
       BodyType: Static
       FixedRotation: false
@@ -104,6 +127,9 @@ Entities:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
     CRigidbody2D:
       BodyType: Static
       FixedRotation: false
@@ -125,6 +151,9 @@ Entities:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
     CRigidbody2D:
       BodyType: Static
       FixedRotation: false

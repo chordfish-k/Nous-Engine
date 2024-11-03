@@ -28,6 +28,17 @@ namespace Nous
             NS_CORE_ASSERT(false);
             return 0;
         }
+
+        static GLint ImageFilterToGLTextureFilter(ImageFilter format)
+        {
+            switch (format)
+            {
+            case ImageFilter::Linear: return GL_LINEAR;
+            case ImageFilter::Nearst: return GL_NEAREST;
+            }
+            NS_CORE_ASSERT(false);
+            return 0;
+        }
     }
 
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& specification, Buffer data)
@@ -41,8 +52,8 @@ namespace Nous
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
         glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, Utils::ImageFilterToGLTextureFilter(specification.MinFilter));
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, Utils::ImageFilterToGLTextureFilter(specification.MaxFilter));
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);

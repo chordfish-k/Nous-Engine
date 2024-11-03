@@ -55,6 +55,9 @@ namespace Nous {
         glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
         AssetHandle Texture = 0;
         float TilingFactor = 1.0f;
+        int SheetWidth = 0; // 0 = Max
+        int SheetHeight = 0;
+        int Index = 0;
 
         CSpriteRenderer() = default;
         CSpriteRenderer(const CSpriteRenderer&) = default;

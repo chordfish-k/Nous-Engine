@@ -18,12 +18,22 @@ namespace Nous
         RGBA32F
     };
 
+    enum class ImageFilter
+    {
+        Linear = 0,
+        Nearst
+    };
+
     struct TextureSpecification
     {
         uint32_t Width = 1;
         uint32_t Height = 1;
         ImageFormat Format = ImageFormat::RGBA8;
         bool GenerateMips = true;
+
+        // maybe meta file
+        ImageFilter MinFilter = ImageFilter::Nearst;
+        ImageFilter MaxFilter = ImageFilter::Nearst;
     };
 
     class Texture : public Asset

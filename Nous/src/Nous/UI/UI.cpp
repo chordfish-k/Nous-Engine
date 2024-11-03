@@ -167,6 +167,21 @@ namespace Nous::UI
         return changed;
     }
 
+    bool DrawIntControl(const std::string& label, int* values, int vmin, int vmax, float columnWidth)
+    {
+        bool changed = false;
+
+        NS_IMGUI_FIELD_BEGIN;
+
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+        changed = ImGui::DragInt("##X", values, 1, vmin, vmax);
+        ImGui::PopItemWidth();
+
+        NS_IMGUI_FIELD_END;
+
+        return changed;
+    }
+
     bool DrawColor4Control(const std::string& label, glm::vec4& color, float columnWidth)
     {
         bool changed = false;

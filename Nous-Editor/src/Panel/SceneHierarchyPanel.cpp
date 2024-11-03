@@ -346,14 +346,11 @@ namespace Nous {
                 component.Texture = handle;
             }
 
-            // 删除按钮
-            //if (isTextureValid)
-            //{
-            //    ImGui::SameLine();
-            //    ImGui
-            //}
-
             UI::DrawFloatControl("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+            UI::DrawIntControl("Sheet Width", &component.SheetWidth, 0);
+            UI::DrawIntControl("Sheet Height", &component.SheetHeight, 0);
+            UI::DrawIntControl("Index", &component.Index, 0);
+
         });
 
         DrawComponent<CCircleRenderer>("Circle Renderer", entity, [](auto& component)

@@ -451,14 +451,48 @@ namespace Nous {
         NS_PROFILE_FUNCTION();
         //NS_CORE_VERIFY(texture);
 
+        DrawQuad(transform, texture, 0, 0, 0, tilingFactor, color, entityID);
+    }
+
+    void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int sheetWidth, int sheetHeight, int sheetIndex, float tilingFactor, const glm::vec4& color, int entityID)
+    {
+        NS_PROFILE_FUNCTION();
+
         if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
             NextBatch();
 
         constexpr size_t quadVertexCount = 4;
-        constexpr glm::vec2 textureCoords[] = {{0.0f, 0.0f},
-                                               {1.0f, 0.0f},
-                                               {1.0f, 1.0f},
-                                               {0.0f, 1.0f}};
+        glm::vec2 textureCoords[] = { {0.0f, 0.0f},
+                                    {1.0f, 0.0f},
+                                    {1.0f, 1.0f},
+                                    {0.0f, 1.0f} };
+
+        float tW = (float) texture->GetWidth();
+        float tH = (float) texture->GetHeight();
+        int gridCols = 1;
+        int gridRows = 1;
+        if (sheetWidth > 0)
+            gridCols = std::max((int)tW / sheetWidth, 1);
+        if (sheetHeight > 0)
+            gridRows = std::max((int)tH / sheetHeight, 1);
+
+        if (gridCols > 1 || gridRows > 1)
+        {
+            int j = sheetIndex % gridCols;
+            int i = gridRows - sheetIndex / gridCols - 1;
+
+            float xMin = j / (float)gridCols;
+            float xMax = (j + 1) / (float)gridCols;
+            float yMin = i / (float)gridRows;
+            float yMax = (i+1) / (float)gridRows;
+
+            textureCoords[0] = { xMin, yMin };
+            textureCoords[1] = { xMax, yMin };
+            textureCoords[2] = { xMax, yMax };
+            textureCoords[3] = { xMin, yMax };
+        }
+
+        
 
         float textureIndex = 0.0f;
         // 找出当前纹理的id
@@ -468,12 +502,12 @@ namespace Nous {
             {
                 if (*s_Data.TextureSlots[i] == *texture.get())
                 {
-                    textureIndex = (float) i;
+                    textureIndex = (float)i;
                     break;
                 }
             }
         }
-        
+
 
         // 如果是新纹理，则添加到纹理槽
         if (texture && textureIndex == 0.0f)
@@ -482,7 +516,7 @@ namespace Nous {
             if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
                 NextBatch();
 
-            textureIndex = (float) s_Data.TextureSlotIndex;
+            textureIndex = (float)s_Data.TextureSlotIndex;
             s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
             s_Data.TextureSlotIndex++;
         }
@@ -573,7 +607,7 @@ namespace Nous {
         if (src.Texture)
         {
             Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(src.Texture);
-            DrawQuad(transform, texture, src.TilingFactor, src.Color, entityID);
+            DrawQuad(transform, texture, src.SheetWidth, src.SheetHeight, src.Index, src.TilingFactor, src.Color, entityID);
         }
         else
             DrawQuad(transform, src.Color, entityID);
