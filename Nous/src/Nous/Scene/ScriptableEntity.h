@@ -4,6 +4,8 @@
 
 namespace Nous {
 
+    class ScriptSystem;
+
     class ScriptableEntity
     {
     public:
@@ -21,6 +23,7 @@ namespace Nous {
     private:
         Entity m_Entity;
         friend class Scene;
+        friend class ScriptSystem;
     };
 
 }

@@ -68,10 +68,6 @@ namespace Nous {
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
 
-        void OnPhysics2DStart();
-        void OnPhysics2DStop();
-
-        void RenderScene();
     private:
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据
         uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
@@ -79,7 +75,6 @@ namespace Nous {
         bool m_IsPaused = false;
         int m_StepFrames = 0;
 
-        b2World* m_PhysicsWorld = nullptr;
         entt::entity m_SelectedEntityID = { entt::null };
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;

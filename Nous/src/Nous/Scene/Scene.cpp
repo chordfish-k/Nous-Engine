@@ -3,52 +3,24 @@
 #include "Nous/Scene/Entity.h"
 
 #include "Nous/Scene/Component.h"
-#include "Nous/Scene/ScriptableEntity.h"
 #include "Nous/Renderer/Renderer2D.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Physics/Physics2D.h"
 
-#include <glm/glm.hpp>
+#include "Nous/Scene/System/RenderSystem.h"
+#include "Nous/Scene/System/PhysicsSystem.h"
+#include "Nous/Scene/System/ScriptSystem.h"
 
-// Box2D
-#include "box2d/b2_world.h"
-#include "box2d/b2_body.h"
-#include "box2d/b2_fixture.h"
-#include "box2d/b2_polygon_shape.h"
-#include "box2d/b2_circle_shape.h"
+#include <glm/glm.hpp>
 
 namespace Nous {
 
-    static b2BodyType Rigidbody2DTypeToBox2DBody(CRigidbody2D::BodyType bodyType)
-    {
-        switch (bodyType)
-        {
-            case CRigidbody2D::BodyType::Static:    return b2_staticBody;
-            case CRigidbody2D::BodyType::Dynamic:   return b2_dynamicBody;
-            case CRigidbody2D::BodyType::Kinematic: return b2_kinematicBody;
-        }
-
-        NS_CORE_ASSERT(false, "未知的 body type");
-        return b2_staticBody;
-    }
-
     Scene::Scene()
     {
-        delete m_PhysicsWorld;
     }
 
     Scene::~Scene()
     {
-        // 执行脚本销毁
-        {
-            m_Registry.view<CNativeScript>().each([=](auto ent, auto& script) {
-                if (script.Instance)
-                {
-                    script.Instance->OnDestroy();
-                    script.DestroyScript(&script);
-                }
-            });
-        }
     }
 
     template<typename... Component>
@@ -157,166 +129,57 @@ namespace Nous {
     {
         m_IsRunning = true;
 
-        OnPhysics2DStart();
-
-        // 脚本
-        {
-            ScriptEngine::OnRuntimeStart(this);
-            // 实例化所有脚本entites
-
-            auto view = m_Registry.view<CMonoScript>();
-            for (auto e : view)
-            {
-                Entity entity = { e, this };
-                ScriptEngine::OnCreateEntity(entity);
-            }
-
-            // 全部实例化之后再调用 OnStart
-            for (auto e : view)
-            {
-                Entity entity = { e, this };
-                ScriptEngine::OnStartEntity(entity);
-            }
-        }
-        
+        ScriptSystem::Start(this);
+        PhysicsSystem::Start(this);
+        RenderSystem::Start(this);
     }
 
     void Scene::OnRuntimeStop()
     {
         m_IsRunning = false;
 
-        OnPhysics2DStop();
-
-        ScriptEngine::OnRuntimeStop();
+        ScriptSystem::Stop();
+        PhysicsSystem::Stop();
+        RenderSystem::Stop();
     }
 
     void Scene::OnSimulationStart()
     {
-        OnPhysics2DStart();
+        PhysicsSystem::Start(this);
     }
 
     void Scene::OnSimulationStop()
     {
-        OnPhysics2DStop();
+        PhysicsSystem::Stop();
     }
 
     void Scene::OnUpdateRuntime(Timestep dt)
     {
         if (!m_IsPaused || m_StepFrames-- > 0)
         {
-            // 执行脚本更新
-            {
-                // C# Entity Update
-                auto view = m_Registry.view<CMonoScript>();
-                for (auto e : view)
-                {
-                    Entity entity = { e, this };
-                    ScriptEngine::OnUpdateEntity(entity, dt);
-                }
-
-                m_Registry.view<CNativeScript>().each([=](auto ent, auto& script) {
-                    // 没有脚本实例就先创建
-                    if (!script.Instance)
-                    {
-                       script.Instance = script.InitScript();
-                       script.Instance->m_Entity = Entity{ent, this};
-                       script.Instance->OnCreate();
-                    }
-
-                    script.Instance->OnUpdate(dt);
-                });
-            }
-
-            // 物理更新
-            {
-                // 控制物理模拟的迭代次数
-                const int32_t velocityIterations = 6;
-                const int32_t positionIterations = 2;
-                m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-
-                // 从Box2D中取出transform数据
-                auto view = m_Registry.view<CRigidbody2D>();
-                for (auto e : view)
-                {
-                    Entity entity = { e, this };
-                    auto& transform = entity.GetComponent<CTransform>();
-                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                    const auto& position = body->GetPosition();
-                    transform.Translation.x = position.x;
-                    transform.Translation.y = position.y;
-                    transform.Rotation.z = body->GetAngle();
-                }
-            }
+            ScriptSystem::Update(dt);
+            PhysicsSystem::Update(dt);
         }
 
-        // 2D渲染
-        Camera* mainCamera = nullptr;
-        glm::mat4 cameraTransform;
-        {
-            auto view = m_Registry.view<CTransform, CCamera>();
-            for (auto ent: view)
-            {
-                auto [transform, camera] = view.get<CTransform, CCamera>(ent);
-
-                if (camera.Primary)
-                {
-                    mainCamera = &camera.Camera;
-                    cameraTransform = transform.GetTransform();
-                    break;
-                }
-            }
-        }
-
-        if (mainCamera)
-        {
-            Renderer2D::BeginScene(*mainCamera, cameraTransform);
-            RenderScene();
-            Renderer2D::EndScene();
-        }
+        RenderSystem::Update(dt);
     }
 
     void Scene::OnUpdateSimulation(Timestep dt, EditorCamera& camera)
     {
         if (!m_IsPaused || m_StepFrames-- > 0)
         {
-            // 物理更新
-            {
-                // 控制物理模拟的迭代次数
-                const int32_t velocityIterations = 6;
-                const int32_t positionIterations = 2;
-                m_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-
-                // 从Box2D中取出transform数据
-                auto view = m_Registry.view<CRigidbody2D>();
-                for (auto e : view)
-                {
-                    Entity entity = { e, this };
-                    auto& transform = entity.GetComponent<CTransform>();
-                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-                    b2Body* body = (b2Body*) rb2d.RuntimeBody;
-                    const auto& position = body->GetPosition();
-                    transform.Translation.x = position.x;
-                    transform.Translation.y = position.y;
-                    transform.Rotation.z = body->GetAngle();
-                }
-            }
+            PhysicsSystem::Update(dt);
         }
 
         // 渲染
-        Renderer2D::BeginScene(camera);
-        RenderScene();
-        Renderer2D::EndScene();
+        RenderSystem::Update(dt, &camera);
     }
 
     void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
     {
         // 渲染
-        Renderer2D::BeginScene(camera);
-        RenderScene();
-        Renderer2D::EndScene();
+        RenderSystem::Start(this);
+        RenderSystem::Update(dt, &camera);
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -394,103 +257,7 @@ namespace Nous {
         m_StepFrames = frames;
     }
 
-    void Scene::OnPhysics2DStart()
-    {
-        m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
-        auto view = m_Registry.view<CRigidbody2D>();
-        for (auto e : view)
-        {
-            Entity entity = { e, this };
-            auto& transform = entity.GetComponent<CTransform>();
-            auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-            b2BodyDef bodyDef;
-            bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
-            bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
-            bodyDef.angle = transform.Rotation.z;
-
-            b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-            body->SetFixedRotation(rb2d.FixedRotation);
-            rb2d.RuntimeBody = body;
-
-            if (entity.HasComponent<CBoxCollider2D>())
-            {
-                auto& bc2d = entity.GetComponent<CBoxCollider2D>();
-
-                b2PolygonShape boxShape;
-                boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &boxShape;
-                fixtureDef.density = bc2d.Density;
-                fixtureDef.friction = bc2d.Friction;
-                fixtureDef.restitution = bc2d.Restitution;
-                fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-                body->CreateFixture(&fixtureDef);
-            }
-
-            if (entity.HasComponent<CCircleCollider2D>())
-            {
-                auto& cc2d = entity.GetComponent<CCircleCollider2D>();
-
-                b2CircleShape circleShape;
-                circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
-                circleShape.m_radius = transform.Scale.x * cc2d.Radius;
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &circleShape;
-                fixtureDef.density = cc2d.Density;
-                fixtureDef.friction = cc2d.Friction;
-                fixtureDef.restitution = cc2d.Restitution;
-                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-                body->CreateFixture(&fixtureDef);
-            }
-        }
-    }
-
-    void Scene::OnPhysics2DStop()
-    {
-        delete m_PhysicsWorld;
-        m_PhysicsWorld = nullptr;
-    }
-
-    void Scene::RenderScene()
-    {
-        // Sprites
-        {
-            auto group = m_Registry.group<CTransform>(entt::get<CSpriteRenderer>);
-            for (auto ent: group)
-            {
-                auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
-
-                Renderer2D::DrawSprite(transform, sprite, (int)ent);
-            }
-        }
-
-        // Circles
-        {
-            auto view = m_Registry.view<CTransform, CCircleRenderer>();
-            for (auto ent : view)
-            {
-                auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
-
-                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
-            }
-
-        }
-
-        // Text
-        {
-            auto view = m_Registry.view<CTransform, CTextRenderer>();
-            for (auto ent : view)
-            {
-                auto [transform, text] = view.get<CTransform, CTextRenderer>(ent);
-
-                Renderer2D::DrawString(transform.GetTransform(), text.TextString, text, text.Color, (int)ent);
-            }
-        }
-    }
-
+    // 组件添加事件
     template<typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
     {

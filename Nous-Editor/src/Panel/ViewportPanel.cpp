@@ -93,7 +93,7 @@ namespace Nous
         }
 
         // Gizmos
-        if (m_Context)
+        if (m_Context && !m_Context->IsRunning())
         {
             Entity selectedEntity = m_Context->GetSelectedEntity();
             if (selectedEntity && m_GizmoType >= 0 && m_GizmoType <= 3)
