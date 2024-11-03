@@ -202,6 +202,11 @@ namespace Nous::UI
 
     bool DrawAssetDragDropBox(const std::string& label, const std::string& text, AssetHandle* handle, AssetType requireType, float columnWidth)
     {
+        return DrawAssetDragDropBox(label, text, handle, { requireType }, nullptr, columnWidth);
+    }
+
+    bool DrawAssetDragDropBox(const std::string& label, const std::string& text, AssetHandle* handle, std::vector<AssetType> requireType, AssetType* outType, float columnWidth)
+    {
         bool changed = false;
 
         NS_IMGUI_FIELD_BEGIN;
@@ -228,19 +233,23 @@ namespace Nous::UI
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
             {
                 AssetHandle handle_ = *(AssetHandle*)payload->Data;
-                if (AssetManager::GetAssetType(handle_) == requireType)
+
+                for (auto& type : requireType)
                 {
-                    if (*handle != handle_)
+                    if (AssetManager::GetAssetType(handle_) == type)
                     {
-                        changed = true;
-                        *handle = handle_;
+                        if (*handle != handle_)
+                        {
+                            changed = true;
+                            if (outType) *outType = type;
+                            *handle = handle_;
+                        }
+                    }
+                    else
+                    {
+                        NS_CORE_WARN("错误的资源类型！");
                     }
                 }
-                else
-                {
-                    NS_CORE_WARN("错误的资源类型！");
-                }
-
             }
             ImGui::EndDragDropTarget();
         }
@@ -255,6 +264,7 @@ namespace Nous::UI
             if (ImGui::Button("X", ImVec2(buttonSize, buttonSize)))
             {
                 changed = true;
+                if (outType) *outType = AssetType::None;
                 *handle = 0;
             }
             ImGui::PopStyleColor(3);
@@ -263,7 +273,6 @@ namespace Nous::UI
         }
 
         NS_IMGUI_FIELD_END;
-
         return changed;
     }
 

@@ -33,11 +33,11 @@ namespace Nous
 		int CurrentFrame = 0;
 		float CurrentFrameTimeUsed = 0;
 		// Single
-		std::string Name;
+		std::string Name = "None";
 		// SpriteSheet
-		AssetHandle ImageHandle;
-		int SheetWidth;
-		int SheetHeight;
+		AssetHandle ImageHandle = 0;
+		int SheetWidth = 0;
+		int SheetHeight = 0;
 	};
 
 	

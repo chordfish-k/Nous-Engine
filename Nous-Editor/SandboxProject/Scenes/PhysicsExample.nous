@@ -2,11 +2,17 @@ Scene: Untitled
 Entities:
   - Entity: 8205205435348422958
     CTag:
-      Tag: Charactor
+      Tag: Shikuro
     CTransform:
       Translation: [-1.326828, 1.09465456, 0]
       Rotation: [0, 0, 0]
       Scale: [4, 4, 1]
+    CMonoScript:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 3.9000001
     CSpriteRenderer:
       Color: [1, 1, 1, 1]
       TextureHandle: 6485004313021763567
@@ -15,7 +21,7 @@ Entities:
       SheetHeight: 48
       Index: 0
     CRigidbody2D:
-      BodyType: Static
+      BodyType: Kinematic
       FixedRotation: false
     CBoxCollider2D:
       Offset: [0, -0.400000006]
@@ -25,10 +31,11 @@ Entities:
       Restitution: 0
       RestitutionThreshold: 0.5
     CAnimPlayer:
-      AnimClip: 5452335139868395504
+      AnimClip: 3517851791646336134
+      Type: 1
   - Entity: 1870787110829827085
     CTag:
-      Tag: Charactor
+      Tag: Kid
     CTransform:
       Translation: [2.76999998, 1.09465456, 0]
       Rotation: [0, 0, 0]
@@ -52,6 +59,7 @@ Entities:
       RestitutionThreshold: 0.5
     CAnimPlayer:
       AnimClip: 6301804288407615871
+      Type: 0
   - Entity: 5042216685119532454
     CTag:
       Tag: Bar
@@ -80,15 +88,9 @@ Entities:
     CTag:
       Tag: Player
     CTransform:
-      Translation: [-5.14656782, -3.23933625, 0]
+      Translation: [0.506585598, -2.83393121, 0]
       Rotation: [0, 0, 0]
       Scale: [0.5, 0.5, 1]
-    CMonoScript:
-      ClassName: Sandbox.Player
-      ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 3
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
       TextureHandle: 5215514554843654355

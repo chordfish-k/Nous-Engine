@@ -405,15 +405,20 @@ namespace Nous {
         DrawComponent<CAnimPlayer>("CAnimPlayer", entity, [](auto& component)
         {
             std::string btnLabel = "None";
-            bool isTextureValid = false;
             if (component.AnimClip != 0)
             {
-                if (AssetManager::IsAssetHandleValid(component.AnimClip)
-                    && AssetManager::GetAssetType(component.AnimClip) == AssetType::AnimClip)
+                if (AssetManager::IsAssetHandleValid(component.AnimClip))
                 {
-                    const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetMetadata(component.AnimClip);
-                    btnLabel = AssetManager::GetAsset<AnimClip>(component.AnimClip)->Name;
-                    isTextureValid = true;
+                    AssetType type = AssetManager::GetAssetType(component.AnimClip);
+                    if (type == AssetType::AnimClip)
+                    {
+                        btnLabel = AssetManager::GetAsset<AnimClip>(component.AnimClip)->Name;
+                    }
+                    else if (type == AssetType::AnimMachine)
+                    {
+                        const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetMetadata(component.AnimClip);
+                        btnLabel = metadata.FilePath.filename().string();
+                    }
                 }
                 else
                 {
@@ -422,9 +427,11 @@ namespace Nous {
             }
 
             AssetHandle handle = component.AnimClip;
-            if (UI::DrawAssetDragDropBox("Clip", btnLabel, &handle, AssetType::AnimClip))
+            AssetType outType = component.Type;
+            if (UI::DrawAssetDragDropBox("Clip", btnLabel, &handle, { AssetType::AnimClip, AssetType::AnimMachine }, &outType))
             {
                 component.AnimClip = handle;
+                component.Type = outType;
             }
         });
     }

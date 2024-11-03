@@ -83,6 +83,7 @@ namespace Nous::UI
     bool DrawColor4Control(const std::string& label, glm::vec4& color, float columnWidth = 100.0f);
 
     bool DrawAssetDragDropBox(const std::string& label, const std::string& text, AssetHandle* handle, AssetType requireType, float columnWidth = 100.0f);
+	bool DrawAssetDragDropBox(const std::string& label, const std::string& text, AssetHandle* handle, std::vector<AssetType> requireType, AssetType* outType = nullptr, float columnWidth = 100.0f);
 
     bool DrawInputText(const std::string& label, char* buf, size_t buf_size, float columnWidth = 100.0f);
 

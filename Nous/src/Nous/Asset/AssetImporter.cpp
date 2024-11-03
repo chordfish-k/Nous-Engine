@@ -4,6 +4,7 @@
 #include "TextureImporter.h"
 #include "SceneImporter.h"
 #include "AnimClipImporter.h"
+#include "AnimMachineImporter.h"
 
 #include <map>
 
@@ -14,7 +15,8 @@ namespace Nous
 	static std::map<AssetType, AssetImportFunction> s_AssetImportFunctions = {
 		{ AssetType::Texture2D, TextureImporter::ImportTexture2D },
 		{ AssetType::Scene, SceneImporter::ImportScene },
-		{ AssetType::AnimClip, AnimClipImporter::ImportAnimClip }
+		{ AssetType::AnimClip, AnimClipImporter::ImportAnimClip },
+		{ AssetType::AnimMachine, AnimMachineImporter::ImportAnimMachine }
 	};
 
 	Ref<Asset> AssetImporter::ImportAsset(AssetHandle handle, const AssetMetadata& metadata)

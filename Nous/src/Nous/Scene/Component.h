@@ -71,6 +71,7 @@ namespace Nous {
     struct CAnimPlayer
     {
         AssetHandle AnimClip = 0;
+        AssetType Type = AssetType::AnimClip;
 
         CAnimPlayer() = default;
         CAnimPlayer(const CAnimPlayer&) = default;

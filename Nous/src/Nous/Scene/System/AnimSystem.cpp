@@ -5,13 +5,13 @@
 #include "Nous/Scene/Entity.h"
 
 #include "Nous/Anim/AnimClip.h"
+#include "Nous/Anim/AnimMachine.h"
 
 #include "Nous/Asset/AssetManager.h"
 
 namespace Nous
 {
 	static Scene* s_Scene = nullptr;
-	static float s_Time = 0;
 
 	void AnimSystem::Start(Scene* scene)
 	{
@@ -24,7 +24,23 @@ namespace Nous
 		for (auto& ent : view)
 		{
 			auto [animPlayer, spriteRenderer] = view.get<CAnimPlayer, CSpriteRenderer>(ent);
-			auto& clip = AssetManager::GetAsset<AnimClip>(animPlayer.AnimClip);
+
+			Ref<AnimClip> clip;
+
+			if (animPlayer.Type == AssetType::AnimClip)
+			{
+				clip = AssetManager::GetAsset<AnimClip>(animPlayer.AnimClip);
+				
+			}
+			else if (animPlayer.Type == AssetType::AnimMachine)
+			{
+				auto& machine = AssetManager::GetAsset<AnimMachine>(animPlayer.AnimClip);
+				clip = machine->GetCurrentClip();
+			}
+
+			if (!clip)
+				continue;
+
 			auto& nowTime = clip->CurrentFrameTimeUsed += dt;
 			auto& dur = clip->Frames[clip->CurrentFrame].Duration;
 			while (nowTime >= dur)
@@ -48,10 +64,7 @@ namespace Nous
 				spriteRenderer.Texture = clip->ImageHandle;
 				spriteRenderer.Index = nowFrame.Index;
 			}
-			
 		}
-
-		s_Time += dt;
 	}
 
 	void AnimSystem::Stop()

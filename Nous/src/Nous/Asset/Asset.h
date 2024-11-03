@@ -11,7 +11,8 @@ namespace Nous
 		None = 0,
 		Scene,
 		Texture2D,
-		AnimClip
+		AnimClip,
+		AnimMachine
 	};
 
 	std::string_view AssetTypeToString(AssetType type);

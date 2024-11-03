@@ -2,6 +2,12 @@ AssetRegistry:
   - Handle: 2907078287622620602
     FilePath: Textures/kid/player_idle_2.png
     Type: AssetType::Texture2D
+  - Handle: 2973636089570710957
+    FilePath: Anim/idleR.nsani
+    Type: AssetType::AnimClip
+  - Handle: 3517851791646336134
+    FilePath: Anim/idle.nsanm
+    Type: AssetType::AnimMachine
   - Handle: 3813795801237644536
     FilePath: Scenes/PhysicsExample.nous
     Type: AssetType::Scene
@@ -20,11 +26,17 @@ AssetRegistry:
   - Handle: 6485004313021763567
     FilePath: Textures/character_idle_left.png
     Type: AssetType::Texture2D
+  - Handle: 6627634050650639938
+    FilePath: Anim/idleR.nsani
+    Type: AssetType::AnimClip
   - Handle: 8863621358159051246
     FilePath: Textures/kid/player_idle_0.png
     Type: AssetType::Texture2D
   - Handle: 9064584609031623573
     FilePath: Textures/kid/player_idle_3.png
+    Type: AssetType::Texture2D
+  - Handle: 9535293915289877611
+    FilePath: Textures/character_idle_right.png
     Type: AssetType::Texture2D
   - Handle: 11289935122047927156
     FilePath: Scenes/Example.nous
@@ -38,3 +50,6 @@ AssetRegistry:
   - Handle: 17969972638127828694
     FilePath: Textures/kid/player_idle_1.png
     Type: AssetType::Texture2D
+  - Handle: 18119325843901715227
+    FilePath: Anim/idleL.nsani
+    Type: AssetType::AnimClip

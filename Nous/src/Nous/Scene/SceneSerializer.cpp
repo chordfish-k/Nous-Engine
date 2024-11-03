@@ -381,6 +381,7 @@ namespace Nous {
 
             auto& textComponent = entity.GetComponent<CAnimPlayer>();
             out << YAML::Key << "AnimClip" << YAML::Value << textComponent.AnimClip;
+            out << YAML::Key << "Type" << YAML::Value << (textComponent.Type == AssetType::AnimClip ? 0 : 1);
 
             out << YAML::EndMap; // CAnimPlayer
         }
@@ -616,6 +617,7 @@ namespace Nous {
             {
                 auto& ap = deserializedEntity.AddComponent<CAnimPlayer>();
                 ap.AnimClip = animPlayer["AnimClip"].as<AssetHandle>();
+                ap.Type = animPlayer["Type"].as<int>() == 0 ? AssetType::AnimClip : AssetType::AnimMachine;
             }
         }
         return true;
