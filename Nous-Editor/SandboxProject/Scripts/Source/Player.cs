@@ -17,6 +17,7 @@ namespace Sandbox
         private TheText m_Text = null;
 
         public float Speed = 1.0f;
+        public float JumpSpeed = 1.0f;
 
         void OnCreate()
         {
@@ -34,21 +35,21 @@ namespace Sandbox
 
         void OnUpdate(float dt)
         {
-            
+            Vector2 velocity = m_Rigidbody.LinearVelocity;
 
-            Vector2 velocity = Vector2.Zero;
-
-            if (Input.IsKeyDown(KeyCode.W))
+/*            if (Input.IsKeyDown(KeyCode.W))
                 velocity.Y = 1.0f;
             else if (Input.IsKeyDown(KeyCode.S))
-                velocity.Y = -1.0f;
+                velocity.Y = -1.0f;*/
 
             if (Input.IsKeyDown(KeyCode.A))
-                velocity.X = -1.0f;
+                velocity.X = -1.0f * Speed;
             else if (Input.IsKeyDown(KeyCode.D))
-                velocity.X = 1.0f;
+                velocity.X = 1.0f * Speed;
 
-            velocity *= Speed;
+            if (Input.IsKeyDown(KeyCode.Space))
+                velocity.Y = JumpSpeed;
+                //m_Rigidbody.ApplyLinearImpulse(new Vector2(0, 500), true);
 
             //if (m_Text != null)
             m_Text.Text = "" + dt;
@@ -56,8 +57,9 @@ namespace Sandbox
             m_Rigidbody.LinearVelocity = velocity;
 
             m_AnimPlayer.SetFloat("x", velocity.X);
+            m_AnimPlayer.SetFloat("y", velocity.Y);
 
-            NousConsole.Log($"x: {velocity.X}");
+            NousConsole.Log($"x: {velocity.X}, y: {velocity.Y}");
         }
     }
 }

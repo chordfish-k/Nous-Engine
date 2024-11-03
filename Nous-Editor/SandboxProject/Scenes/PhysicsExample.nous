@@ -4,15 +4,18 @@ Entities:
     CTag:
       Tag: Shikuro
     CTransform:
-      Translation: [-1.326828, 1.09465456, 0]
+      Translation: [-1.99694443, -2.97413778, 0]
       Rotation: [0, 0, 0]
-      Scale: [4, 4, 1]
+      Scale: [1, 1, 1]
     CMonoScript:
       ClassName: Sandbox.Player
       ScriptFields:
+        - Name: JumpSpeed
+          Type: Float
+          Data: 4.30000019
         - Name: Speed
           Type: Float
-          Data: 3.9000001
+          Data: 3.20000005
     CSpriteRenderer:
       Color: [1, 1, 1, 1]
       TextureHandle: 6485004313021763567
@@ -21,15 +24,15 @@ Entities:
       SheetHeight: 48
       Index: 0
     CRigidbody2D:
-      BodyType: Kinematic
-      FixedRotation: false
+      BodyType: Dynamic
+      FixedRotation: true
     CBoxCollider2D:
-      Offset: [0, -0.400000006]
+      Offset: [0, 0]
       Size: [0.200000003, 0.400000006]
-      Density: 1
-      Friction: 0.5
+      Density: 10000
+      Friction: 50
       Restitution: 0
-      RestitutionThreshold: 0.5
+      RestitutionThreshold: 0
     CAnimPlayer:
       AnimClip: 3517851791646336134
       Type: 1
@@ -64,9 +67,9 @@ Entities:
     CTag:
       Tag: Bar
     CTransform:
-      Translation: [0.578536987, -3.85929108, 0]
+      Translation: [0.578536987, -4.58704424, 0]
       Rotation: [0, 0, 0]
-      Scale: [13.8000002, 0.400000006, 1]
+      Scale: [13.8000002, 1, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -82,8 +85,8 @@ Entities:
       Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
-      Restitution: 1
-      RestitutionThreshold: 7.1500001
+      Restitution: 0
+      RestitutionThreshold: 50
   - Entity: 7440336366702553677
     CTag:
       Tag: Player
@@ -99,31 +102,31 @@ Entities:
       SheetHeight: 0
       Index: 0
     CRigidbody2D:
-      BodyType: Kinematic
+      BodyType: Dynamic
       FixedRotation: true
     CBoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 6
       Friction: 0.5
-      Restitution: 1
-      RestitutionThreshold: 1
+      Restitution: 0
+      RestitutionThreshold: 10
   - Entity: 15775383373780603297
     CTag:
       Tag: Camera
     CTransform:
-      Translation: [0, 0, 18.6000004]
+      Translation: [0, 0, 20]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CCamera:
       Camera:
-        ProjectionType: 0
+        ProjectionType: 1
         PerspFOV: 0.785398185
         PerspNear: 0.00999999978
         PerspFar: 1000
-        OrthoSize: 12
+        OrthoSize: 4
         OrthoNear: -10
-        OrthoFar: 10
+        OrthoFar: 100
       Primary: true
       FixedAspectRatio: false
     CMonoScript:
@@ -154,8 +157,8 @@ Entities:
       Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
-      Restitution: 1
-      RestitutionThreshold: 7.1500001
+      Restitution: 0
+      RestitutionThreshold: 50
   - Entity: 2026840844774714788
     CTag:
       Tag: Bar
@@ -179,7 +182,7 @@ Entities:
       Density: 1
       Friction: 0.5
       Restitution: 0
-      RestitutionThreshold: 6.44999981
+      RestitutionThreshold: 50
   - Entity: 8117675833086537693
     CTag:
       Tag: Bar
@@ -203,7 +206,7 @@ Entities:
       Density: 1
       Friction: 0.5
       Restitution: 0
-      RestitutionThreshold: 7.25
+      RestitutionThreshold: 50
   - Entity: 9416632023506076275
     CTag:
       Tag: Text

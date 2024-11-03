@@ -18,7 +18,7 @@ namespace Sandbox
 
 		void OnCreate()
         {
-			m_Player = FindEntityByName("Player");
+			m_Player = FindEntityByName("Shikuro");
         }
 
 		void OnUpdate(float ts)

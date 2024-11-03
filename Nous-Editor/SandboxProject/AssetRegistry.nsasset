@@ -1,4 +1,7 @@
 AssetRegistry:
+  - Handle: 809185336578540949
+    FilePath: Textures/character_jump_right.png
+    Type: AssetType::Texture2D
   - Handle: 2907078287622620602
     FilePath: Textures/kid/player_idle_2.png
     Type: AssetType::Texture2D
@@ -43,6 +46,9 @@ AssetRegistry:
     Type: AssetType::Texture2D
   - Handle: 9535293915289877611
     FilePath: Textures/character_idle_right.png
+    Type: AssetType::Texture2D
+  - Handle: 9540628050906475021
+    FilePath: Textures/character_jump_left.png
     Type: AssetType::Texture2D
   - Handle: 11289935122047927156
     FilePath: Scenes/Example.nous

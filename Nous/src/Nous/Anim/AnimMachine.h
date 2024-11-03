@@ -9,7 +9,7 @@ namespace Nous
 {
 	struct AnimState;
 
-	enum class CompareType : uint16_t
+	enum class FloatCompareType : uint16_t
 	{
 		None = 0,
 		Equal,
@@ -20,6 +20,14 @@ namespace Nous
 		NotGreaterThan,
 	};
 
+	enum class BoolCompareType : uint16_t
+	{
+		None = 0,
+		And,
+		Or,
+		Not
+	};
+
 	enum class ValueType : uint8_t
 	{
 		None = 0,
@@ -27,17 +35,40 @@ namespace Nous
 		Bool,
 	};
 
+	enum class ConditionNodeType : uint8_t
+	{
+		None = 0,
+		Node,
+		Leaf
+	};
+
+	struct ConditionNode
+	{
+		ConditionNodeType Type;
+		struct Exp
+		{
+			std::string VarName;
+			FloatCompareType Compare;
+			ValueType ValueType;
+			union
+			{
+				float FloatValue;
+				bool BoolValue;
+			} TargetValue;
+		} Exp;
+		BoolCompareType Symbol;
+		
+		Ref<ConditionNode> LeftChild;
+		Ref<ConditionNode> RightChild;
+
+		ConditionNode() {}
+		~ConditionNode() {}
+	};
+
 	struct AnimStateCondition
 	{
 		int StateIndex;
-		std::string VarName;
-		CompareType Compare;
-		ValueType ValueType;
-		union 
-		{
-			float FloatValue;
-			bool BoolValue;
-		} TargetValue;
+		Ref<ConditionNode> ConditionRoot;
 	};
 
 	struct AnimState
@@ -62,6 +93,7 @@ namespace Nous
 		virtual AssetType GetType() const { return AssetType::AnimMachine; }
 	private:
 		void UpdateState(UUID entity, const std::string& key);
+		bool SolveConditionNode(UUID entity, Ref<ConditionNode> node);
 	private:
 		std::vector<AnimState> m_AllStates;
 

@@ -28,29 +28,48 @@ namespace Nous
 {
 	namespace Utils
 	{
-		static std::string CompareTypeToString(CompareType type)
+		static std::string FloatCompareTypeToString(FloatCompareType type)
 		{
 			switch (type)
 			{
-			case CompareType::Equal:			return "eq";
-			case CompareType::NotEqual:			return "ne";
-			case CompareType::LessThan:			return "lt";
-			case CompareType::GreaterThan:		return "gt";
-			case CompareType::NotLessThan:		return "gte";
-			case CompareType::NotGreaterThan:	return "lte";
+			case FloatCompareType::Equal:			return "eq";
+			case FloatCompareType::NotEqual:		return "ne";
+			case FloatCompareType::LessThan:		return "lt";
+			case FloatCompareType::GreaterThan:		return "gt";
+			case FloatCompareType::NotLessThan:		return "gte";
+			case FloatCompareType::NotGreaterThan:	return "lte";
 			}
 			return "";
 		}
 
-		static CompareType CompareTypeFromString(const std::string type)
+		static FloatCompareType FloatCompareTypeFromString(const std::string type)
 		{
-			if (type == "eq")	return CompareType::Equal;
-			if (type == "nq")	return CompareType::NotEqual;
-			if (type == "lt")	return CompareType::LessThan;
-			if (type == "gt")	return CompareType::GreaterThan;
-			if (type == "gte")	return CompareType::NotLessThan;
-			if (type == "lte")	return CompareType::NotGreaterThan;
-			return CompareType::None;
+			if (type == "eq")	return FloatCompareType::Equal;
+			if (type == "nq")	return FloatCompareType::NotEqual;
+			if (type == "lt")	return FloatCompareType::LessThan;
+			if (type == "gt")	return FloatCompareType::GreaterThan;
+			if (type == "gte")	return FloatCompareType::NotLessThan;
+			if (type == "lte")	return FloatCompareType::NotGreaterThan;
+			return FloatCompareType::None;
+		}
+
+		static std::string BoolCompareTypeToString(BoolCompareType type)
+		{
+			switch (type)
+			{
+			case BoolCompareType::And:	return "and";
+			case BoolCompareType::Or:	return "or";
+			case BoolCompareType::Not:	return "not";
+			}
+			return "";
+		}
+
+		static BoolCompareType BoolCompareTypeFromString(const std::string type)
+		{
+			if (type == "and")	return BoolCompareType::And;
+			if (type == "or")	return BoolCompareType::Or;
+			if (type == "not")	return BoolCompareType::Not;
+			return BoolCompareType::None;
 		}
 
 		static std::string ValueTypeToString(ValueType type)
@@ -69,8 +88,86 @@ namespace Nous
 			if (type == "Bool")		return ValueType::Bool;
 			return ValueType::None;
 		}
+
+		static std::string ConditionNodeTypeToString(ConditionNodeType type)
+		{
+			switch (type)
+			{
+			case ConditionNodeType::Node:	return "Node";
+			case ConditionNodeType::Leaf:	return "Leaf";
+			}
+			return "";
+		}
+
+		static ConditionNodeType ConditionNodeTypeFromString(const std::string type)
+		{
+			if (type == "Node")	return ConditionNodeType::Node;
+			if (type == "Leaf")		return ConditionNodeType::Leaf;
+			return ConditionNodeType::None;
+		}
 	}
 
+	static void SerialzeConditionNode(YAML::Emitter& out, Ref<ConditionNode> node)
+	{
+		out << YAML::BeginMap;
+
+		out << YAML::Key << "Type" << YAML::Value << Utils::ConditionNodeTypeToString(node->Type);
+		if (node->Type == ConditionNodeType::Leaf)
+		{
+			out << YAML::Key << "VarName" << YAML::Value << node->Exp.VarName;
+			out << YAML::Key << "Compare" << YAML::Value << Utils::FloatCompareTypeToString(node->Exp.Compare);
+			out << YAML::Key << "ValueType" << YAML::Value << Utils::ValueTypeToString(node->Exp.ValueType);
+			if (node->Exp.ValueType == ValueType::Float)
+				out << YAML::Key << "TargetValue" << YAML::Value << node->Exp.TargetValue.FloatValue;
+			else if (node->Exp.ValueType == ValueType::Bool)
+				out << YAML::Key << "TargetValue" << YAML::Value << node->Exp.TargetValue.BoolValue;
+		}
+		else if (node->Type == ConditionNodeType::Node)
+		{
+			out << YAML::Key << "Symbol" << YAML::Value << Utils::BoolCompareTypeToString(node->Symbol);
+			if (node->LeftChild)
+			{
+				out << YAML::Key << "Left" << YAML::BeginMap;
+				SerialzeConditionNode(out, node->LeftChild);
+				out << YAML::EndMap;
+			}
+			if (node->RightChild)
+			{
+				out << YAML::Key << "Right" << YAML::BeginMap;
+				SerialzeConditionNode(out, node->RightChild);
+				out << YAML::EndMap;
+			}
+		}
+
+		out << YAML::EndMap;
+	}
+
+	static Ref<ConditionNode> DeserialzeConditionNode(YAML::Node& data)
+	{
+		Ref<ConditionNode> node = CreateRef<ConditionNode>();
+		node->Type = Utils::ConditionNodeTypeFromString(data["Type"].as<std::string>());
+		if (node->Type == ConditionNodeType::Leaf)
+		{
+			std::string s = data["VarName"].as<std::string>();
+			node->Exp.VarName = s;
+			node->Exp.Compare = Utils::FloatCompareTypeFromString(data["Compare"].as<std::string>());
+			node->Exp.ValueType = Utils::ValueTypeFromString(data["ValueType"].as<std::string>());
+			if (node->Exp.ValueType == ValueType::Float)
+			{
+				node->Exp.TargetValue.FloatValue = data["TargetValue"].as<float>();
+			}
+			else if (node->Exp.ValueType == ValueType::Bool)
+			{
+				node->Exp.TargetValue.BoolValue = data["TargetValue"].as<bool>();
+			}
+		}
+		else if (node->Type == ConditionNodeType::Node)
+		{
+			node->LeftChild = DeserialzeConditionNode(data["Left"]);
+			node->RightChild = DeserialzeConditionNode(data["Right"]);
+		}
+		return node;
+	}
 
 	AnimMachineSerializer::AnimMachineSerializer(const Ref<AnimMachine>& animMachine)
 		: m_AnimMachine(animMachine)
@@ -92,17 +189,8 @@ namespace Nous
 			{
 				out << YAML::BeginMap;
 				out << YAML::Key << "NextIndex" << YAML::Value << con.StateIndex;
-				out << YAML::Key << "VarName" << YAML::Value << con.VarName;
-				out << YAML::Key << "Compare" << YAML::Value << Utils::CompareTypeToString(con.Compare);
-				out << YAML::Key << "ValueType" << YAML::Value << Utils::ValueTypeToString(con.ValueType);
-				if (con.ValueType == ValueType::Float)
-				{
-					out << YAML::Key << "TargetValue" << YAML::Value << con.TargetValue.FloatValue;
-				}
-				else if (con.ValueType == ValueType::Bool)
-				{
-					out << YAML::Key << "TargetValue" << YAML::Value << con.TargetValue.BoolValue;
-				}
+				out << YAML::Key << "Condition" << YAML::Value;
+				SerialzeConditionNode(out, con.ConditionRoot);
 				out << YAML::EndMap;
 			}
 			
@@ -145,17 +233,9 @@ namespace Nous
 			{
 				AnimStateCondition asc;
 				asc.StateIndex = con["NextIndex"].as<int>();
-				asc.VarName = con["VarName"].as<std::string>();
-				asc.Compare = Utils::CompareTypeFromString(con["Compare"].as<std::string>());
-				asc.ValueType = Utils::ValueTypeFromString(con["ValueType"].as<std::string>());
-				if (asc.ValueType == ValueType::Float)
-				{
-					asc.TargetValue.FloatValue = con["TargetValue"].as<float>();
-				}
-				else if (asc.ValueType == ValueType::Bool)
-				{
-					asc.TargetValue.BoolValue = con["TargetValue"].as<bool>();
-				}
+				asc.ConditionRoot = DeserialzeConditionNode(con["Condition"]);
+				
+				
 				st.Conditions.emplace_back(asc);
 			}
 			m_AnimMachine->m_AllStates.emplace_back(st);

@@ -1,0 +1,12 @@
+Name: JumpRight
+Type: SpriteSheet
+ImageHandle: 809185336578540949
+SheetWidth: 48
+SheetHeight: 48
+Frames:
+  - Index: 0
+    Duration: 0.15
+  - Index: 1
+    Duration: 0.15
+  - Index: 2
+    Duration: 0.15
