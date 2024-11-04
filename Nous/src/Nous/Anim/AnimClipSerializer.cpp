@@ -57,6 +57,7 @@ namespace Nous
 
 		out << YAML::Key << "Name" << YAML::Value << m_AnimClip->Name;
 		out << YAML::Key << "Type" << YAML::Value << Utils::AnimClipTypeToString(m_AnimClip->Type);
+		out << YAML::Key << "Loop" << YAML::Value << m_AnimClip->Loop;
 		bool isSingle = m_AnimClip->Type == AnimClipType::Single;
 		if (!isSingle)
 		{
@@ -102,6 +103,8 @@ namespace Nous
 			return false;
 		m_AnimClip->Name = data["Name"].as<std::string>();
 		m_AnimClip->Type = Utils::StringToAnimClipType(data["Type"].as<std::string>());
+		if (data["Loop"])
+			m_AnimClip->Loop = data["Loop"].as<bool>();
 
 		bool isSingle = m_AnimClip->Type == AnimClipType::Single;
 		if (!isSingle)

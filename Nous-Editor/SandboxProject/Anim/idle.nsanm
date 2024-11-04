@@ -6,33 +6,65 @@ States:
           Type: Node
           Symbol: and
           Left:
-            Type: Node
-            Symbol: and
-            Left:
-              Type: Leaf
-              VarName: x
-              Compare: gt
-              ValueType: Float
-              TargetValue: 2.5999999
-            Right:
-              Type: Leaf
-              VarName: x
-              Compare: gt
-              ValueType: Float
-              TargetValue: 0
-          Right:
             Type: Leaf
             VarName: x
             Compare: gt
             ValueType: Float
             TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: y
+            Compare: eq
+            ValueType: Float
+            TargetValue: 0
       - NextIndex: 2
         Condition:
-          Type: Leaf
-          VarName: x
-          Compare: eq
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: eq
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: y
+            Compare: eq
+            ValueType: Float
+            TargetValue: 0
+      - NextIndex: 5
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: -2
+          Right:
+            Type: Leaf
+            VarName: y
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+      - NextIndex: 0
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 2
+          Right:
+            Type: Leaf
+            VarName: y
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
   - Clip: 14605462766273728014
     Conditions:
       - NextIndex: 0
@@ -79,6 +111,33 @@ States:
           Type: Leaf
           VarName: x
           Compare: gt
+          ValueType: Float
+          TargetValue: 0
+  - Clip: 3522631799546958894
+    Conditions:
+      - NextIndex: 0
+        Condition:
+          Type: Leaf
+          VarName: y
+          Compare: eq
+          ValueType: Float
+          TargetValue: 0
+  - Clip: 3522631799546958894
+    Conditions:
+      - NextIndex: 2
+        Condition:
+          Type: Leaf
+          VarName: y
+          Compare: lt
+          ValueType: Float
+          TargetValue: 0
+  - Clip: 618681295933084313
+    Conditions:
+      - NextIndex: 3
+        Condition:
+          Type: Leaf
+          VarName: y
+          Compare: lt
           ValueType: Float
           TargetValue: 0
 DefaultIndex: 2

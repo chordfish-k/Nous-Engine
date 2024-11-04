@@ -31,6 +31,7 @@ namespace Nous
 		// Save
 		float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.f;
 		float padx = ImGui::GetStyle().FramePadding.x * 2;
+		
 
 		{
 			float total = ImGui::GetContentRegionAvailWidth();
@@ -99,6 +100,9 @@ namespace Nous
 		if (UI::DrawCombo("Type", animClipTypeStrings, &currentIndex, 2))
 			s_Clip->Type = (AnimClipType)currentIndex;
 
+		// Loop
+		UI::DrawCheckbox("Loop", &s_Clip->Loop);
+
 		// Type:SpriteSheet
 		if (s_Clip->Type == AnimClipType::SpriteSheet)
 		{
@@ -127,6 +131,8 @@ namespace Nous
 		{
 			int i = 0;
 			static int draging = -1;
+			int deleteIdx = -1;
+			float deleteBtnW = ImGui::CalcTextSize("X").x + ImGui::GetStyle().IndentSpacing;
 
 			for (auto& frame : s_Clip->Frames)
 			{
@@ -144,15 +150,15 @@ namespace Nous
 				ImGui::PopItemWidth();
 				ImGui::SameLine();
 
-				float dragBtnW = 50;
-				float availW = totalW - labelW - dragBtnW;
+				float dragBtnW = 50;;
+				float availW = totalW - labelW - dragBtnW - deleteBtnW;
 
 				// Type:SpriteSheet
 				if (s_Clip->Type == AnimClipType::SpriteSheet)
 				{
 					// Index
 					ImGui::PushItemWidth(availW / 2 - padx);
-					if (ImGui::DragInt("##Index", &index, 1, 0, 0, "idx: %d") && index > 0)
+					if (ImGui::DragInt("##Index", &index, 1, 0, 0, "idx: %d") && index >= 0)
 						frame.Index = index;
 					ImGui::PopItemWidth();
 				}
@@ -178,13 +184,63 @@ namespace Nous
 				// Duration
 				ImGui::SameLine();
 				ImGui::PushItemWidth(availW / 2 - padx);
-				if (ImGui::DragFloat("##Duration", &duration, 0.01f, 0, 0, "dur: %.2f") && duration > 0.0f)
+				if (ImGui::DragFloat("##Duration", &duration, 0.01f, 0, 0, "dur: %.2f") && duration >= 0.0f)
 					frame.Duration = duration;
 				ImGui::PopItemWidth();
 
 				// Drag
 				ImGui::SameLine();
-				ImGui::Button("Drag", { ImGui::GetContentRegionAvailWidth(), lineHeight});
+				ImGui::Button("Drag", { dragBtnW , lineHeight});
+				if (ImGui::IsItemHovered())
+				{
+					uint32_t id = 0;
+					ImVec2 size, uv0, uv1;
+					if (s_Clip->Type == AnimClipType::SpriteSheet && AssetManager::IsAssetHandleValid(s_Clip->ImageHandle))
+					{
+						auto texture = AssetManager::GetAsset<Texture2D>(s_Clip->ImageHandle);
+						id = texture->GetRendererID();
+						float tW = (float)texture->GetWidth();
+						float tH = (float)texture->GetHeight();
+						int gridCols = 1;
+						int gridRows = 1;
+						if (s_Clip->SheetWidth > 0)
+							gridCols = std::max((int)tW / s_Clip->SheetWidth, 1);
+						if (s_Clip->SheetHeight > 0)
+							gridRows = std::max((int)tH / s_Clip->SheetHeight, 1);
+
+						if (gridCols > 1 || gridRows > 1)
+						{
+							int j = frame.Index % gridCols;
+							int i = gridRows - frame.Index / gridCols - 1;
+
+							float xMin = j / (float)gridCols;
+							float xMax = (j + 1) / (float)gridCols;
+							float yMin = i / (float)gridRows;
+							float yMax = (i + 1) / (float)gridRows;
+
+							size = { (xMax - xMin) * texture->GetWidth(), (yMax - yMin) * texture->GetHeight() };
+							uv0 = { xMin, yMax };
+							uv1 = { xMax, yMin };
+						}
+					}
+					else if (s_Clip->Type == AnimClipType::Single && AssetManager::IsAssetHandleValid(frame.ImageHandle))
+					{
+						auto texture = AssetManager::GetAsset<Texture2D>(frame.ImageHandle);
+						id = texture->GetRendererID();
+						size = { (float) texture->GetWidth(), (float) texture->GetHeight() };
+						uv0 = { 0, 1 };
+						uv1 = { 1, 0 };
+					}
+
+					if (id)
+					{
+						ImGui::BeginTooltip();
+						ImGui::SameLine();
+						ImGui::ImageButton((ImTextureID)id, size, uv0, uv1);
+						ImGui::EndTooltip();
+					}
+				}
+
 				if (ImGui::BeginDragDropSource())
 				{
 					ImGui::SetDragDropPayload("ANIM_CLIP_FRAME", &i, sizeof(i));
@@ -194,6 +250,19 @@ namespace Nous
 					ImGui::EndDragDropSource();
 				}
 
+				// DeleteBtn
+				ImGui::SameLine();
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+					if (ImGui::Button("X", { deleteBtnW, lineHeight }))
+						deleteIdx = i;
+					ImGui::PopStyleColor(3);
+				}
+				
+
+				// ·ìÏ¶ÍÏ·ÅÄ¿±ê
 				bool shouldResetDraging = false;
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 8);
 				ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvailWidth(), 10));
@@ -238,6 +307,9 @@ namespace Nous
 					}
 					ImGui::EndDragDropTarget();
 				}
+
+				
+
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 5);
 				ImGui::PopID();
 				i++;
@@ -249,6 +321,12 @@ namespace Nous
 					draging = -1;
 				
 			}
+
+			if (deleteIdx >= 0)
+			{
+				s_Clip->Frames.erase(s_Clip->Frames.begin() + deleteIdx);
+			}
+
 			ImGui::TreePop();
 		}
 

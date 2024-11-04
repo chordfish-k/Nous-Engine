@@ -65,7 +65,7 @@ namespace Nous
 				currentFrame++;
 				// LOOP
 				if (currentFrame >= clip->Frames.size())
-					currentFrame = 0;
+					currentFrame = clip->Loop ? 0 : currentFrame - 1;
 			}
 
 			auto& nowFrame = clip->Frames[currentFrame];

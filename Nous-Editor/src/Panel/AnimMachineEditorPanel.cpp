@@ -200,6 +200,7 @@ namespace Nous
 					cons.push_back({ 0, node });
 				}
 
+				int deleteIdx = -1;
 				for (auto& con : cons)
 				{
 					if (ImGui::TreeNode(fmt::format("Condition {0} ##{1}", j, i).c_str()))
@@ -211,9 +212,18 @@ namespace Nous
 						// Condition
 						ShowConditionGui(con.ConditionRoot);
 
+						if (ImGui::Button("Delete"))
+						{
+							deleteIdx = j;
+						}
 						ImGui::TreePop();
 					}
 					j++;
+				}
+
+				if (deleteIdx > -1)
+				{
+					cons.erase(cons.begin() + deleteIdx);
 				}
 
 				ImGui::TreePop();

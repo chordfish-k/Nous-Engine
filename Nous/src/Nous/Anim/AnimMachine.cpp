@@ -95,6 +95,9 @@ namespace Nous
             if (SolveConditionNode(entity, con.ConditionRoot))
             {
                 cur.CurrentIndex = con.StateIndex;
+                auto& data = GetCurrentClip(entity)->Data[entity];
+                data.Frame = 0;
+                data.FrameTimeUsed = 0.0f;
             }
         }
     }

@@ -43,6 +43,9 @@ namespace Nous
 		AssetHandle ImageHandle = 0;
 		int SheetWidth = 0;
 		int SheetHeight = 0;
+
+		// 
+		bool Loop = true;
 	};
 
 	
