@@ -44,19 +44,19 @@ namespace Nous
 
 	struct ConditionNode
 	{
-		ConditionNodeType Type;
+		ConditionNodeType Type = ConditionNodeType::Leaf;
 		struct Exp
 		{
-			std::string VarName;
-			FloatCompareType Compare;
-			ValueType ValueType;
-			union
+			std::string VarName = "";
+			FloatCompareType Compare = FloatCompareType::Equal;
+			ValueType ValueType = ValueType::Float;
+			struct
 			{
-				float FloatValue;
-				bool BoolValue;
+				float FloatValue = 0.0f;
+				bool BoolValue = false;
 			} TargetValue;
 		} Exp;
-		BoolCompareType Symbol;
+		BoolCompareType Symbol = BoolCompareType::And;
 		
 		Ref<ConditionNode> LeftChild;
 		Ref<ConditionNode> RightChild;
@@ -87,6 +87,8 @@ namespace Nous
 		float GetFloat(UUID entity, const std::string& key);
 		bool GetBool(UUID entity, const std::string& key);
 		Ref<AnimClip> GetCurrentClip(UUID entity);
+
+		std::vector<AnimState>& GetAllStates() { return m_AllStates; }
 
 		void SetCurrentClipIndex(UUID entity, int index);
 

@@ -279,7 +279,6 @@ namespace Nous {
                     }
                 }
             }
-            
             else
             {
                 if (scriptClassExists)

@@ -127,15 +127,13 @@ namespace Nous
 			out << YAML::Key << "Symbol" << YAML::Value << Utils::BoolCompareTypeToString(node->Symbol);
 			if (node->LeftChild)
 			{
-				out << YAML::Key << "Left" << YAML::BeginMap;
+				out << YAML::Key << "Left" << YAML::Value;
 				SerialzeConditionNode(out, node->LeftChild);
-				out << YAML::EndMap;
 			}
 			if (node->RightChild)
 			{
-				out << YAML::Key << "Right" << YAML::BeginMap;
+				out << YAML::Key << "Right" << YAML::Value;
 				SerialzeConditionNode(out, node->RightChild);
-				out << YAML::EndMap;
 			}
 		}
 
@@ -163,6 +161,7 @@ namespace Nous
 		}
 		else if (node->Type == ConditionNodeType::Node)
 		{
+			node->Symbol = Utils::BoolCompareTypeFromString(data["Symbol"].as<std::string>());
 			node->LeftChild = DeserialzeConditionNode(data["Left"]);
 			node->RightChild = DeserialzeConditionNode(data["Right"]);
 		}
@@ -177,13 +176,14 @@ namespace Nous
 	void AnimMachineSerializer::Serialize(const std::filesystem::path& filepath)
 	{
 		YAML::Emitter out;
+		out << YAML::BeginMap;
 
-		out << YAML::Key << "States" << YAML::BeginSeq;
+		out << YAML::Key << "States" << YAML::Value << YAML::BeginSeq;
 		for (auto& state : m_AnimMachine->m_AllStates)
 		{
 			out << YAML::BeginMap;
-			out << YAML::Key << "Clip" << state.Clip;
-			out << YAML::Key << "Conditions" << YAML::BeginSeq;
+			out << YAML::Key << "Clip" << YAML::Value << state.Clip;
+			out << YAML::Key << "Conditions" << YAML::Value << YAML::BeginSeq;
 
 			for (auto& con : state.Conditions)
 			{
@@ -197,8 +197,9 @@ namespace Nous
 			out << YAML::EndSeq;
 			out << YAML::EndMap;
 		}
-		out << YAML::Key << "DefaultIndex" << YAML::Value << m_AnimMachine->DefaultIndex;
 		out << YAML::EndSeq;
+		out << YAML::Key << "DefaultIndex" << YAML::Value << m_AnimMachine->DefaultIndex;
+		out << YAML::EndMap;
 
 		std::ofstream fout(filepath);
 		fout << out.c_str();

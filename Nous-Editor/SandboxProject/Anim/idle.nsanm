@@ -3,11 +3,29 @@ States:
     Conditions:
       - NextIndex: 1
         Condition:
-          Type: Leaf
-          VarName: x
-          Compare: gt
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Node
+            Symbol: and
+            Left:
+              Type: Leaf
+              VarName: x
+              Compare: gt
+              ValueType: Float
+              TargetValue: 2.5999999
+            Right:
+              Type: Leaf
+              VarName: x
+              Compare: gt
+              ValueType: Float
+              TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
       - NextIndex: 2
         Condition:
           Type: Leaf

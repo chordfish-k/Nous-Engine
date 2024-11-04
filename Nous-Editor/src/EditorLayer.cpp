@@ -200,6 +200,7 @@ namespace Nous
 
         //
         m_AnimClipEditorPanel.OnImGuiRender();
+        m_AnimMachineEditorPanel.OnImGuiRender();
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
@@ -599,12 +600,14 @@ namespace Nous
         switch (type)
         {
         case AssetType::Scene:
-        {
             OpenScene(e.Handle);
             break;
-        }
         case AssetType::AnimClip:
             m_AnimClipEditorPanel.Open(e.Handle);
+            break;
+        case AssetType::AnimMachine:
+            m_AnimMachineEditorPanel.Open(e.Handle);
+            break;
         }
     }
 
