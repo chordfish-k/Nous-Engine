@@ -22,3 +22,4 @@ url=https://github.com/chordfish-k/glfw.git
 [submodule "Nous/vendor/msdf-atlas-gen"]
 	path = Nous/vendor/msdf-atlas-gen
 	url = https://github.com/chordfish-k/msdf-atlas-gen.git
+	branch = premake
