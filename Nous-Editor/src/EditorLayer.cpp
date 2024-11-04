@@ -192,10 +192,14 @@ namespace Nous
         // Resource
         m_ResourceBrowserPanel->OnImGuiRender();
 
+        // Console
         m_ConsolePanel.OnImGuiRender();
 
         // Viewport
         m_ViewportPanel.OnImGuiRender();
+
+        //
+        m_AnimClipEditorPanel.OnImGuiRender();
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
@@ -591,9 +595,16 @@ namespace Nous
 
     void EditorLayer::OnAssetFileDoubleClick(AssetFileDoubleClickEvent& e)
     {
-        if (AssetManager::GetAssetType(e.Handle) == AssetType::Scene)
+        AssetType type = AssetManager::GetAssetType(e.Handle);
+        switch (type)
+        {
+        case AssetType::Scene:
         {
             OpenScene(e.Handle);
+            break;
+        }
+        case AssetType::AnimClip:
+            m_AnimClipEditorPanel.Open(e.Handle);
         }
     }
 

@@ -27,6 +27,8 @@ namespace Nous
         TextureSpecification spec;
         spec.Width = bitmap.width;
         spec.Height = bitmap.height;
+        spec.MinFilter = ImageFilter::Linear;
+        spec.MaxFilter = ImageFilter::Linear;
         spec.Format = ImageFormat::RGB8;
         spec.GenerateMips = false;
 

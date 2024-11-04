@@ -30,5 +30,24 @@ namespace Nous
 		{
 			return Project::GetActive()->GetAssetManager()->GetAssetType(handle);
 		}
+
+		template<typename T>
+		static std::string GetAssetFileName(AssetHandle handle)
+		{
+			std::string btnLabel = "None";
+			if (handle != 0)
+			{
+				if (AssetManager::IsAssetHandleValid(handle))
+				{
+					const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetMetadata(handle);
+					btnLabel = metadata.FilePath.filename().string();
+				}
+				else
+				{
+					btnLabel = "Invalid";
+				}
+			}
+			return btnLabel;
+		}
 	};
 }

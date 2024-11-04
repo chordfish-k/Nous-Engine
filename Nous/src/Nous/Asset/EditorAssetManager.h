@@ -18,7 +18,7 @@ namespace Nous
 		virtual bool IsAssetLoaded(AssetHandle handle) const override;
 		virtual AssetType GetAssetType(AssetHandle handle) const override;
 
-		void ImportAsset(const std::filesystem::path& filepath);
+		AssetHandle ImportAsset(const std::filesystem::path& filepath);
 		void RemoveAsset(AssetHandle handle);
 		void ReloadAsset(AssetHandle handle);
 

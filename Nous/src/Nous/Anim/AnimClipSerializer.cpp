@@ -65,7 +65,7 @@ namespace Nous
 			out << YAML::Key << "SheetHeight" << YAML::Value << m_AnimClip->SheetHeight;
 		}
 
-		out << YAML::Key << "Frame" << YAML::Value << YAML::BeginSeq;
+		out << YAML::Key << "Frames" << YAML::Value << YAML::BeginSeq;
 		
 		for (auto& frame : m_AnimClip->Frames)
 		{

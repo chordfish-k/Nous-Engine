@@ -78,14 +78,14 @@ namespace Nous
         return m_AssetRegistry.at(handle).Type;
     }
 
-    void EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
+    AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
     {
         AssetHandle handle;
         AssetMetadata metadata;
         metadata.FilePath = filepath;
         metadata.Type = GetAssetTypeFromFileExtension(filepath.extension());
         if (metadata.Type == AssetType::None)
-            return;
+            return 0;
 
         Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
         asset->Handle = handle;
@@ -94,7 +94,9 @@ namespace Nous
             m_LoadedAssets[handle] = asset;
             m_AssetRegistry[handle] = metadata;
             SerializeAssetRegistry();
+            return handle;
         }
+        return 0;
     }
 
     void EditorAssetManager::RemoveAsset(AssetHandle handle)

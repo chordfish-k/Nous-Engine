@@ -1,12 +1,12 @@
-Name: JumpLeft
+Name: FallLeft
 Type: SpriteSheet
 ImageHandle: 9540628050906475021
 SheetWidth: 48
 SheetHeight: 48
 Frames:
-  - Index: 0
+  - Index: 4
     Duration: 0.150000006
-  - Index: 1
+  - Index: 5
     Duration: 0.150000006
-  - Index: 2
+  - Index: 6
     Duration: 0.150000006

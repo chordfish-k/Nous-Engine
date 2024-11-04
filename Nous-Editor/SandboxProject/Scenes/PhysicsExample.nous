@@ -36,33 +36,6 @@ Entities:
     CAnimPlayer:
       AnimClip: 3517851791646336134
       Type: 1
-  - Entity: 1870787110829827085
-    CTag:
-      Tag: Kid
-    CTransform:
-      Translation: [2.76999998, 1.09465456, 0]
-      Rotation: [0, 0, 0]
-      Scale: [4, 4, 1]
-    CSpriteRenderer:
-      Color: [1, 1, 1, 1]
-      TextureHandle: 9535293915289877611
-      TilingFactor: 1
-      SheetWidth: 48
-      SheetHeight: 48
-      Index: 0
-    CRigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    CBoxCollider2D:
-      Offset: [0, -0.400000006]
-      Size: [0.200000003, 0.400000006]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-    CAnimPlayer:
-      AnimClip: 3517851791646336134
-      Type: 1
   - Entity: 5042216685119532454
     CTag:
       Tag: Bar

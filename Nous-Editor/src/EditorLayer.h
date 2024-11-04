@@ -5,6 +5,8 @@
 #include "Panel/ResourceBrowserPanel.h"
 #include "Panel/ViewportPanel.h"
 #include "Panel/ConsolePanel.h"
+#include "Panel/AnimClipEditorPanel.h"
+#include "Panel/AnimMachineEditorPanel.h"
 
 #include "Nous/Renderer/EditorCamera.h"
 
@@ -69,6 +71,8 @@ namespace Nous {
         Scope<ResourceBrowserPanel> m_ResourceBrowserPanel;
         ConsolePanel m_ConsolePanel;
         ViewportPanel m_ViewportPanel;
+        AnimClipEditorPanel m_AnimClipEditorPanel;
+        AnimMachineEditorPanel m_AnimMachineEditorPanel;
 
         bool m_ShowPhysicsColliders = false;
 
