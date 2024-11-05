@@ -12,6 +12,8 @@ namespace Nous
 		static void Update(Timestep dt);
 
 		static void Stop();
+
+		static void OnCollision(UUID A, UUID B, const glm::vec2& normal, bool type); // type: enter / leave
 	};
 }
 

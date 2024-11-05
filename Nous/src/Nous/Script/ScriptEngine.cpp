@@ -17,6 +17,7 @@
 #include "Nous/Core/Console.h"
 #include "Nous/Core/FileSystem.h"
 #include "Nous/Project/Project.h"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Nous
 {
@@ -392,6 +393,16 @@ namespace Nous
 		}
 	}
 
+	void ScriptEngine::OnColliedWith(Entity entity, UUID otherID, const glm::vec2& normal, bool type)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnCollision(otherID, normal, type);
+		}
+	}
+
 	Scene* ScriptEngine::GetSceneContext()
 	{
 		return s_Data->SceneContext;
@@ -500,6 +511,7 @@ namespace Nous
 		return mono_runtime_invoke(method, instance, params, &execption);
 	}
 
+	// 获取钩子函数
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass)
 	{
@@ -509,6 +521,7 @@ namespace Nous
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnStartMethod = scriptClass->GetMethod("OnStart", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+		m_OnCollisionMethod = scriptClass->GetMethod("OnCollision", 3);
 
 		{
 			UUID entityID = entity.GetUUID();
@@ -535,6 +548,20 @@ namespace Nous
 		{
 			void* param = &dt;
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+		}
+	}
+
+	void ScriptInstance::InvokeOnCollision(UUID otherID, const glm::vec2& normal, bool isEnter)
+	{
+		if (m_OnCollisionMethod)
+		{
+			void* param[3] =
+			{
+				&otherID,
+				const_cast<glm::vec2*>(&normal),
+				&isEnter
+			};
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionMethod, param);
 		}
 	}
 

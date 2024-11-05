@@ -16,6 +16,8 @@ namespace Sandbox
 
 		private Entity m_Player;
 
+		public float Speed = 1.5f;
+
 		void OnCreate()
         {
 			m_Player = FindEntityByName("Shikuro");
@@ -24,7 +26,7 @@ namespace Sandbox
 		void OnUpdate(float ts)
 		{
 			if (m_Player != null)
-				Translation = new Vector3(m_Player.Translation.XY, DistanceFromPlayer);
+				Translation = new Vector3(Vector2.Lerp(Translation.XY, m_Player.Translation.XY, ts * Speed), DistanceFromPlayer);
 		}
 
 	}

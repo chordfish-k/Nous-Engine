@@ -89,6 +89,14 @@ namespace Nous
 		return entity.GetUUID();
 	}
 
+	static void Entity_GetName(UUID entityID, MonoString** name)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		Entity e = { scene->GetEntityByUUID(entityID), scene };
+		*name = ScriptEngine::CreateString(e.GetName().c_str());
+	}
+
 	// Transform£∫ªÒ»°Œª“∆
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
 	{
@@ -310,9 +318,9 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(NousConsole_Log);
 
 		NS_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
-
 		NS_ADD_INTERNAL_CALL(Entity_HasComponent);
 		NS_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		NS_ADD_INTERNAL_CALL(Entity_GetName);
 
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

@@ -32,14 +32,14 @@ namespace Nous
 			if (UI::DrawCombo("Value Type", typeStrs, &typeIndex, 2))
 				node->Exp.ValueType = (ValueType)(typeIndex + 1);
 
+			// VarNam
+			char buffer[32];
+			strcpy_s(buffer, sizeof(buffer), node->Exp.VarName.c_str());
+			if (UI::DrawInputText("Var Name", buffer, sizeof(buffer)))
+				node->Exp.VarName = buffer;
+
 			if (node->Exp.ValueType == ValueType::Float)
 			{
-				// VarNam
-				char buffer[32];
-				strcpy_s(buffer, sizeof(buffer), node->Exp.VarName.c_str());
-				if (UI::DrawInputText("Var Name", buffer, sizeof(buffer)))
-					node->Exp.VarName = buffer;
-
 				// Compare
 				static const char* symbolStrs[6] = {"==", "!=", "<", ">", ">=", "<="};
 				uint32_t symbolIndex = (int)node->Exp.Compare - 1;
@@ -53,7 +53,12 @@ namespace Nous
 			}
 			else if(node->Exp.ValueType == ValueType::Bool)
 			{
-
+				bool value = node->Exp.TargetValue.BoolValue;
+				if (UI::DrawCheckbox("Is True", &value))
+				{
+					node->Exp.TargetValue.BoolValue = value;
+					node->Exp.Compare = FloatCompareType::Equal;
+				}
 			}
 		}
 		else if (type == ConditionNodeType::Node)
@@ -168,10 +173,12 @@ namespace Nous
 		{
 			s_Machine->GetAllStates().push_back({ 0, {} });
 		}
+		
 
 		// States
 		auto& states = s_Machine->GetAllStates();
 		int i = 0;
+		int deleteStateIdx = -1;
 
 		for (auto& state : states)
 		{
@@ -194,10 +201,17 @@ namespace Nous
 				auto& cons = state.Conditions;
 				int j = 0;
 
+				// Add Condition
 				if (ImGui::Button("Add Condition"))
 				{
 					auto node = CreateRef<ConditionNode>();
 					cons.push_back({ 0, node });
+				}
+				ImGui::SameLine();
+				// Delete State
+				if (ImGui::Button("Delete State"))
+				{
+					deleteStateIdx = i;
 				}
 
 				int deleteIdx = -1;
@@ -229,6 +243,11 @@ namespace Nous
 				ImGui::TreePop();
 			}
 			i++;
+		}
+
+		if (deleteStateIdx >= 0)
+		{
+			states.erase(states.begin() + deleteStateIdx);
 		}
 
 		ImGui::End();

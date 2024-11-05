@@ -4,12 +4,15 @@
 #include "Nous/Scene/Component.h"
 #include "Nous/Scene/Entity.h"
 
+#include "ScriptSystem.h"
+
 // Box2D
-#include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
 #include "box2d/b2_circle_shape.h"
+#include "box2d/b2_collision.h"
+#include "box2d/b2_contact.h"
 
 namespace Nous
 {
@@ -31,6 +34,7 @@ namespace Nous
 
 	static Scene* s_Scene = nullptr;
     static b2World* s_PhysicsWorld = nullptr;
+    static ContactListener* s_ContactListener = nullptr;
 
 	void PhysicsSystem::Start(Scene* scene)
 	{
@@ -48,6 +52,11 @@ namespace Nous
             bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
             bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
             bodyDef.angle = transform.Rotation.z;
+            
+            // ½«uuid´æ´¢ÔÙbodyÖÐ
+            b2BodyUserData userData;
+            userData.pointer = entity.GetUUID();
+            bodyDef.userData = userData;
 
             b2Body* body = s_PhysicsWorld->CreateBody(&bodyDef);
             body->SetFixedRotation(rb2d.FixedRotation);
@@ -56,9 +65,19 @@ namespace Nous
             if (entity.HasComponent<CBoxCollider2D>())
             {
                 auto& bc2d = entity.GetComponent<CBoxCollider2D>();
-
+                auto offset = bc2d.Offset;
                 b2PolygonShape boxShape;
-                boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
+                float hx = bc2d.Size.x * transform.Scale.x;
+                float hy = bc2d.Size.y * transform.Scale.y;
+                b2Vec2 points[4] =
+                {
+                    {-hx + offset.x, -hy + offset.y},
+                    { hx + offset.x, -hy + offset.y},
+                    { hx + offset.x,  hy + offset.y},
+                    {-hx + offset.x,  hy + offset.y}
+                };
+                boxShape.Set(points, 4);
+                //boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, );
 
                 b2FixtureDef fixtureDef;
                 fixtureDef.shape = &boxShape;
@@ -86,6 +105,9 @@ namespace Nous
                 body->CreateFixture(&fixtureDef);
             }
         }
+
+        s_ContactListener = new ContactListener();
+        s_PhysicsWorld->SetContactListener(s_ContactListener);
 	}
 
 	void PhysicsSystem::Update(Timestep dt)
@@ -117,8 +139,38 @@ namespace Nous
 
 	void PhysicsSystem::Stop()
 	{
+        delete s_ContactListener;
+        s_ContactListener = nullptr;
+
         delete s_PhysicsWorld;
         s_PhysicsWorld = nullptr;
         //s_Scene = nullptr;
 	}
+
+    void ContactListener::BeginContact(b2Contact* contact)
+    {
+        UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+        UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+        NS_CORE_INFO("BeginContact: A={0}, B={1}", idA, idB);
+
+        b2WorldManifold manifold;
+        contact->GetWorldManifold(&manifold);
+        glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
+
+        ScriptSystem::OnCollision(idA, idB, normal, true);
+    }
+
+    void ContactListener::EndContact(b2Contact* contact)
+    {
+        UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+        UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+        NS_CORE_INFO("EndContact: A={0}, B={1}", idA, idB);
+
+        //
+        b2WorldManifold manifold;
+        contact->GetWorldManifold(&manifold);
+        glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
+
+        ScriptSystem::OnCollision(idA, idB, normal, false);
+    }
 }

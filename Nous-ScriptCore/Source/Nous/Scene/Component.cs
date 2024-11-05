@@ -104,5 +104,10 @@ namespace Nous
         {
             InternalCalls.AnimPlayerComponent_SetFloat(Entity.ID, key, value);
         }
+
+        public void SetBool(string key, bool value)
+        {
+            InternalCalls.AnimPlayerComponent_SetBool(Entity.ID, key, value);
+        }
     }
 }

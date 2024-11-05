@@ -19,10 +19,13 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static object Entity_GetScriptInstance(ulong entityID);
-        #endregion
 
-        #region TransformComponent
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_GetName(ulong entityID, out string name);
+		#endregion
+
+		#region TransformComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void TransformComponent_GetTranslation(ulong entityID, out Vector3 translation);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]

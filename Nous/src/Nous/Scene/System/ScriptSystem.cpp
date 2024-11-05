@@ -76,4 +76,18 @@ namespace Nous
             });
         }
 	}
+
+    void ScriptSystem::OnCollision(UUID A, UUID B, const glm::vec2& normal, bool type)
+    {
+        if (s_Scene)
+        {
+            auto entityIDA = s_Scene->GetEntityByUUID(A);
+            auto entityIDB = s_Scene->GetEntityByUUID(B);
+            Entity entityA = { entityIDA, s_Scene };
+            Entity entityB = { entityIDB, s_Scene };
+            ScriptEngine::OnColliedWith(entityA, B, normal, type);
+            ScriptEngine::OnColliedWith(entityB, A, -normal, type);
+            
+        }
+    }
 }

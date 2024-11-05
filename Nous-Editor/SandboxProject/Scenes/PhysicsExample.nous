@@ -1,48 +1,12 @@
 Scene: Untitled
 Entities:
-  - Entity: 8205205435348422958
+  - Entity: 14826108298483068105
     CTag:
-      Tag: Shikuro
+      Tag: Panel
     CTransform:
-      Translation: [-1.99694443, -2.97413778, 0]
+      Translation: [-0.196209431, -0.780967355, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CMonoScript:
-      ClassName: Sandbox.Player
-      ScriptFields:
-        - Name: JumpSpeed
-          Type: Float
-          Data: 4.30000019
-        - Name: Speed
-          Type: Float
-          Data: 3.20000005
-    CSpriteRenderer:
-      Color: [1, 1, 1, 1]
-      TextureHandle: 6485004313021763567
-      TilingFactor: 1
-      SheetWidth: 48
-      SheetHeight: 48
-      Index: 0
-    CRigidbody2D:
-      BodyType: Dynamic
-      FixedRotation: true
-    CBoxCollider2D:
-      Offset: [0, 0]
-      Size: [0.200000003, 0.400000006]
-      Density: 10000
-      Friction: 50
-      Restitution: 0
-      RestitutionThreshold: 0
-    CAnimPlayer:
-      AnimClip: 3517851791646336134
-      Type: 1
-  - Entity: 5042216685119532454
-    CTag:
-      Tag: Bar
-    CTransform:
-      Translation: [0.578536987, -4.58704424, 0]
-      Rotation: [0, 0, 0]
-      Scale: [13.8000002, 1, 1]
+      Scale: [1.31410885, 0.121454932, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -60,55 +24,79 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 50
-  - Entity: 7440336366702553677
+  - Entity: 1208148810121693870
     CTag:
-      Tag: Player
+      Tag: Panel
     CTransform:
-      Translation: [0.506585598, -2.83393121, 0]
+      Translation: [2.10262918, 0.102157295, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.5, 0.5, 1]
+      Scale: [1.31410885, 0.121454932, 1]
     CSpriteRenderer:
-      Color: [0.999989986, 1, 0.999990046, 1]
-      TextureHandle: 5215514554843654355
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
       TilingFactor: 1
       SheetWidth: 0
       SheetHeight: 0
       Index: 0
     CRigidbody2D:
-      BodyType: Dynamic
-      FixedRotation: true
+      BodyType: Static
+      FixedRotation: false
     CBoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 6
+      Density: 1
       Friction: 0.5
       Restitution: 0
-      RestitutionThreshold: 10
-  - Entity: 15775383373780603297
+      RestitutionThreshold: 50
+  - Entity: 15760434830325146853
     CTag:
-      Tag: Camera
+      Tag: Panel
     CTransform:
-      Translation: [0, 0, 20]
+      Translation: [1.56880236, -2.2892344, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CCamera:
-      Camera:
-        ProjectionType: 1
-        PerspFOV: 0.785398185
-        PerspNear: 0.00999999978
-        PerspFar: 1000
-        OrthoSize: 4
-        OrthoNear: -10
-        OrthoFar: 100
-      Primary: true
-      FixedAspectRatio: false
-    CMonoScript:
-      ClassName: Sandbox.Camera
-      ScriptFields:
-        - Name: DistanceFromPlayer
-          Type: Float
-          Data: 20
-  - Entity: 7410354370059520324
+      Scale: [1.31410885, 0.121454932, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 12795004027127446226
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [-0.772602856, -3.24181962, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 4263623520360732655
     CTag:
       Tag: Bar
     CTransform:
@@ -132,13 +120,124 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 50
-  - Entity: 2026840844774714788
+  - Entity: 8205205435348422958
     CTag:
-      Tag: Bar
+      Tag: Shikuro
     CTransform:
-      Translation: [7.19946766, 0.38149035, 0]
-      Rotation: [0, 0, 1.57079637]
-      Scale: [9, 0.400000006, 1]
+      Translation: [-3.01288676, -3.9098928, -1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CMonoScript:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: AccelFalling
+          Type: Float
+          Data: 0.200000003
+        - Name: JumpSpeed
+          Type: Float
+          Data: 6
+        - Name: Speed
+          Type: Float
+          Data: 3
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+      TextureHandle: 6485004313021763567
+      TilingFactor: 1
+      SheetWidth: 48
+      SheetHeight: 48
+      Index: 0
+    CRigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: true
+    CBoxCollider2D:
+      Offset: [0, -0.150000006]
+      Size: [0.150000006, 0.349999994]
+      Density: 10000
+      Friction: 1
+      Restitution: 1
+      RestitutionThreshold: 50
+    CAnimPlayer:
+      AnimClip: 3517851791646336134
+      Type: 1
+  - Entity: 5042216685119532454
+    CTag:
+      Tag: Ground
+    CTransform:
+      Translation: [0.578536749, -4.97165966, 0]
+      Rotation: [0, 0, 0]
+      Scale: [13.8000002, 1, 1]
+    CSpriteRenderer:
+      Color: [0.360553145, 0.709163308, 0.172346443, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 7440336366702553677
+    CTag:
+      Tag: Mario
+    CTransform:
+      Translation: [-3.99557209, 1.54099262, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [0.999989986, 1, 0.999990046, 1]
+      TextureHandle: 5215514554843654355
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: true
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 6
+      Friction: 0.5
+      Restitution: 1
+      RestitutionThreshold: 10
+  - Entity: 15775383373780603297
+    CTag:
+      Tag: Camera
+    CTransform:
+      Translation: [-3.52999997, -3.77485394, 6.69999981]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CCamera:
+      Camera:
+        ProjectionType: 1
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 4
+        OrthoNear: -10
+        OrthoFar: 100
+      Primary: true
+      FixedAspectRatio: false
+    CMonoScript:
+      ClassName: Sandbox.Camera
+      ScriptFields:
+        - Name: DistanceFromPlayer
+          Type: Float
+          Data: 20
+  - Entity: 7410354370059520324
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [-0.41689384, 1.4442687, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -156,13 +255,37 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 50
+  - Entity: 16001182247238514678
+    CTag:
+      Tag: Bar
+    CTransform:
+      Translation: [-5.77896404, 0.133144855, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 9.19999981, 1]
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 6
+      Friction: 0.5
+      Restitution: 0.100000001
+      RestitutionThreshold: 5
   - Entity: 8117675833086537693
     CTag:
       Tag: Bar
     CTransform:
-      Translation: [-6.05214262, 0.381489873, 0]
-      Rotation: [0, 0, 1.57079637]
-      Scale: [9, 0.400000006, 1]
+      Translation: [6.93626785, 0.133144855, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 9.19999981, 1]
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -176,10 +299,10 @@ Entities:
     CBoxCollider2D:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 1
+      Density: 6
       Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 50
+      Restitution: 0.100000001
+      RestitutionThreshold: 5
   - Entity: 9416632023506076275
     CTag:
       Tag: Text

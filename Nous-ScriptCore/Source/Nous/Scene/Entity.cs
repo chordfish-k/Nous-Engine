@@ -7,7 +7,7 @@ namespace Nous
 	{
 		protected Entity() { ID = 0; }
 
-		internal Entity(ulong id)
+		public Entity(ulong id)
 		{
 			ID = id;
 		}
@@ -25,6 +25,15 @@ namespace Nous
 			set
             {
 				InternalCalls.TransformComponent_SetTranslation(ID, ref value);
+			}
+        }
+
+		public string Name
+        {
+			get
+			{
+				InternalCalls.Entity_GetName(ID, out string name);
+				return name;
 			}
         }
 

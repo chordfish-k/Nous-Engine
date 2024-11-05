@@ -20,6 +20,16 @@ namespace Nous
 			Y = y;
 		}
 
+		public static bool operator ==(Vector2 a, Vector2 b)
+		{
+			return a.X.Equals(b.X) && a.Y.Equals(b.Y);
+		}
+
+		public static bool operator !=(Vector2 a, Vector2 b)
+		{
+			return a.X.Equals(b.X) && a.Y.Equals(b.Y);
+		}
+
 		public static Vector2 operator +(Vector2 a, Vector2 b)
 		{
 			return new Vector2(a.X + b.X, a.Y + b.Y);
@@ -29,6 +39,11 @@ namespace Nous
 		{
 			return new Vector2(vector.X * scalar, vector.Y * scalar);
 		}
+
+		public static Vector2 Lerp(Vector2 source, Vector2 target, float dt)
+        {
+			return new Vector2((target.X - source.X) * dt + source.X, (target.Y - source.Y) * dt + source.Y);
+        }
 
 		public float LengthSquared()
         {

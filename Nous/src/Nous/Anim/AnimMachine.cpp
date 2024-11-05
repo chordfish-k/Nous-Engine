@@ -49,8 +49,8 @@ namespace Nous
 
                 switch (node->Exp.Compare)
                 {
-                case FloatCompareType::Equal:            res = (value == target); break;
-                case FloatCompareType::NotEqual:         res = (value != target); break;
+                case FloatCompareType::Equal:            res = (std::fabs(value - target) < 1e-6); break;
+                case FloatCompareType::NotEqual:         res = (std::fabs(value - target) >= 1e-6); break;
                 case FloatCompareType::LessThan:         res = (value < target);  break;
                 case FloatCompareType::GreaterThan:      res = (value > target);  break;
                 case FloatCompareType::NotLessThan:      res = (value >= target); break;

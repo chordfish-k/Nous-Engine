@@ -6,8 +6,4 @@ SheetWidth: 48
 SheetHeight: 48
 Frames:
   - Index: 0
-    Duration: 0.150000006
-  - Index: 0
-    Duration: 0.150000006
-  - Index: 0
-    Duration: 0.150000006
+    Duration: 0.100000001

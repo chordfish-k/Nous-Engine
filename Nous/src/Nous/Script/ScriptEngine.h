@@ -100,6 +100,7 @@ namespace Nous
 		void InvokeOnCreate();
 		void InvokeOnStart();
 		void InvokeOnUpdate(float dt);
+		void InvokeOnCollision(UUID otherID, const glm::vec2& normal, bool isEnter);
 
 		Ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
 
@@ -134,6 +135,7 @@ namespace Nous
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnStartMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
+		MonoMethod* m_OnCollisionMethod = nullptr;
 
 		inline static char s_FieldValueBuffer[8];
 
@@ -161,6 +163,7 @@ namespace Nous
 		static void OnCreateEntity(Entity entity);
 		static void OnStartEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
+		static void OnColliedWith(Entity entity, UUID otherID, const glm::vec2& normal, bool type); // type: enter / leave
 
 		static Scene* GetSceneContext();
 		static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);

@@ -12,11 +12,20 @@ States:
             ValueType: Float
             TargetValue: 0
           Right:
-            Type: Leaf
-            VarName: y
-            Compare: eq
-            ValueType: Float
-            TargetValue: 0
+            Type: Node
+            Symbol: and
+            Left:
+              Type: Leaf
+              VarName: y
+              Compare: eq
+              ValueType: Float
+              TargetValue: 0
+            Right:
+              Type: Leaf
+              VarName: onGround
+              Compare: eq
+              ValueType: Bool
+              TargetValue: true
       - NextIndex: 2
         Condition:
           Type: Node
@@ -29,11 +38,11 @@ States:
             TargetValue: 0
           Right:
             Type: Leaf
-            VarName: y
+            VarName: onGround
             Compare: eq
-            ValueType: Float
-            TargetValue: 0
-      - NextIndex: 5
+            ValueType: Bool
+            TargetValue: true
+      - NextIndex: 4
         Condition:
           Type: Node
           Symbol: and
@@ -42,14 +51,57 @@ States:
             VarName: x
             Compare: lt
             ValueType: Float
-            TargetValue: -2
+            TargetValue: -1
           Right:
             Type: Leaf
-            VarName: y
-            Compare: gt
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
+  - Clip: 14605462766273728014
+    Conditions:
+      - NextIndex: 0
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
             ValueType: Float
             TargetValue: 0
-      - NextIndex: 0
+          Right:
+            Type: Node
+            Symbol: and
+            Left:
+              Type: Leaf
+              VarName: y
+              Compare: eq
+              ValueType: Float
+              TargetValue: 0
+            Right:
+              Type: Leaf
+              VarName: onGround
+              Compare: eq
+              ValueType: Bool
+              TargetValue: true
+      - NextIndex: 3
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: eq
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
+      - NextIndex: 5
         Condition:
           Type: Node
           Symbol: and
@@ -58,86 +110,243 @@ States:
             VarName: x
             Compare: gt
             ValueType: Float
-            TargetValue: 2
+            TargetValue: 1
           Right:
             Type: Leaf
-            VarName: y
-            Compare: gt
-            ValueType: Float
-            TargetValue: 0
-  - Clip: 14605462766273728014
-    Conditions:
-      - NextIndex: 0
-        Condition:
-          Type: Leaf
-          VarName: x
-          Compare: lt
-          ValueType: Float
-          TargetValue: 0
-      - NextIndex: 3
-        Condition:
-          Type: Leaf
-          VarName: x
-          Compare: eq
-          ValueType: Float
-          TargetValue: 0
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
   - Clip: 18119325843901715227
     Conditions:
       - NextIndex: 0
         Condition:
-          Type: Leaf
-          VarName: x
-          Compare: lt
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
       - NextIndex: 1
         Condition:
-          Type: Leaf
-          VarName: x
-          Compare: gt
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
+      - NextIndex: 4
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
+      - NextIndex: 5
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
   - Clip: 6627634050650639938
     Conditions:
       - NextIndex: 0
         Condition:
-          Type: Leaf
-          VarName: x
-          Compare: lt
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
       - NextIndex: 1
         Condition:
-          Type: Leaf
-          VarName: x
-          Compare: gt
-          ValueType: Float
-          TargetValue: 0
-  - Clip: 3522631799546958894
-    Conditions:
-      - NextIndex: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
+      - NextIndex: 5
         Condition:
-          Type: Leaf
-          VarName: y
-          Compare: eq
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
+      - NextIndex: 4
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
   - Clip: 3522631799546958894
     Conditions:
       - NextIndex: 2
         Condition:
-          Type: Leaf
-          VarName: y
-          Compare: lt
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: eq
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
+      - NextIndex: 5
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
+      - NextIndex: 0
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
   - Clip: 618681295933084313
     Conditions:
       - NextIndex: 3
         Condition:
-          Type: Leaf
-          VarName: y
-          Compare: lt
-          ValueType: Float
-          TargetValue: 0
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: eq
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
+      - NextIndex: 4
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: lt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: false
+      - NextIndex: 1
+        Condition:
+          Type: Node
+          Symbol: and
+          Left:
+            Type: Leaf
+            VarName: x
+            Compare: gt
+            ValueType: Float
+            TargetValue: 0
+          Right:
+            Type: Leaf
+            VarName: onGround
+            Compare: eq
+            ValueType: Bool
+            TargetValue: true
 DefaultIndex: 2
