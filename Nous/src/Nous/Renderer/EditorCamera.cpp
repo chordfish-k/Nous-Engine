@@ -27,16 +27,15 @@ namespace Nous {
         }
         else
         {
-            // 使用 m_Distance 控制正交范围
-            float orthoLeft = -m_AspectRatio * m_Distance * 0.5f;
-            float orthoRight = m_AspectRatio * m_Distance * 0.5f;
-            float orthoBottom = -m_Distance * 0.5f;
-            float orthoTop = m_Distance * 0.5f;
+            // 正交模式下，根据摄像机的位置和焦点之间的距离调整正交尺寸
+            constexpr float sizeMul = 0.4f;
+            float left = -m_AspectRatio * m_Distance * sizeMul;
+            float right = m_AspectRatio * m_Distance * sizeMul;
+            float bottom = -m_Distance * sizeMul;
+            float top = m_Distance * sizeMul;
 
-            float orthoNear = -m_FarClip;
-            float orthoFar = m_FarClip;
-
-            m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
+            // 更新正交投影的参数
+            m_Projection = glm::ortho(left, right, bottom, top, m_OrthoNearClip, m_OrthoFarClip);
         }
     }
 
@@ -53,14 +52,10 @@ namespace Nous {
         }
         else
         {
-            // 正交模式下，摄像机位置固定，通过旋转来对准焦点
+            m_Position = CalculatePosition();
             glm::quat orientation = GetOrientation();
-            glm::mat4 rotation = glm::toMat4(orientation);
-
-            // 使视图矩阵保持固定，不随距离改变位置
-            glm::mat4 translation = glm::translate(glm::mat4(1.0f), -m_FocalPoint);
-
-            m_ViewMatrix = rotation * translation;
+            m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
+            m_ViewMatrix = glm::inverse(m_ViewMatrix);
         }
     }
 
