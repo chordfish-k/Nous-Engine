@@ -187,9 +187,9 @@ namespace Nous
 
         UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
         UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-        NS_CORE_INFO("EndContact: A={0}, B={1}", idA, idB);
 
         //
+        s_LastContact = contact;
         b2WorldManifold manifold;
         contact->GetWorldManifold(&manifold);
         glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
