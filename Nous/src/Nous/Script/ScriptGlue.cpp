@@ -12,6 +12,8 @@
 
 #include "Nous/Physics/Physics2D.h"
 
+#include "Nous/Scene/System/PhysicsSystem.h"
+
 #include "Nous/Asset/AssetManager.h"
 #include "Nous/Anim/AnimMachine.h"
 
@@ -280,6 +282,11 @@ namespace Nous
 		return Input::IsKeyPressed(keycode);
 	}
 
+	static void Physics_DisableLastContact()
+	{
+		PhysicsSystem::DisableLastContact();
+	}
+
 	// ×¢²á×é¼þ
 	template<typename... Component>
 	static void RegisterComponent()
@@ -345,5 +352,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetBool);
 
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
+
+		NS_ADD_INTERNAL_CALL(Physics_DisableLastContact);
 	}
 }

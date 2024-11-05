@@ -98,19 +98,10 @@ namespace Nous
             Entity selectedEntity = m_Context->GetSelectedEntity();
             if (selectedEntity && m_GizmoType >= 0 && m_GizmoType <= 3)
             {
-                ImGuizmo::SetOrthographic(false);
                 ImGuizmo::SetDrawlist();
-
                 ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y,
                                   m_ViewportBounds[1].x - m_ViewportBounds[0].x,
                                   m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-
-                // TODO 切换不同的摄像机
-                // Runtime camera
-//            auto cameraEntity = m_Context->GetPrimaryCameraEntity();
-//            const auto& camera = cameraEntity.GetComponent<CCamera>();
-//            auto cameraProjection = camera.Camera.GetProjectionMatrix();
-//            auto cameraView = glm::inverse(cameraEntity.GetComponent<CTransform>().GetTransform());
 
                 // Editor camera
                 const glm::mat4& cameraProjection = m_EditorCamera->GetProjectionMatrix();
@@ -132,6 +123,10 @@ namespace Nous
                 glm::mat4 delta(1.0f);
                 if (m_ShowGizmo)
                 {
+                    if (m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic)
+                    {
+
+                    }
                     ImGuizmo::SetOrthographic(m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic);
                     ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                         (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),

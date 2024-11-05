@@ -8,10 +8,10 @@ namespace Nous
 		#region NousConsole
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool NousConsole_Log(string log, string filepath, int lineNumber);
-		#endregion
+        #endregion
 
-		#region Entity
-		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+        #region Entity
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -88,5 +88,8 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Physics_DisableLastContact();
 	}
 }

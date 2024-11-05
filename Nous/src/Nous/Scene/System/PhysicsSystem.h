@@ -12,10 +12,10 @@ namespace Nous
 	{
 	public:
 		static void Start(Scene* scene);
-
 		static void Update(Timestep dt);
-
 		static void Stop();
+
+		static void DisableLastContact();
 	};
 
 	class ContactListener : public b2ContactListener
@@ -23,6 +23,7 @@ namespace Nous
 	public:
 		virtual void BeginContact(b2Contact* contact) override;
 		virtual void EndContact(b2Contact* contact) override;
+		virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 	};
 }
 

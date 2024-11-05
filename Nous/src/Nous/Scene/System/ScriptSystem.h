@@ -13,7 +13,8 @@ namespace Nous
 
 		static void Stop();
 
-		static void OnCollision(UUID A, UUID B, const glm::vec2& normal, bool type); // type: enter / leave
+		static void OnPreCollision(UUID A, UUID B, glm::vec2& normal);
+		static void OnCollision(UUID A, UUID B, glm::vec2& normal, bool type); // type: enter / leave
 	};
 }
 

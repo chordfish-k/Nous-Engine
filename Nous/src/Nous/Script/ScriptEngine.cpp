@@ -393,7 +393,17 @@ namespace Nous
 		}
 	}
 
-	void ScriptEngine::OnColliedWith(Entity entity, UUID otherID, const glm::vec2& normal, bool type)
+	void ScriptEngine::OnPreColliedWith(Entity entity, UUID otherID, glm::vec2& normal)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnPreCollision(otherID, normal);
+		}
+	}
+
+	void ScriptEngine::OnColliedWith(Entity entity, UUID otherID, glm::vec2& normal, bool type)
 	{
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
@@ -521,6 +531,7 @@ namespace Nous
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnStartMethod = scriptClass->GetMethod("OnStart", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+		m_OnPreCollisionMethod = scriptClass->GetMethod("OnPreCollision", 2);
 		m_OnCollisionMethod = scriptClass->GetMethod("OnCollision", 3);
 
 		{
@@ -551,18 +562,29 @@ namespace Nous
 		}
 	}
 
-	void ScriptInstance::InvokeOnCollision(UUID otherID, const glm::vec2& normal, bool isEnter)
+	void ScriptInstance::InvokeOnPreCollision(UUID otherID, glm::vec2& normal)
 	{
-		if (m_OnCollisionMethod)
+		if (!m_OnPreCollisionMethod)
+			return;
+		void* param[2] =
 		{
-			void* param[3] =
-			{
-				&otherID,
-				const_cast<glm::vec2*>(&normal),
-				&isEnter
-			};
-			m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionMethod, param);
-		}
+			&otherID,
+			&normal
+		};
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnPreCollisionMethod, param);
+	}
+
+	void ScriptInstance::InvokeOnCollision(UUID otherID, glm::vec2& normal, bool isEnter)
+	{
+		if (!m_OnCollisionMethod)
+			return;
+		void* param[3] =
+		{
+			&otherID,
+			&normal,
+			&isEnter
+		};
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionMethod, param);
 	}
 
 	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)

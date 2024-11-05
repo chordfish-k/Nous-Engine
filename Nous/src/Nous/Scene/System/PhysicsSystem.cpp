@@ -35,6 +35,7 @@ namespace Nous
 	static Scene* s_Scene = nullptr;
     static b2World* s_PhysicsWorld = nullptr;
     static ContactListener* s_ContactListener = nullptr;
+    static b2Contact* s_LastContact = nullptr;
 
 	void PhysicsSystem::Start(Scene* scene)
 	{
@@ -147,6 +148,12 @@ namespace Nous
         //s_Scene = nullptr;
 	}
 
+    void PhysicsSystem::DisableLastContact()
+    {
+        if (s_LastContact)
+            s_LastContact->SetEnabled(false);
+    }
+
     void ContactListener::BeginContact(b2Contact* contact)
     {
         UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
@@ -172,5 +179,21 @@ namespace Nous
         glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
 
         ScriptSystem::OnCollision(idA, idB, normal, false);
+    }
+
+    void Nous::ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+    {
+        s_LastContact = contact;
+
+        UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+        UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+        NS_CORE_INFO("EndContact: A={0}, B={1}", idA, idB);
+
+        //
+        b2WorldManifold manifold;
+        contact->GetWorldManifold(&manifold);
+        glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
+
+        ScriptSystem::OnPreCollision(idA, idB, normal);
     }
 }
