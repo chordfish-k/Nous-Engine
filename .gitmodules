@@ -1,25 +1,25 @@
 [submodule "Nous/vendor/spdlog"]
 	path = Nous/vendor/spdlog
-	url = https://github.com/gabime/spdlog.git
+url=https://gitee.com/mirror-luyi/spdlog.git
 [submodule "Nous/vendor/imgui"]
 	path = Nous/vendor/imgui
-url=https://github.com/chordfish-k/imgui.git
+url=https://gitee.com/chordfish/imgui.git
 [submodule "Nous/vendor/glm"]
 	path = Nous/vendor/glm
-	url = https://github.com/icaven/glm
+url=https://gitee.com/chordfish/glm.git
 [submodule "Nous/vendor/yaml-cpp"]
 	path = Nous/vendor/yaml-cpp
-url=https://github.com/chordfish-k/yaml-cpp.git
+url=https://gitee.com/chordfish/yaml-cpp.git
 [submodule "Nous/vendor/imguizmo"]
 	path = Nous/vendor/imguizmo
-url=https://github.com/chordfish-k/ImGuizmo.git
+url=https://gitee.com/chordfish/ImGuizmo.git
 [submodule "Nous/vendor/box2d"]
 	path = Nous/vendor/box2d
-	url=https://github.com/chordfish-k/box2d
+url=https://gitee.com/chordfish/box2d
 [submodule "Nous/vendor/glfw"]
 	path = Nous/vendor/glfw
-url=https://github.com/chordfish-k/glfw.git
+url=https://gitee.com/chordfish/glfw.git
 [submodule "Nous/vendor/msdf-atlas-gen"]
 	path = Nous/vendor/msdf-atlas-gen
-	url = https://github.com/chordfish-k/msdf-atlas-gen.git
+url=https://gitee.com/chordfish/msdf-atlas-gen.git
 	branch = premake
