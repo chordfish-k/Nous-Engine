@@ -77,7 +77,7 @@ namespace Nous
         }
 	}
 
-    void ScriptSystem::OnPreCollision(void* contactPtr, UUID A, UUID B, glm::vec2& normal)
+    void ScriptSystem::OnCollisionPreSolve(void* contactPtr, UUID A, UUID B, glm::vec2& normal)
     {
         if (!s_Scene)
             return;
@@ -86,11 +86,11 @@ namespace Nous
         Entity entityA = { entityIDA, s_Scene };
         Entity entityB = { entityIDB, s_Scene };
         
-        ScriptEngine::OnPreColliedWith(contactPtr, entityA, B, normal);
-        ScriptEngine::OnPreColliedWith(contactPtr, entityB, A, -normal);
+        ScriptEngine::OnCollisionPreSolve(contactPtr, entityA, B, normal);
+        ScriptEngine::OnCollisionPreSolve(contactPtr, entityB, A, -normal);
     }
 
-    void ScriptSystem::OnCollision(UUID A, UUID B, glm::vec2& normal, bool type)
+    void ScriptSystem::OnCollisionPostSolve(void* contactPtr, UUID A, UUID B, glm::vec2& normal)
     {
         if (!s_Scene)
             return;
@@ -98,7 +98,32 @@ namespace Nous
         auto entityIDB = s_Scene->GetEntityByUUID(B);
         Entity entityA = { entityIDA, s_Scene };
         Entity entityB = { entityIDB, s_Scene };
-        ScriptEngine::OnColliedWith(entityA, B, normal, type);
-        ScriptEngine::OnColliedWith(entityB, A, -normal, type);
+
+        ScriptEngine::OnCollisionPostSolve(contactPtr, entityA, B, normal);
+        ScriptEngine::OnCollisionPostSolve(contactPtr, entityB, A, -normal);
+    }
+
+    void ScriptSystem::OnCollisionExit(void* contactPtr, UUID A, UUID B)
+    {
+        if (!s_Scene)
+            return;
+        auto entityIDA = s_Scene->GetEntityByUUID(A);
+        auto entityIDB = s_Scene->GetEntityByUUID(B);
+        Entity entityA = { entityIDA, s_Scene };
+        Entity entityB = { entityIDB, s_Scene };
+        ScriptEngine::OnCollisionExit(contactPtr, entityA, B);
+        ScriptEngine::OnCollisionExit(contactPtr, entityB, A);
+    }
+
+    void ScriptSystem::OnCollisionEnter(void* contactPtr, UUID A, UUID B, glm::vec2& normal)
+    {
+        if (!s_Scene)
+            return;
+        auto entityIDA = s_Scene->GetEntityByUUID(A);
+        auto entityIDB = s_Scene->GetEntityByUUID(B);
+        Entity entityA = { entityIDA, s_Scene };
+        Entity entityB = { entityIDB, s_Scene };
+        ScriptEngine::OnCollisionEnter(contactPtr, entityA, B, normal);
+        ScriptEngine::OnCollisionEnter(contactPtr, entityB, A, -normal);
     }
 }

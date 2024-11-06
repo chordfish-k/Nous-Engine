@@ -270,8 +270,24 @@ namespace Nous {
                     {
                         if (field.Type == ScriptFieldType::Float)
                         {
-                            float data = scriptInstance->GetFieldValue<float>(name);
+                            auto data = scriptInstance->GetFieldValue<float>(name);
                             if (UI::DrawFloatControl(name.c_str(), &data))
+                            {
+                                scriptInstance->SetFieldValue(name, data);
+                            }
+                        }
+                        if (field.Type == ScriptFieldType::Vector2)
+                        {
+                            auto data = scriptInstance->GetFieldValue<glm::vec2>(name);
+                            if (UI::DrawVec2Control(name.c_str(), data))
+                            {
+                                scriptInstance->SetFieldValue(name, data);
+                            }
+                        }
+                        else if (field.Type == ScriptFieldType::Bool)
+                        {
+                            auto data = scriptInstance->GetFieldValue<bool>(name);
+                            if (UI::DrawCheckbox(name.c_str(), &data))
                             {
                                 scriptInstance->SetFieldValue(name, data);
                             }
@@ -297,8 +313,20 @@ namespace Nous {
                             // 
                             if (field.Type == ScriptFieldType::Float)
                             {
-                                float data = scriptField.GetValue<float>();
+                                auto data = scriptField.GetValue<float>();
                                 if (UI::DrawFloatControl(name.c_str(), &data))
+                                    scriptField.SetValue(data);
+                            }
+                            else if (field.Type == ScriptFieldType::Vector2)
+                            {
+                                auto data = scriptField.GetValue<glm::vec2>();
+                                if (UI::DrawVec2Control(name.c_str(), data))
+                                    scriptField.SetValue(data);
+                            }
+                            else if (field.Type == ScriptFieldType::Bool)
+                            {
+                                auto data = scriptField.GetValue<bool>();
+                                if (UI::DrawCheckbox(name.c_str(), &data))
                                     scriptField.SetValue(data);
                             }
                         }
@@ -310,6 +338,29 @@ namespace Nous {
                                 if (UI::DrawFloatControl(name.c_str(), &data))
                                 {
                                     ScriptFieldInstance& scriptField = entityFields[name];
+
+                                    scriptField.Field = field;
+                                    scriptField.SetValue(data);
+                                }
+                            }
+                            else if (field.Type == ScriptFieldType::Vector2)
+                            {
+                                glm::vec2 data(0.0f);
+                                if (UI::DrawVec2Control(name.c_str(), data))
+                                {
+                                    ScriptFieldInstance& scriptField = entityFields[name];
+
+                                    scriptField.Field = field;
+                                    scriptField.SetValue(data);
+                                }
+                            }
+                            else if (field.Type == ScriptFieldType::Bool)
+                            {
+                                bool data = false;
+                                if (UI::DrawCheckbox(name.c_str(), &data))
+                                {
+                                    ScriptFieldInstance& scriptField = entityFields[name];
+
                                     scriptField.Field = field;
                                     scriptField.SetValue(data);
                                 }

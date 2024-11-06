@@ -158,42 +158,51 @@ namespace Nous
     {
         UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
         UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-        NS_CORE_INFO("BeginContact: A={0}, B={1}", idA, idB);
 
+        // 需要修改
         b2WorldManifold manifold;
         contact->GetWorldManifold(&manifold);
         glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
 
-        ScriptSystem::OnCollision(idA, idB, normal, true);
+        ScriptSystem::OnCollisionEnter(contact, idA, idB, normal);
     }
 
     void ContactListener::EndContact(b2Contact* contact)
     {
         UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
         UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-        NS_CORE_INFO("EndContact: A={0}, B={1}", idA, idB);
 
-        //
+        // 需要修改
         b2WorldManifold manifold;
         contact->GetWorldManifold(&manifold);
         glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
 
-        ScriptSystem::OnCollision(idA, idB, normal, false);
+        ScriptSystem::OnCollisionExit(contact, idA, idB);
     }
 
     void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
     {
-        s_LastContact = contact;
-
         UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
         UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
 
-        //
-        s_LastContact = contact;
+        // 需要修改
         b2WorldManifold manifold;
         contact->GetWorldManifold(&manifold);
         glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
 
-        ScriptSystem::OnPreCollision(contact, idA, idB, normal);
+        ScriptSystem::OnCollisionPreSolve(contact, idA, idB, normal);
+    }
+
+    void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+    {
+        UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+        UUID idB = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+
+        // 需要修改
+        b2WorldManifold manifold;
+        contact->GetWorldManifold(&manifold);
+        glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
+
+        ScriptSystem::OnCollisionPostSolve(contact, idA, idB, normal);
     }
 }
