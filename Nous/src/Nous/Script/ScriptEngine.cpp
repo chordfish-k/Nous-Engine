@@ -38,6 +38,7 @@ namespace Nous
 		{"System.UInt64",	ScriptFieldType::ULong	},
 
 		{"Nous.Entity",		ScriptFieldType::Entity	},
+		{"Nous.Vector2",	ScriptFieldType::Vector2},
 	};
 
 	namespace Utils
@@ -126,8 +127,11 @@ namespace Nous
 		std::filesystem::path AppAssemblyFilePath;
 
 		ScriptClass EntityClass;
+		ScriptClass CollisionContactClass;
 		
 		MonoObject* ConsoleTextWriterInstance = nullptr;
+
+		std::unordered_map<std::string, Ref<ScriptClass>> InternalClasses;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
@@ -252,6 +256,9 @@ namespace Nous
 		LoadAppAssemblyClasses();
 
 		s_Data->EntityClass = ScriptClass("Nous", "Entity", true);
+		s_Data->CollisionContactClass = ScriptClass("Nous", "CollisionContact", true);
+
+		s_Data->InternalClasses["Vector2"] = CreateRef<ScriptClass>("Nous", "Vector2", true);
 
 		ScriptGlue::RegisterFunctions();
 		ScriptGlue::RegisterComponents();
@@ -393,23 +400,43 @@ namespace Nous
 		}
 	}
 
-	void ScriptEngine::OnPreColliedWith(Entity entity, UUID otherID, glm::vec2& normal)
+	void ScriptEngine::OnCollisionPreSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal)
 	{
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
-			instance->InvokeOnPreCollision(otherID, normal);
+			instance->InvokeOnCollisionPreSolve(contactPtr, otherID, normal);
 		}
 	}
 
-	void ScriptEngine::OnColliedWith(Entity entity, UUID otherID, glm::vec2& normal, bool type)
+	void ScriptEngine::OnCollisionPostSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal)
 	{
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
-			instance->InvokeOnCollision(otherID, normal, type);
+			instance->InvokeOnCollisionPostSolve(contactPtr, otherID, normal);
+		}
+	}
+
+	void ScriptEngine::OnCollisionEnter(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnCollisionEnter(contactPtr, otherID, normal);
+		}
+	}
+
+	void ScriptEngine::OnCollisionExit(void* contactPtr, Entity entity, UUID otherID)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnCollisionExit(contactPtr, otherID);
 		}
 	}
 
@@ -483,6 +510,7 @@ namespace Nous
 				if (flags & MONO_FIELD_ATTR_PUBLIC)
 				{
 					MonoType* type = mono_field_get_type(field);
+					//mono_class_get_type
 					ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
 					NS_CORE_WARN("  {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
 
@@ -521,6 +549,11 @@ namespace Nous
 		return mono_runtime_invoke(method, instance, params, &execption);
 	}
 
+	MonoType* ScriptClass::GetType()
+	{
+		return mono_class_get_type(m_MonoClass);
+	}
+
 	// 获取钩子函数
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass)
@@ -531,8 +564,10 @@ namespace Nous
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnStartMethod = scriptClass->GetMethod("OnStart", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
-		m_OnPreCollisionMethod = scriptClass->GetMethod("OnPreCollision", 2);
-		m_OnCollisionMethod = scriptClass->GetMethod("OnCollision", 3);
+		m_OnCollisionPreSolveMethod = scriptClass->GetMethod("OnCollisionPreSolve", 3);
+		m_OnCollisionPostSolveMethod = scriptClass->GetMethod("OnCollisionPostSolve", 3);
+		m_OnCollisionEnterMethod = scriptClass->GetMethod("OnCollisionEnter", 3);
+		m_OnCollisionExitMethod = scriptClass->GetMethod("OnCollisionExit", 2);
 
 		{
 			UUID entityID = entity.GetUUID();
@@ -562,29 +597,67 @@ namespace Nous
 		}
 	}
 
-	void ScriptInstance::InvokeOnPreCollision(UUID otherID, glm::vec2& normal)
+	void ScriptInstance::InvokeOnCollisionPreSolve(void* contactPtr, UUID otherID, glm::vec2& normal)
 	{
-		if (!m_OnPreCollisionMethod)
+		if (!m_OnCollisionPreSolveMethod)
 			return;
-		void* param[2] =
+
+		ClassWrapper contact{ contactPtr };
+
+		void* param[3] =
 		{
+			&contact,
 			&otherID,
 			&normal
 		};
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnPreCollisionMethod, param);
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionPreSolveMethod, param);
 	}
 
-	void ScriptInstance::InvokeOnCollision(UUID otherID, glm::vec2& normal, bool isEnter)
+	void ScriptInstance::InvokeOnCollisionPostSolve(void* contactPtr, UUID otherID, glm::vec2& normal)
 	{
-		if (!m_OnCollisionMethod)
+		if (!m_OnCollisionPostSolveMethod)
 			return;
+
+		ClassWrapper contact{ contactPtr };
+
 		void* param[3] =
 		{
+			&contact,
 			&otherID,
-			&normal,
-			&isEnter
+			&normal
 		};
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionMethod, param);
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionPostSolveMethod, param);
+	}
+
+	void ScriptInstance::InvokeOnCollisionEnter(void* contactPtr, UUID otherID, glm::vec2& normal)
+	{
+		if (!m_OnCollisionEnterMethod)
+			return;
+
+		ClassWrapper contact{ contactPtr };
+
+		void* param[3] =
+		{
+			&contact,
+			&otherID,
+			&normal
+		};
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionEnterMethod, param);
+	}
+
+	void ScriptInstance::InvokeOnCollisionExit(void* contactPtr, UUID otherID)
+	{
+		if (!m_OnCollisionExitMethod)
+			return;
+
+		ClassWrapper contact{ contactPtr };
+
+		void* param[2] =
+		{
+			&contact,
+			&otherID
+		};
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionExitMethod, param);
 	}
 
 	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)

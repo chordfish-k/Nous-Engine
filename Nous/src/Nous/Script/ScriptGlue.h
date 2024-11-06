@@ -8,5 +8,11 @@ namespace Nous
 		static void RegisterComponents();
 		static void RegisterFunctions();
 	};
+
+	//
+	struct ClassWrapper
+	{
+		void* ptr;
+	};
 }
 

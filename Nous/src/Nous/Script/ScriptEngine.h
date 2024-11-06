@@ -16,6 +16,7 @@ extern "C" {
 	typedef struct _MonoImage MonoImage;
 	typedef struct _MonoClassField MonoClassField;
 	typedef struct _MonoString MonoString;
+	typedef struct _MonoType MonoType;
 }
 
 namespace Nous
@@ -79,6 +80,8 @@ namespace Nous
 		MonoObject* Instantiate();
 		MonoMethod* GetMethod(const std::string& name, int parameterCount);
 		MonoObject* InvokeMethod(MonoObject* instance, MonoMethod* method, void** params);
+
+		MonoType* GetType();
 	
 		const std::map<std::string, ScriptField>& GetFields() const { return m_Fields;  }
 	private:
@@ -100,8 +103,10 @@ namespace Nous
 		void InvokeOnCreate();
 		void InvokeOnStart();
 		void InvokeOnUpdate(float dt);
-		void InvokeOnPreCollision(UUID otherID, glm::vec2& normal);
-		void InvokeOnCollision(UUID otherID, glm::vec2& normal, bool isEnter);
+		void InvokeOnCollisionPreSolve(void* contactPtr, UUID otherID, glm::vec2& normal);
+		void InvokeOnCollisionPostSolve(void* contactPtr, UUID otherID, glm::vec2& normal);
+		void InvokeOnCollisionEnter(void* contactPtr, UUID otherID, glm::vec2& normal);
+		void InvokeOnCollisionExit(void* contactPtr, UUID otherID);
 
 		Ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
 
@@ -136,8 +141,10 @@ namespace Nous
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnStartMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
-		MonoMethod* m_OnPreCollisionMethod = nullptr;
-		MonoMethod* m_OnCollisionMethod = nullptr;
+		MonoMethod* m_OnCollisionPreSolveMethod = nullptr;
+		MonoMethod* m_OnCollisionPostSolveMethod = nullptr;
+		MonoMethod* m_OnCollisionEnterMethod = nullptr;
+		MonoMethod* m_OnCollisionExitMethod = nullptr;
 
 		inline static char s_FieldValueBuffer[8];
 
@@ -165,8 +172,10 @@ namespace Nous
 		static void OnCreateEntity(Entity entity);
 		static void OnStartEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
-		static void OnPreColliedWith(Entity entity, UUID otherID, glm::vec2& normal);
-		static void OnColliedWith(Entity entity, UUID otherID, glm::vec2& normal, bool type); // type: enter / leave
+		static void OnCollisionPreSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);
+		static void OnCollisionPostSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);
+		static void OnCollisionEnter(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);
+		static void OnCollisionExit(void* contactPtr, Entity entity, UUID otherID);
 
 		static Scene* GetSceneContext();
 		static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);

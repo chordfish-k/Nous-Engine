@@ -10,16 +10,25 @@ States:
             VarName: x
             Compare: gt
             ValueType: Float
-            TargetValue: 0
+            TargetValue: 0.100000001
           Right:
             Type: Node
             Symbol: and
             Left:
-              Type: Leaf
-              VarName: y
-              Compare: eq
-              ValueType: Float
-              TargetValue: 0
+              Type: Node
+              Symbol: and
+              Left:
+                Type: Leaf
+                VarName: y
+                Compare: lt
+                ValueType: Float
+                TargetValue: 0.100000001
+              Right:
+                Type: Leaf
+                VarName: y
+                Compare: gt
+                ValueType: Float
+                TargetValue: -0.100000001
             Right:
               Type: Leaf
               VarName: onGround
@@ -31,11 +40,20 @@ States:
           Type: Node
           Symbol: and
           Left:
-            Type: Leaf
-            VarName: x
-            Compare: eq
-            ValueType: Float
-            TargetValue: 0
+            Type: Node
+            Symbol: and
+            Left:
+              Type: Leaf
+              VarName: x
+              Compare: lt
+              ValueType: Float
+              TargetValue: 0.100000001
+            Right:
+              Type: Leaf
+              VarName: x
+              Compare: gt
+              ValueType: Float
+              TargetValue: -0.100000001
           Right:
             Type: Leaf
             VarName: onGround
@@ -51,7 +69,7 @@ States:
             VarName: x
             Compare: lt
             ValueType: Float
-            TargetValue: 0
+            TargetValue: 0.100000001
           Right:
             Type: Leaf
             VarName: onGround
@@ -256,11 +274,20 @@ States:
           Type: Node
           Symbol: and
           Left:
-            Type: Leaf
-            VarName: x
-            Compare: eq
-            ValueType: Float
-            TargetValue: 0
+            Type: Node
+            Symbol: and
+            Left:
+              Type: Leaf
+              VarName: x
+              Compare: gt
+              ValueType: Float
+              TargetValue: -0.100000001
+            Right:
+              Type: Leaf
+              VarName: x
+              Compare: lte
+              ValueType: Float
+              TargetValue: 0
           Right:
             Type: Leaf
             VarName: onGround
@@ -306,11 +333,20 @@ States:
           Type: Node
           Symbol: and
           Left:
-            Type: Leaf
-            VarName: x
-            Compare: eq
-            ValueType: Float
-            TargetValue: 0
+            Type: Node
+            Symbol: and
+            Left:
+              Type: Leaf
+              VarName: x
+              Compare: gte
+              ValueType: Float
+              TargetValue: 0
+            Right:
+              Type: Leaf
+              VarName: x
+              Compare: lt
+              ValueType: Float
+              TargetValue: 0.100000001
           Right:
             Type: Leaf
             VarName: onGround

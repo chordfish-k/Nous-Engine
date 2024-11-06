@@ -91,5 +91,12 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Physics_DisableLastContact();
+
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Physics_Contact_IsEnable(ulong contact);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Physics_Contact_SetEnable(ulong contact, bool enable);
 	}
 }

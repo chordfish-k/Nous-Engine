@@ -1,12 +1,16 @@
 Scene: Untitled
 Entities:
-  - Entity: 14826108298483068105
+  - Entity: 15570393466670420773
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [-0.196209416, -0.946321607, 0]
+      Translation: [-0.479842871, -3.10525775, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -24,13 +28,17 @@ Entities:
       Friction: 1
       Restitution: 0
       RestitutionThreshold: 50
-  - Entity: 1208148810121693870
+  - Entity: 15818029497235824307
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [2.10262918, 0.102157295, 0]
+      Translation: [3.40987587, -2.68958974, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -48,13 +56,17 @@ Entities:
       Friction: 1
       Restitution: 0
       RestitutionThreshold: 50
-  - Entity: 15760434830325146853
+  - Entity: 9633313884412855616
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [1.56880236, -2.2892344, 0]
+      Translation: [3.43349695, 0.310409904, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -72,13 +84,167 @@ Entities:
       Friction: 1
       Restitution: 0
       RestitutionThreshold: 50
-  - Entity: 12795004027127446226
+  - Entity: 15102010736816564428
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [-0.772602856, -3.24181962, 0]
+      Translation: [-2.82634497, -1.24864495, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 13049240162027793043
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [-0.322407246, -0.162031293, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 16405699056583819371
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [-1.7633512, -3.37734485, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        - Name: CheckDirectionThreshold
+          Type: Float
+          Data: 0
+        - Name: CollisionOnBottom
+          Type: Bool
+          Data: false
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 2077500851071126415
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [0.281425714, -2.29714203, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        - Name: CheckDirectionThreshold
+          Type: Float
+          Data: 0
+        - Name: CollisionOnBottom
+          Type: Bool
+          Data: false
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 2544599864472092315
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [1.85082138, -1.39037716, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50
+  - Entity: 13957864780229522697
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [-0.275163293, 1.34978044, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -124,7 +290,7 @@ Entities:
     CTag:
       Tag: Shikuro
     CTransform:
-      Translation: [-3.01288676, -3.86264873, 1]
+      Translation: [-2.70915604, -0.541231334, 1]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CMonoScript:
@@ -133,9 +299,18 @@ Entities:
         - Name: AccelFalling
           Type: Float
           Data: 0.200000003
-        - Name: JumpSpeed
+        - Name: CoyoteTime
           Type: Float
-          Data: 6
+          Data: 0.100000001
+        - Name: JumpBoost
+          Type: Float
+          Data: 4
+        - Name: MaxJumpPressTime
+          Type: Float
+          Data: 0.200000003
+        - Name: MinJumpSpeed
+          Type: Float
+          Data: 2
         - Name: Speed
           Type: Float
           Data: 3
@@ -235,9 +410,13 @@ Entities:
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [-0.41689384, 1.4442687, 0]
+      Translation: [3.40987587, 2.17655182, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
