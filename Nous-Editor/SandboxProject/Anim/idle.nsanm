@@ -51,7 +51,7 @@ States:
             VarName: x
             Compare: lt
             ValueType: Float
-            TargetValue: 0
+            TargetValue: -1
           Right:
             Type: Leaf
             VarName: onGround
@@ -110,7 +110,7 @@ States:
             VarName: x
             Compare: gt
             ValueType: Float
-            TargetValue: 0
+            TargetValue: 1
           Right:
             Type: Leaf
             VarName: onGround

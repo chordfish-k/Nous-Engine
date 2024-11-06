@@ -28,17 +28,12 @@ namespace Sandbox
         public float SpeedOnAirMul = 0.6f;
         public float AccelFalling = 0.2f;
         public float JumpSpeed = 1.0f;
-        private Vector2 velocity;
 
         private bool m_IsJumpKeyPress = false;
         private bool s_OnGround = false;
         private Direction s_OnWall = Direction.None;
 
         private Dictionary<ulong, Vector2> m_Collisions;
-
-        private bool m_PassingFromBottom = false;
-        private bool m_PassingFromTop = false;
-        private ulong m_LastPassingEntityID = 0;
 
         void OnCreate()
         {
@@ -58,7 +53,7 @@ namespace Sandbox
 
         void OnUpdate(float dt)
         {
-            velocity = m_Rigidbody.LinearVelocity;
+            Vector2 velocity = m_Rigidbody.LinearVelocity;
 
             if (Input.IsKeyDown(KeyCode.A))
             {
@@ -120,47 +115,6 @@ namespace Sandbox
             m_AnimPlayer.SetBool("onGround", s_OnGround);
 
             //NousConsole.Log($"x: {velocity.X}, y: {velocity.Y}, onGround: {s_OnGround}, onWall: {s_OnWall}");
-        }
-
-        void OnPreCollision(ulong otherID, Vector2 normal)
-        {
-            Entity otherEntity = new Entity(otherID);
-            if (otherEntity.Name == "Panel")
-            {
-                if (normal.Y == 1.0f)
-                {
-                    // 碰到顶
-                    m_PassingFromBottom = true;
-                    m_PassingFromTop = false;
-                    m_LastPassingEntityID = otherID;
-                }
-                if (normal.Y == -1.0f && Input.IsKeyDown(KeyCode.S))
-                {
-                    // 下落触底
-                    m_PassingFromTop = true;
-                    m_PassingFromBottom = false;
-                    m_LastPassingEntityID = otherID;
-                }
-
-                if (m_LastPassingEntityID == otherID)
-                {
-                    if (m_PassingFromBottom)
-                    {
-                        if (velocity.Y > 0.0f)
-                            Physics.DisableLastContact();
-                        else
-                            m_PassingFromBottom = false;
-                    }
-                    if (m_PassingFromTop)
-                    {
-                        if (velocity.Y < 0.0f)
-                            Physics.DisableLastContact();
-                        else
-                            m_PassingFromTop = false;
-                    }
-                } 
-            }
-            m_LastPassingEntityID = otherID;
         }
 
         void OnCollision(ulong otherID, Vector2 normal, bool enter)
