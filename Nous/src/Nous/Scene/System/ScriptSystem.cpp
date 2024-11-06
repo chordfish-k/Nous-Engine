@@ -77,7 +77,7 @@ namespace Nous
         }
 	}
 
-    void ScriptSystem::OnPreCollision(UUID A, UUID B, glm::vec2& normal)
+    void ScriptSystem::OnPreCollision(void* contactPtr, UUID A, UUID B, glm::vec2& normal)
     {
         if (!s_Scene)
             return;
@@ -85,8 +85,9 @@ namespace Nous
         auto entityIDB = s_Scene->GetEntityByUUID(B);
         Entity entityA = { entityIDA, s_Scene };
         Entity entityB = { entityIDB, s_Scene };
-        ScriptEngine::OnPreColliedWith(entityA, B, normal);
-        ScriptEngine::OnPreColliedWith(entityB, A, -normal);
+        
+        ScriptEngine::OnPreColliedWith(contactPtr, entityA, B, normal);
+        ScriptEngine::OnPreColliedWith(contactPtr, entityB, A, -normal);
     }
 
     void ScriptSystem::OnCollision(UUID A, UUID B, glm::vec2& normal, bool type)

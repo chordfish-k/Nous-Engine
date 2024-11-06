@@ -122,7 +122,7 @@ namespace Sandbox
             //NousConsole.Log($"x: {velocity.X}, y: {velocity.Y}, onGround: {s_OnGround}, onWall: {s_OnWall}");
         }
 
-        void OnPreCollision(ulong otherID, Vector2 normal)
+        void OnPreCollision(CollisionContact contact, ulong otherID, Vector2 normal)
         {
             Entity otherEntity = new Entity(otherID);
             if (otherEntity.Name == "Panel")
@@ -147,14 +147,14 @@ namespace Sandbox
                     if (m_PassingFromBottom)
                     {
                         if (velocity.Y > 0.0f)
-                            Physics.DisableLastContact();
+                            contact.Enable = false;
                         else
                             m_PassingFromBottom = false;
                     }
                     if (m_PassingFromTop)
                     {
                         if (velocity.Y < 0.0f)
-                            Physics.DisableLastContact();
+                            contact.Enable = false;
                         else
                             m_PassingFromTop = false;
                     }
@@ -179,6 +179,7 @@ namespace Sandbox
                     normal = m_Collisions[otherID];
                     m_Collisions.Remove(otherID);
                 }
+                s_OnGround = false;
             }
 
             // 检查是否在地面上

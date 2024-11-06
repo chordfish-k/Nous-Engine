@@ -181,7 +181,7 @@ namespace Nous
         ScriptSystem::OnCollision(idA, idB, normal, false);
     }
 
-    void Nous::ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+    void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
     {
         s_LastContact = contact;
 
@@ -194,6 +194,6 @@ namespace Nous
         contact->GetWorldManifold(&manifold);
         glm::vec2 normal = { manifold.normal.x, manifold.normal.y };
 
-        ScriptSystem::OnPreCollision(idA, idB, normal);
+        ScriptSystem::OnPreCollision(contact, idA, idB, normal);
     }
 }

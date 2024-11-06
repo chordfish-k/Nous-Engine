@@ -21,6 +21,7 @@
 #include "mono/metadata/reflection.h"
 
 #include <box2d/b2_body.h>
+#include <box2d/b2_contact.h>
 
 namespace Nous
 {
@@ -287,6 +288,16 @@ namespace Nous
 		PhysicsSystem::DisableLastContact();
 	}
 
+	static void Physics_Contact_SetEnable(b2Contact* contact, bool enable)
+	{
+		contact->SetEnabled(enable);
+	}
+
+	static bool Physics_Contact_IsEnable(b2Contact* contact)
+	{
+		return contact->IsEnabled();
+	}
+
 	// ×¢²á×é¼þ
 	template<typename... Component>
 	static void RegisterComponent()
@@ -354,5 +365,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
 		NS_ADD_INTERNAL_CALL(Physics_DisableLastContact);
+		NS_ADD_INTERNAL_CALL(Physics_Contact_IsEnable);
+		NS_ADD_INTERNAL_CALL(Physics_Contact_SetEnable);
 	}
 }

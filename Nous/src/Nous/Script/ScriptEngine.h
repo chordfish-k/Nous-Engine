@@ -100,7 +100,7 @@ namespace Nous
 		void InvokeOnCreate();
 		void InvokeOnStart();
 		void InvokeOnUpdate(float dt);
-		void InvokeOnPreCollision(UUID otherID, glm::vec2& normal);
+		void InvokeOnPreCollision(void* contactPtr, UUID otherID, glm::vec2& normal);
 		void InvokeOnCollision(UUID otherID, glm::vec2& normal, bool isEnter);
 
 		Ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
@@ -165,7 +165,7 @@ namespace Nous
 		static void OnCreateEntity(Entity entity);
 		static void OnStartEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
-		static void OnPreColliedWith(Entity entity, UUID otherID, glm::vec2& normal);
+		static void OnPreColliedWith(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);
 		static void OnColliedWith(Entity entity, UUID otherID, glm::vec2& normal, bool type); // type: enter / leave
 
 		static Scene* GetSceneContext();

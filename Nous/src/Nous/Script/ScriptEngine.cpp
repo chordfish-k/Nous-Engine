@@ -126,6 +126,7 @@ namespace Nous
 		std::filesystem::path AppAssemblyFilePath;
 
 		ScriptClass EntityClass;
+		ScriptClass CollisionContactClass;
 		
 		MonoObject* ConsoleTextWriterInstance = nullptr;
 
@@ -252,6 +253,7 @@ namespace Nous
 		LoadAppAssemblyClasses();
 
 		s_Data->EntityClass = ScriptClass("Nous", "Entity", true);
+		s_Data->CollisionContactClass = ScriptClass("Nous", "CollisionContact", true);
 
 		ScriptGlue::RegisterFunctions();
 		ScriptGlue::RegisterComponents();
@@ -393,13 +395,13 @@ namespace Nous
 		}
 	}
 
-	void ScriptEngine::OnPreColliedWith(Entity entity, UUID otherID, glm::vec2& normal)
+	void ScriptEngine::OnPreColliedWith(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal)
 	{
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
-			instance->InvokeOnPreCollision(otherID, normal);
+			instance->InvokeOnPreCollision(contactPtr, otherID, normal);
 		}
 	}
 
@@ -531,7 +533,7 @@ namespace Nous
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnStartMethod = scriptClass->GetMethod("OnStart", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
-		m_OnPreCollisionMethod = scriptClass->GetMethod("OnPreCollision", 2);
+		m_OnPreCollisionMethod = scriptClass->GetMethod("OnPreCollision", 3);
 		m_OnCollisionMethod = scriptClass->GetMethod("OnCollision", 3);
 
 		{
@@ -562,12 +564,16 @@ namespace Nous
 		}
 	}
 
-	void ScriptInstance::InvokeOnPreCollision(UUID otherID, glm::vec2& normal)
+	void ScriptInstance::InvokeOnPreCollision(void* contactPtr, UUID otherID, glm::vec2& normal)
 	{
 		if (!m_OnPreCollisionMethod)
 			return;
-		void* param[2] =
+
+		ClassWrapper contact{ contactPtr };
+
+		void* param[3] =
 		{
+			&contact,
 			&otherID,
 			&normal
 		};
