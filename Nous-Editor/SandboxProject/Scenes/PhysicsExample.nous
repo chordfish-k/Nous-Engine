@@ -4,7 +4,7 @@ Entities:
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [-0.196209431, -0.780967355, 0]
+      Translation: [-0.196209416, -0.946321607, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
     CSpriteRenderer:
@@ -21,7 +21,7 @@ Entities:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
-      Friction: 0.5
+      Friction: 1
       Restitution: 0
       RestitutionThreshold: 50
   - Entity: 1208148810121693870
@@ -45,7 +45,7 @@ Entities:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
-      Friction: 0.5
+      Friction: 1
       Restitution: 0
       RestitutionThreshold: 50
   - Entity: 15760434830325146853
@@ -124,7 +124,7 @@ Entities:
     CTag:
       Tag: Shikuro
     CTransform:
-      Translation: [-3.01288676, -3.9098928, -1]
+      Translation: [-3.01288676, -3.86264873, 1]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CMonoScript:
@@ -153,7 +153,7 @@ Entities:
       Offset: [0, -0.150000006]
       Size: [0.150000006, 0.349999994]
       Density: 10000
-      Friction: 1
+      Friction: 2
       Restitution: 1
       RestitutionThreshold: 50
     CAnimPlayer:
@@ -252,7 +252,7 @@ Entities:
       Offset: [0, 0]
       Size: [0.5, 0.5]
       Density: 1
-      Friction: 0.5
+      Friction: 1
       Restitution: 0
       RestitutionThreshold: 50
   - Entity: 16001182247238514678
