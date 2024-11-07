@@ -140,8 +140,13 @@ namespace Nous
 		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AssemblyReloadPending = false;
 
+		
+#if NS_RELEASE
+		bool EnableDebugging = false;
+#endif
+#if NS_DEBUG
 		bool EnableDebugging = true;
-
+#endif
 		// Runtime
 		Scene* SceneContext = nullptr;
 	};
@@ -167,7 +172,6 @@ namespace Nous
 	void ScriptEngine::Init()
 	{
 		s_Data = new ScriptEngineData();
-
 		InitMono();
 	}
 
@@ -179,7 +183,10 @@ namespace Nous
 	
 	void ScriptEngine::InitMono()
 	{
-		mono_set_assemblies_path("mono/lib");
+		//mono_set_assemblies_path("mono/lib");
+		// 如果有中文(unicode)路径
+		auto path = std::filesystem::current_path() / "mono/lib";
+		_putenv_s("MONO_PATH", path.generic_string().c_str());
 
 		// debug
 		if (s_Data->EnableDebugging)
@@ -192,8 +199,8 @@ namespace Nous
 			mono_jit_parse_options(2, (char**)argv);
 			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 		}
-
 		MonoDomain* rootDomain = mono_jit_init("NousJITRuntime");
+
 		NS_CORE_ASSERT(rootDomain);
 
 		// 存储这个 root domain 指针
@@ -226,11 +233,6 @@ namespace Nous
 
 		mono_domain_set(mono_get_root_domain(), false);
 
-		//if (s_Data->EnableDebugging)
-		//{
-		//	mono_debug_domain_unload(s_Data->RootDomain);
-		//	mono_debug_cleanup();
-		//}
 
 		if (s_Data && s_Data->AppDomain)
 		{
@@ -266,6 +268,7 @@ namespace Nous
 
 	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
+		NS_CORE_TRACE("加载dll: {}", filepath.string());
 		// 创建一个 app domain
 		s_Data->AppDomain = mono_domain_create_appdomain("NousScriptDomain", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
@@ -281,6 +284,7 @@ namespace Nous
 
 	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
+		NS_CORE_TRACE("加载dll: {}", filepath.string());
 		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
