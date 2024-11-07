@@ -1,0 +1,22 @@
+Name: IdleLeft
+Type: SpriteSheet
+ImageHandle: 6485004313021763567
+SheetWidth: 48
+SheetHeight: 48
+Frames:
+  - Index: 0
+    Duration: 0.2
+  - Index: 1
+    Duration: 0.2
+  - Index: 2
+    Duration: 0.2
+  - Index: 3
+    Duration: 0.2
+  - Index: 4
+    Duration: 0.2
+  - Index: 5
+    Duration: 0.2
+  - Index: 6
+    Duration: 0.2
+  - Index: 7
+    Duration: 0.2

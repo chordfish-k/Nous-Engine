@@ -44,5 +44,5 @@ group "Tools"
 group ""
 
 group "Misc"
-	include "SandBox"
+	include "Sandbox"
 group ""

@@ -1,0 +1,13 @@
+Scene: Untitled
+Entities:
+  - Entity: 450477536504913341
+    CTag:
+      Tag: Empty Entity
+    CTransform:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+      TextureHandle: 10548005792465007447
+      TilingFactor: 1

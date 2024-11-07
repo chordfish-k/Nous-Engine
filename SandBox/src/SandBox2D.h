@@ -1,27 +1,48 @@
 #pragma once
 
 #include "Nous.h"
+#include "ViewportPanel.h"
 
-class SandBox2D : public Nous::Layer
+namespace Nous
 {
-public:
-    SandBox2D();
-    virtual ~SandBox2D() = default;
+    class SandBox2D : public Layer
+    {
+    public:
+        SandBox2D();
+        virtual ~SandBox2D() = default;
 
-    virtual void OnAttached() override;
-    virtual void OnDetached() override;
+        virtual void OnAttached() override;
+        virtual void OnDetached() override;
 
-    virtual void OnUpdate(Nous::Timestep dt) override;
-    virtual void OnImGuiRender() override;
-    virtual void OnEvent(Nous::Event& event) override;
-private:
-    Nous::OrthoCameraController m_CameraController;
+        virtual void OnUpdate(Timestep dt) override;
+        virtual void OnImGuiRender() override;
+        virtual void OnEvent(Event& event) override;
+    private:
+        bool OpenProject();
+        void OpenProject(const std::filesystem::path& path);
 
-    Nous::Ref<Nous::VertexArray> m_SquareVA;
-    Nous::Ref<Nous::Shader> m_FlatColorShader;
-    Nous::Ref<Nous::Framebuffer> m_Framebuffer;
+        void OpenScene();
+        void OpenScene(AssetHandle handle);
 
-    Nous::Ref<Nous::Texture2D> m_MarioTexture, m_CheckerboardTexture;
+        void OnScenePlay();
 
-    glm::vec4 m_SquareColor = {0.2f, 0.3f, 0.8f, 1.0f};
-};
+    private:
+        Ref<Framebuffer> m_Framebuffer;
+        Ref<Scene> m_ActiveScene;
+        Ref<Scene> m_EditorScene;
+        std::filesystem::path m_EditorScenePath;
+
+        EditorCamera m_EditorCamera;
+
+        // 面板窗口
+        ViewportPanel m_ViewportPanel;
+
+        bool m_ShowPhysicsColliders = false;
+
+        enum class SceneState
+        {
+            Edit = 0, Play = 1, Simulate = 2 // 模拟：用编辑器的摄像机，不使用场景摄像机
+        };
+        SceneState m_SceneState = SceneState::Play;
+    };
+}
