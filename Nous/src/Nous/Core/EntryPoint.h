@@ -7,9 +7,18 @@
 
 extern Nous::Application* Nous::CreateApplication(ApplicationCommandLineArgs args);
 
+
 int main(int argc, char** argv)
 {
-    Nous::Log::Init();
+    bool toFile = false;
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--log") == 0)
+        {
+            toFile = true;
+        }
+    }
+    Nous::Log::Init(toFile);
 
     NS_PROFILE_BEGIN_SESSION("Startup", "Profile-Startup.json");
     auto app = Nous::CreateApplication({ argc, argv });
