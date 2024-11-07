@@ -161,6 +161,7 @@ namespace Nous
 
 		static bool LoadAssembly(const std::filesystem::path& filepath);
 		static bool LoadAppAssembly(const std::filesystem::path& filepath);
+		static std::vector<std::string> FindDependencies();
 
 		static void ReloadAssembly();
 

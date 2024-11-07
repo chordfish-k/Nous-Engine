@@ -8,6 +8,7 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/mono-debug.h>
 #include <mono/metadata/threads.h>
+#include <mono/metadata/image.h>
 
 #include <FileWatch.h>
 
@@ -18,6 +19,7 @@
 #include "Nous/Core/FileSystem.h"
 #include "Nous/Project/Project.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <set>
 
 namespace Nous
 {
@@ -108,8 +110,6 @@ namespace Nous
 
 			return it->second;
 		}
-
-		
 	}
 
 	struct ScriptEngineData
@@ -295,6 +295,19 @@ namespace Nous
 		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
 		return true;
+	}
+
+	std::vector<std::string> ScriptEngine::FindDependencies()
+	{
+		static std::vector<std::string> res;
+		res.clear();
+		MonoFunc func = [](void* assembly, void* user_data) {
+			MonoImage* image = mono_assembly_get_image((MonoAssembly*)assembly);
+			const char* name = mono_image_get_name(image);
+			res.emplace_back(name);
+		};
+		mono_assembly_foreach(func, nullptr);
+		return res;
 	}
 
 	void ScriptEngine::ReloadAssembly()
