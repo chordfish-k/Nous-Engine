@@ -16,7 +16,7 @@ namespace Nous {
     class Log
     {
     public:
-        static void Init();
+        static void Init(bool toFile = false);
 
         static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
         static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }

@@ -29,7 +29,6 @@ namespace Sandbox
             {
                 if (normal.Y >= CheckDirectionThreshold)
                 {
-                    NousConsole.Log($"{normal.Y}");
                     IsDisable = true;
                 }
             }
@@ -38,12 +37,9 @@ namespace Sandbox
                 
                 if (normal.Y <= -CheckDirectionThreshold)
                 {
-                    NousConsole.Log($"{normal.Y}");
                     IsDisable = true;
                 }
             }
-
-
 
             if (IsDisable)
                 contact.Enable = false;

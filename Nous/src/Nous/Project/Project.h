@@ -22,6 +22,7 @@ namespace Nous
 	{
 	public:
 		const std::filesystem::path& GetProjectDirectory() { return m_ProjectDirectory; }
+		const std::filesystem::path& GetProjectFilePath() { return m_ProjectFilePath; }
 		std::filesystem::path GetAssetDirectory() { return GetProjectDirectory() / s_ActiveProject->m_Config.AssetDirectory; }
 		std::filesystem::path GetAssetRegistryPath() { return GetAssetDirectory() / s_ActiveProject->m_Config.AssetRegistryPath; }
 		// 将来移动到资产管理器
@@ -33,6 +34,12 @@ namespace Nous
 		{
 			NS_CORE_ASSERT(s_ActiveProject);
 			return s_ActiveProject->GetProjectDirectory();
+		}
+
+		static const std::filesystem::path& GetActiveProjectFilePath()
+		{
+			NS_CORE_ASSERT(s_ActiveProject);
+			return s_ActiveProject->GetProjectFilePath();
 		}
 
 		static std::filesystem::path GetActiveAssetDirectory()
@@ -66,9 +73,12 @@ namespace Nous
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool SaveActive(const std::filesystem::path& path);
 
+		static void ExportProject();
+
 	private:
 		ProjectConfig m_Config;
 		std::filesystem::path m_ProjectDirectory;
+		std::filesystem::path m_ProjectFilePath;
 		Ref<AssetManagerBase> m_AssetManager;
 
 		inline static Ref<Project> s_ActiveProject;

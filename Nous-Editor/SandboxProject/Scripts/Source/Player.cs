@@ -206,9 +206,10 @@ namespace Sandbox
             }
 
             // 检查是否在墙上
-            if (Math.Abs(normal.X) > 0 && !isPanel || isPanel && Math.Abs(Velocity.Y) < 0.1f)
+            if (Math.Abs(normal.X) > 0 && !isPanel/* || isPanel && Math.Abs(Velocity.Y) < 0.1f*/)
             {
                 m_OnWallDir = normal.X < 0 ? Direction.Left : Direction.Right;
+                NousConsole.Log($"? {normal.X} {normal.Y}");
             }
         }
 

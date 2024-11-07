@@ -152,6 +152,9 @@ namespace Nous
                 if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
                     OpenProject();
 
+                if (ImGui::MenuItem("Export...", "", false, m_ActiveScene && !m_ActiveScene->IsRunning()))
+                    Export();
+
                 ImGui::Separator();
 
                 // 新建场景
@@ -499,6 +502,11 @@ namespace Nous
     void EditorLayer::SaveProject()
     {
         // Project::SaveActive();
+    }
+
+    void EditorLayer::Export()
+    {
+        Project::ExportProject();
     }
 
     void EditorLayer::NewScene()

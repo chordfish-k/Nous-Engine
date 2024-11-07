@@ -1,94 +1,185 @@
 #include "SandBox2D.h"
+
+#include "Nous/Asset/AssetManager.h"
+#include "Nous/Utils/PlatformUtils.h"
+#include "Nous/Script/ScriptEngine.h"
+#include "DockingSpace.h"
+
 #include "imgui/imgui.h"
-
 #include <glm/gtc/type_ptr.hpp>
-
 #include <chrono>
 
-SandBox2D::SandBox2D()
-    : Layer("SandBox2D"), m_CameraController(1280.0f / 720.0f)
+namespace Nous
 {
-}
+    static Ref<Font> s_Font;
 
-void SandBox2D::OnAttached()
-{
-    NS_PROFILE_FUNCTION();
-
-    m_MarioTexture = Nous::Texture2D::Create("assets/textures/Mario.png");
-    m_CheckerboardTexture = Nous::Texture2D::Create("assets/textures/Checkerboard.png");
-
-    Nous::FramebufferSpecification fbSpec = {};
-    fbSpec.Width = 1280;
-    fbSpec.Height = 720;
-    m_Framebuffer = Nous::Framebuffer::Create(fbSpec);
-}
-
-void SandBox2D::OnDetached()
-{
-    NS_PROFILE_FUNCTION();
-}
-
-static float fps = 0.0f;
-
-void SandBox2D::OnUpdate(Nous::Timestep dt)
-{
-    NS_PROFILE_FUNCTION();
-
-    fps = 1.0f / dt;
-
-    // Update
-    m_CameraController.OnUpdate(dt);
-
-    // Render
-    Nous::Renderer2D::ResetStats();
+    SandBox2D::SandBox2D()
+        : Layer("SandBox2D")
     {
-        NS_PROFILE_SCOPE("Render Prepare");
-        Nous::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
-        Nous::RenderCommand::Clear();
+        s_Font = Font::GetDefault();
     }
+
+    void SandBox2D::OnAttached()
     {
-        NS_PROFILE_SCOPE("Render Draw");
+        NS_PROFILE_FUNCTION();
 
-        Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
-        Nous::Renderer2D::DrawQuad({-1.0f, 0.0f}, {0.8f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
-        Nous::Renderer2D::DrawQuad({4.8f, -0.5f, -0.1f}, {0.5f, 0.75f}, {0.2f, 0.3f, 0.8f, 1.0f});
-        Nous::Renderer2D::DrawQuad({0.0f, 0.0f, -0.1f}, {10.0f, 10.0f}, m_MarioTexture, 10.0f);
-        Nous::Renderer2D::DrawRotatedQuad({0.0f, 0.0f, 0.1f}, {1.0f, 1.0f}, 30.0, m_MarioTexture, 20.0f);
-        Nous::Renderer2D::EndScene();
+        FramebufferSpecification fbSpec;
+        fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
+        fbSpec.Width = 1280;
+        fbSpec.Height = 720;
+        //fbSpec.Samples = 4;
+        m_Framebuffer = Framebuffer::Create(fbSpec);
 
-        Nous::Renderer2D::BeginScene(m_CameraController.GetCamera());
-        const float width = 0.5f;
-        for (float y = -5.0f; y < 5.0f; y += width)
+        m_EditorScene = CreateRef<Scene>();
+        m_ActiveScene = m_EditorScene;
+
+
+        // 根据命令行参数打开场景
+        auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
+        if (commandLineArgs.Count > 1)
         {
-            for (float x = -5.0f; x < 5.0f; x += width)
+            auto projectFilePath = commandLineArgs[1];
+            OpenProject(projectFilePath);
+        }
+        else
+        {
+            // TODO 选择一个文件夹
+            // NewProject();
+            // 如果没有打开的项目，直接关闭程序
+            if (!OpenProject())
+                Application::Get().Close();
+        }
+
+        m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+
+        Renderer2D::SetLineWidth(4.0f);
+
+        m_ViewportPanel.SetFramebuffer(m_Framebuffer);
+        m_ViewportPanel.SetEditorCamera(&m_EditorCamera);
+    }
+
+    void SandBox2D::OnDetached()
+    {
+        NS_PROFILE_FUNCTION();
+    }
+
+
+    void SandBox2D::OnUpdate(Timestep dt)
+    {
+        NS_PROFILE_FUNCTION();
+
+        auto viewportSize = m_ViewportPanel.GetSize();
+        m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+
+        // Resize
+        auto spec = m_Framebuffer->GetSpecification();
+        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
+            (spec.Width != (uint32_t)viewportSize.x ||
+                spec.Height != (uint32_t)viewportSize.y))
+        {
+            m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+            m_EditorCamera.SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        }
+
+        // Update
+        m_EditorCamera.OnUpdate(dt);
+
+        m_Framebuffer->Bind();
+
+        // Clear
+        Renderer2D::ResetStats();
+        RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+        RenderCommand::Clear(); // 会把entity ID 附件也统一设置成这个值
+        m_Framebuffer->ClearAttachment(1, -1); // 设置 entity ID 附件的值为 -1
+
+        // Render
+        
+
+        m_ActiveScene->OnUpdateRuntime(dt);
+
+        // Postprocess
+        m_ViewportPanel.CheckHoveredEntity();
+
+        m_Framebuffer->Unbind();
+    }
+
+    void SandBox2D::OnImGuiRender()
+    {
+        NS_PROFILE_FUNCTION();
+
+        DockingSpace::BeginDocking();
+        // Viewport
+        m_ViewportPanel.OnImGuiRender();
+
+        DockingSpace::EndDocking();
+    }
+
+
+    void SandBox2D::OnEvent(Event& e)
+    {
+        m_ViewportPanel.OnEvent(e);
+    }
+
+    bool SandBox2D::OpenProject()
+    {
+        std::string filepath = FileDialogs::OpenFile("Nous Project (*.nsproj)\0*.nsproj\0");
+        if (filepath.empty())
+            return false;
+
+        OpenProject(filepath);
+        return true;
+    }
+
+    void SandBox2D::OpenProject(const std::filesystem::path& path)
+    {
+        if (Project::Load(path))
+        {
+            ScriptEngine::InitApp();
+
+            AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
+            if (startScene)
             {
-                glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.5f};
-                Nous::Renderer2D::DrawQuad({x, y}, {width, width}, color);
+                OpenScene(startScene);
             }
         }
-        Nous::Renderer2D::EndScene();
     }
-}
-
-void SandBox2D::OnImGuiRender()
-{
-    NS_PROFILE_FUNCTION();
 
 
-    ImGui::Begin("Settings");
+    void SandBox2D::OpenScene()
+    {
+        // TODO
+        /*std::string filepath = FileDialogs::OpenFile("Nous Scene (*nous)\0*.nous\0");
+        if (!filepath.empty())
+            OpenScene(filepath);*/
+    }
 
-    auto stats = Nous::Renderer2D::GetStats();
-    ImGui::Text("Renderer2D Stats:");
-    ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-    ImGui::Text("Quads: %d", stats.QuadCount);
-    ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-    ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-    ImGui::Text("FPS: %.2f", fps);
+    void SandBox2D::OpenScene(AssetHandle handle)
+    {
+        NS_CORE_ASSERT(handle);
 
-    ImGui::End();
-}
 
-void SandBox2D::OnEvent(Nous::Event& e)
-{
-    m_CameraController.OnEvent(e);
+        Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(handle);
+        Ref<Scene> newScene = Scene::Copy(readOnlyScene);
+
+        m_EditorScene = newScene;
+        m_ViewportPanel.SetContext(m_EditorScene);
+
+        m_ActiveScene = m_EditorScene;
+        m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetFilePath(handle);
+
+        m_EditorCamera.Reset();
+
+        OnScenePlay();
+    }
+
+
+    void SandBox2D::OnScenePlay()
+    {
+        m_SceneState = SceneState::Play;
+
+        m_ActiveScene = Scene::Copy(m_EditorScene); // 复制一个副本来运行
+        m_ActiveScene->OnRuntimeStart();
+
+        m_ViewportPanel.SetContext(m_ActiveScene);
+    }
 }

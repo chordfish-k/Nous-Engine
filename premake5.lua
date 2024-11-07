@@ -43,6 +43,7 @@ group "Tools"
 	include "Nous-Editor"
 group ""
 
---group "Misc"
-	--include "SandBox"
---group ""
+group "Misc"
+	include "Sandbox"
+group ""
+

@@ -11,7 +11,6 @@ namespace Nous {
         Sandbox(const ApplicationSpecification& specification)
             : Application(specification)
         {
-//        PushLayer(new ExampleLayer());
             PushLayer(new SandBox2D());
         }
 
@@ -26,7 +25,12 @@ namespace Nous {
     {
         ApplicationSpecification spec;
         spec.Name = "Sandbox";
+#if NS_RELEASE
+        spec.WorkingDirectory = ".";
+#endif
+#if NS_DEBUG
         spec.WorkingDirectory = "../Nous-Editor";
+#endif
         spec.CommandLineArgs = args;
 
         return new Sandbox(spec);
