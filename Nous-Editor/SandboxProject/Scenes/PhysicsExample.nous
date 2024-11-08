@@ -7,6 +7,7 @@ Entities:
       Translation: [-0.479842871, -3.10525775, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
+      Children: [15818029497235824307]
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:

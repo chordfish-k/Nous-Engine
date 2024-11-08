@@ -200,6 +200,14 @@ namespace Nous {
             out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
             out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 
+            // Children
+            out << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
+            for (auto& uid : tc.Children)
+            {
+                out << (uint64_t) uid;
+            }
+            out << YAML::EndSeq;
+
             out << YAML::EndMap; // CTransform
         }
 
@@ -459,6 +467,15 @@ namespace Nous {
                 tc.Translation = transformComponent["Translation"].as<glm::vec3>();
                 tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+
+                auto& children = transformComponent["Children"];
+                if (children && children.IsSequence())
+                {
+                    for (auto& id : children)
+                    {
+                        tc.Children.push_back(id.as<uint64_t>());
+                    }
+                }
             }
 
             auto cameraComponent = entity["CCamera"];

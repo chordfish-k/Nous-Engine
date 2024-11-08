@@ -29,7 +29,6 @@ namespace Nous {
     void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
     {
         m_Context = scene;
-        //m_Context->SetSelectedEntity({});
     }
 
     void SceneHierarchyPanel::OnImGuiRender()
@@ -39,10 +38,9 @@ namespace Nous {
         if (m_Context)
         {
             m_Context->m_Registry.each([&](auto entityID)
-                                       {
-                                           Entity entity{entityID, m_Context.get()};
-                                           DrawEntityNode(entity);
-                                       });
+            {
+                DrawEntityNode(entityID);
+            });
 
             if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
                 m_Context->SetSelectedEntity({});
@@ -64,12 +62,17 @@ namespace Nous {
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::DrawEntityNode(Entity entity)
+    void SceneHierarchyPanel::DrawEntityNode(entt::entity entityID)
     {
+        Entity entity{ entityID, m_Context.get() };
         auto& tag = entity.GetComponent<CTag>();
+        auto& transform = entity.GetComponent<CTransform>();
 
-        ImGuiTreeNodeFlags flags = ((m_Context->GetSelectedEntity() == entity) ? ImGuiTreeNodeFlags_Selected : 0)|ImGuiTreeNodeFlags_OpenOnArrow;
-        flags |= ImGuiTreeNodeFlags_SpanAvailWidth; // 让一整行TreeNode都能够被点击
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;// 让一整行TreeNode都能够被点击
+        if (m_Context->GetSelectedEntity() == entity) flags |= ImGuiTreeNodeFlags_Selected;
+        if (transform.Children.size() > 0) flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+        else flags |= ImGuiTreeNodeFlags_Leaf;
+
         bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
         if (ImGui::IsItemClicked())
         {
@@ -88,13 +91,19 @@ namespace Nous {
 
         if (opened)
         {
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-
+            /*ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
             bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
             if (opened)
             {
                 ImGui::TreePop();
+            }*/
+            
+            for (auto& uid : transform.Children)
+            {
+                Entity entityChild = m_Context->GetEntityByUUID(uid);
+                DrawEntityNode(entityChild);
             }
+
             ImGui::TreePop();
         }
 

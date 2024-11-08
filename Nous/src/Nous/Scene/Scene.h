@@ -15,6 +15,8 @@ namespace Nous {
 
     class Entity;
 
+    struct CTransform;
+
     class Scene : public Asset
     {
     public:

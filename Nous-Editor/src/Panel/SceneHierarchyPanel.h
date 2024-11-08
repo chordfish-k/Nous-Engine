@@ -19,7 +19,7 @@ namespace Nous {
         template<typename T>
         void DisplayAddComponentEntry(const std::string& entryName);
 
-        void DrawEntityNode(Entity entity);
+        void DrawEntityNode(entt::entity entityID);
         void DrawComponents(Entity entity);
     private:
         Ref<Scene> m_Context;
