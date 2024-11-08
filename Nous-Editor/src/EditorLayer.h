@@ -18,6 +18,7 @@ namespace Nous {
     {
     public:
         EditorLayer();
+        EditorLayer(Application* application, const ApplicationSpecification& spec);
         virtual ~EditorLayer() = default;
 
         virtual void OnAttached() override;

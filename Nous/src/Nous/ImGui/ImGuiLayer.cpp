@@ -16,8 +16,8 @@
 
 namespace Nous {
 
-    ImGuiLayer::ImGuiLayer()
-        : Layer("ImgGuiLayer")
+    ImGuiLayer::ImGuiLayer(Application* application, const std::string& configFilepath)
+        : Layer(application, "ImgGuiLayer"), m_ConfigFilepath(configFilepath)
     {
     }
 
@@ -34,7 +34,7 @@ namespace Nous {
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         (void) io;
-        io.IniFilename = "imgui.ini";
+        io.IniFilename = m_ConfigFilepath.c_str();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking

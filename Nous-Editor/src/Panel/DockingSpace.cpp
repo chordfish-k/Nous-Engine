@@ -6,7 +6,7 @@
 
 namespace Nous {
 
-    void DockingSpace::BeginDocking()
+    void DockingSpace::BeginDocking(bool hasMenuBar)
     {
         static bool p_open = true;
         static bool opt_fullscreen = true;
@@ -15,7 +15,9 @@ namespace Nous {
 
         // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
         // because it would be confusing to have two docking targets within each others.
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar|ImGuiWindowFlags_NoDocking;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+        if (hasMenuBar)
+            window_flags |= ImGuiWindowFlags_MenuBar;
         if (opt_fullscreen)
         {
             ImGuiViewport* viewport = ImGui::GetMainViewport();

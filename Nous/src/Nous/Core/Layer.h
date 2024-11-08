@@ -6,10 +6,12 @@
 
 namespace Nous {
 
+    class Application;
+
     class Layer
     {
     public:
-        Layer(const std::string& name = "Layer");
+        Layer(Application* application, const std::string& name = "Layer");
         virtual ~Layer();
 
         virtual void OnAttached() {};
@@ -22,6 +24,7 @@ namespace Nous {
 
     protected:
         std::string m_DebugName;
+        Application* m_Application = nullptr;
     };
 
 }

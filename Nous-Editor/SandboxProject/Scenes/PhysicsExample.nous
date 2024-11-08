@@ -410,7 +410,7 @@ Entities:
     CTag:
       Tag: Panel
     CTransform:
-      Translation: [3.40987587, 2.17655182, 0]
+      Translation: [2.6186676, 2.06666136, 0]
       Rotation: [0, 0, 0]
       Scale: [1.31410885, 0.121454932, 1]
     CMonoScript:

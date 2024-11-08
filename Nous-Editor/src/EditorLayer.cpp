@@ -1,5 +1,6 @@
 ﻿#include "EditorLayer.h"
 
+#include "Nous/Core/Application.h"
 #include "Nous/Utils/PlatformUtils.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Renderer/Font.h"
@@ -18,10 +19,16 @@ namespace Nous
     static Ref<Font> s_Font;
 
     EditorLayer::EditorLayer()
-        : Layer("EditorLayer")
+        : Layer(nullptr, "EditorLayer")
     {
         EditorEventEmitter::AddObserver(this);
+        s_Font = Font::GetDefault();
+    }
 
+    EditorLayer::EditorLayer(Application* application, const ApplicationSpecification& spec)
+        : Layer(application, "EditorLayer")
+    {
+        EditorEventEmitter::AddObserver(this);
         s_Font = Font::GetDefault();
     }
 

@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "Layer.h"
 
-Nous::Layer::Layer(const std::string& name)
-        :m_DebugName(name)
+#include "Application.h"
+
+Nous::Layer::Layer(Application* application, const std::string& name)
+        : m_Application(application), m_DebugName(name)
 {
 }
 

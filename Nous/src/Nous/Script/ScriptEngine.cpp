@@ -215,6 +215,9 @@ namespace Nous
 
 	void ScriptEngine::ShutdownMono()
 	{
+		if (!s_Data)
+			return;
+
 		mono_domain_set(mono_get_root_domain(), false);
 
 		if (s_Data->AppDomain)
