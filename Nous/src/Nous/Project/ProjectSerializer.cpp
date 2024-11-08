@@ -19,12 +19,12 @@ namespace Nous
 		{
 			out << YAML::BeginMap; // Root;
 			{
-				out << YAML::BeginMap; // Project
+				out << YAML::Key << "Project" << YAML::Value <<  YAML::BeginMap; // Project
 				out << YAML::Key << "Name" << YAML::Value << config.Name;
 				out << YAML::Key << "StartScene" << YAML::Value << (uint64_t)config.StartScene;
-				out << YAML::Key << "AssetDirectory" << YAML::Value << config.AssetDirectory.string();
-				out << YAML::Key << "AssetRegistryPath" << YAML::Value << config.AssetRegistryPath.string();
-				out << YAML::Key << "ScriptModulePath" << YAML::Value << config.ScriptModulePath.string();
+				out << YAML::Key << "AssetDirectory" << YAML::Value << config.AssetDirectory.generic_string();
+				out << YAML::Key << "AssetRegistryPath" << YAML::Value << config.AssetRegistryPath.generic_string();
+				out << YAML::Key << "ScriptModulePath" << YAML::Value << config.ScriptModulePath.generic_string();
 				out << YAML::EndMap; // Project
 			}
 			out << YAML::EndMap; // Root;

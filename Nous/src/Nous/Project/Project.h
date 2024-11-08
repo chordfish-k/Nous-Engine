@@ -70,8 +70,10 @@ namespace Nous
 		Ref<EditorAssetManager> GetEditorAssetManager() { return std::static_pointer_cast<EditorAssetManager>(m_AssetManager); };
 
 		static Ref<Project> New();
+		static Ref<Project> New(const std::filesystem::path& path);
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool SaveActive(const std::filesystem::path& path);
+		static bool SaveNew(Ref<Project> project);
 
 		static void ExportProject();
 
