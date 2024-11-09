@@ -131,6 +131,27 @@ namespace Nous {
 
     void Scene::DestroyEntity(Entity entity)
     {
+        // 递归删除子节点
+        UUID uid = entity.GetUUID();
+        auto& transform = entity.GetTransform();
+        for (auto& chUid : transform.Children)
+        {
+            DestroyEntity(GetEntityByUUID(chUid));
+        }
+        // 从父节点删除自身
+        if (transform.Parent)
+        {
+            auto& pTr = GetEntityByUUID(transform.Parent).GetTransform();
+            auto& it = std::find(pTr.Children.begin(), pTr.Children.end(), uid);
+            if (it != pTr.Children.end())
+            {
+                pTr.Children.erase(it);
+            }
+        }
+        else
+        {
+            m_RootEntityMap.erase(uid);
+        }
         m_EntityMap.erase(entity.GetUUID());
         m_Registry.destroy(entity);
     }

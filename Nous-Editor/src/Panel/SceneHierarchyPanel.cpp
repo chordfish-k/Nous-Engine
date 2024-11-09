@@ -37,6 +37,15 @@ namespace Nous {
 
         if (m_Context)
         {
+            float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+            if (ImGui::Button("Create Entity", { ImGui::GetContentRegionAvailWidth(), lineHeight }))
+            {
+                Entity entity = m_Context->CreateEntity("Empty Entity");
+                m_Context->m_RootEntityMap[entity.GetUUID()] = entity;
+                m_Context->SetSelectedEntity(entity);
+            }
+
+            ImGui::BeginChild("Nodes");
             for (auto& [uuid, entityID] : m_Context->m_RootEntityMap)
             {
                 if (DrawEntityNode(entityID))
@@ -45,16 +54,7 @@ namespace Nous {
 
             if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
                 m_Context->SetSelectedEntity({});
-
-            if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
-            {
-                if (ImGui::MenuItem("Create Empty Entity"))
-                {
-                   Entity entity = m_Context->CreateEntity("Empty Entity");
-                   m_Context->m_RootEntityMap[entity.GetUUID()] = entity;
-                }
-                ImGui::EndPopup();
-            }
+            ImGui::EndChild();
         }
         ImGui::End();
 
@@ -166,6 +166,7 @@ namespace Nous {
             m_Context->DestroyEntity(entity);
             if (m_Context->GetSelectedEntity() == entity)
                 m_Context->SetSelectedEntity({});
+            changed = true;
         }
 
         return changed;

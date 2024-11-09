@@ -188,9 +188,9 @@ namespace Nous
 
             // ÖØÐ´ DrawCircle ·½·¨
             void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override {
-                const int segments = 16;
+                constexpr const int segments = 16;
+                constexpr float angleStep = 2.0f * glm::pi<float>() / segments;
                 glm::vec4 glmColor = { color.r, color.g, color.b, color.a };
-                float angleStep = 2.0f * glm::pi<float>() / segments;
 
                 for (int i = 0; i < segments; ++i) {
                     float angle0 = i * angleStep;
