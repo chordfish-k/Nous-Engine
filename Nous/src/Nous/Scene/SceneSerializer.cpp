@@ -396,7 +396,6 @@ namespace Nous {
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
-        out << YAML::Key << "Scene" << YAML::Value << "Untitled";
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
         m_Scene->m_Registry.each([&](auto entityID){
             Entity entity = { entityID, m_Scene.get() };
@@ -431,11 +430,7 @@ namespace Nous {
             return false;
         }
 
-        if (!data["Scene"])
-            return false;
-
-        std::string sceneName = data["Scene"].as<std::string>();
-        NS_CORE_TRACE("正在解析场景文件 '{0}'", sceneName);
+        NS_CORE_TRACE("正在解析场景文件 '{0}'", filepath);
 
         auto entities = data["Entities"];
         if (!entities)
