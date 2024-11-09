@@ -110,6 +110,7 @@ namespace Nous
                 // Entity Transform
                 auto& tc = selectedEntity.GetComponent<CTransform>();
                 auto transform = tc.GetTransform();
+                transform = tc.ParentTransform * transform;
 
                 // Snapping 吸附
                 bool snap = Input::IsKeyPressed(Key::LeftControl);
@@ -129,7 +130,7 @@ namespace Nous
                     }
                     ImGuizmo::SetOrthographic(m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic);
                     ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                        (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+                        (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::WORLD, glm::value_ptr(transform),
                         nullptr, snap ? snapValues : nullptr);
                 }
 
@@ -142,7 +143,7 @@ namespace Nous
                 if (ImGuizmo::IsUsing() && m_ShowGizmo)
                 {
                     glm::vec3 translation, rotation, scale;
-                    glm::mat4 tr = transform;
+                    glm::mat4 tr = glm::inverse(tc.ParentTransform) * transform;
                     ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(tr), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
 
                     if (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE)

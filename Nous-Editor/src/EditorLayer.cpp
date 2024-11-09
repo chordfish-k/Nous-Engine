@@ -12,7 +12,12 @@
 #include "Panel/DockingSpace.h"
 #include "Event/EditorEvent.h"
 
+#include "Nous/Scene/System/PhysicsSystem.h"
+
 #include <imgui/imgui.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Nous 
 {
@@ -83,6 +88,9 @@ namespace Nous
     }
 
     static float fps = 0.0f;
+    static float fpsTotal = 0.0f;
+    static constexpr float fpsCC = 50;
+    static float fpsC = fpsCC;
 
     void EditorLayer::OnUpdate(Timestep dt)
     {
@@ -91,7 +99,17 @@ namespace Nous
         auto viewportSize = m_ViewportPanel.GetSize();
         m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 
-        fps = 1.0f / dt;
+        {
+            fpsC--;
+            fpsTotal += dt;
+            if (fpsC == 0)
+            {
+                fps = fpsCC / fpsTotal;
+                fpsC = fpsCC;
+                fpsTotal = 0.0f;
+            }
+        }
+        
 
         // Resize
         auto spec = m_Framebuffer->GetSpecification();
@@ -213,21 +231,20 @@ namespace Nous
         m_AnimMachineEditorPanel.OnImGuiRender();
 
         ImGui::Begin("Settings");
-        ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
-#if 0
-        ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512, 512 }, { 0, 1 }, { 1, 0 });
-#endif
+        ImGui::Checkbox("Show physics colliders (Editor)", &m_ShowPhysicsColliders);
+        if (ImGui::Checkbox("Show physics colliders (Runtime)", &m_ShowRuntimePhysicsColliders))
+        {
+            PhysicsSystem::EnableDebugDraw(m_ShowRuntimePhysicsColliders);
+        }
+        static bool useVSync = Application::Get().GetWindow().IsVSync();
+        if (ImGui::Checkbox("VSync", &useVSync))
+        {
+            Application::Get().GetWindow().SetVSync(useVSync);
+        }
         ImGui::End();
 
         // Properties
         ImGui::Begin("Stats");
-
-#if 0
-        std::string name = "None";
-        if (m_ViewportPanel.GetHoveredEntity())
-            name = m_ViewportPanel.GetHoveredEntity().GetComponent<CTag>().Tag;
-        ImGui::Text("Hovered Entity: %s", name.c_str());
-#endif
 
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -436,16 +453,23 @@ namespace Nous
                 for (auto entity: view)
                 {
                     auto [tc, bc2d] = view.get<CTransform, CBoxCollider2D>(entity);
+                    auto worldTrans = tc.ParentTransform * tc.GetTransform();
 
-                    //glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
-                    glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
+                    // 世界坐标系矩阵结算
+                    glm::vec3 scale, rotation, translation, _;
+                    glm::vec4 __;
+                    glm::quat orientation;
+                    glm::decompose(worldTrans, scale, orientation, translation, _, __);
+                    rotation = glm::eulerAngles(orientation);
+
+                    scale = tc.Scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
 
                     glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
                         * glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
                         * glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.Offset, 0.001f))
                         * glm::scale(glm::mat4(1.0f), scale);
 
-                    Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
+                    Renderer2D::DrawRect(tc.ParentTransform * transform, glm::vec4(0, 1, 0, 1));
                 }
             }
 
@@ -472,7 +496,7 @@ namespace Nous
         if ((selectedEntity = m_ActiveScene->GetSelectedEntity()) && !m_ActiveScene->IsRunning()) {
             const CTransform& transform = selectedEntity.GetComponent<CTransform>();
             // Orange
-            Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+            Renderer2D::DrawRect(transform.ParentTransform * transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
         }
 
         Renderer2D::EndScene();

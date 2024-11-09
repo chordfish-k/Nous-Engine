@@ -13,6 +13,7 @@
 #include "Nous/Scene/System/PhysicsSystem.h"
 #include "Nous/Scene/System/ScriptSystem.h"
 #include "Nous/Scene/System/AnimSystem.h"
+#include "Nous/Scene/System/TransformSystem.h"
 
 #include <glm/glm.hpp>
 
@@ -86,8 +87,14 @@ namespace Nous {
             // 复制 Entity 到新场景
             UUID uuid = srcSceneRegistry.get<CUuid>(e).ID;
             const auto& name = srcSceneRegistry.get<CTag>(e).Tag;
+            auto parent = srcSceneRegistry.get<CTransform>(e).Parent;
             Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
             enttMap[uuid] = (entt::entity)newEntity;
+
+            if (parent == 0)
+            {
+                newScene->m_RootEntityMap[uuid] = (entt::entity)newEntity;
+            }
 
             if (selected && e == selected)
                 newScene->m_SelectedEntityID = (entt::entity)newEntity;
@@ -132,6 +139,8 @@ namespace Nous {
     {
         m_IsRunning = true;
 
+        TransformSystem::Update(this);
+
         ScriptSystem::Start(this);
         PhysicsSystem::Start(this);
         AnimSystem::Start(this);
@@ -150,6 +159,8 @@ namespace Nous {
 
     void Scene::OnSimulationStart()
     {
+        // 初始化物理系统之前更新各个transform的世界坐标系矩阵
+        TransformSystem::Update(this);
         PhysicsSystem::Start(this);
     }
 
@@ -166,7 +177,8 @@ namespace Nous {
             PhysicsSystem::Update(dt);
             AnimSystem::Update(dt);
         }
-
+        // 物理系统更新之后，实际渲染之前，更新各个transform的世界坐标系矩阵
+        TransformSystem::Update(this);
         RenderSystem::Update(dt);
     }
 
@@ -176,13 +188,15 @@ namespace Nous {
         {
             PhysicsSystem::Update(dt);
         }
-
+        TransformSystem::Update(this);
         // 渲染
         RenderSystem::Update(dt, &camera);
     }
 
     void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
     {
+        
+        TransformSystem::Update(this);
         // 渲染
         RenderSystem::Start(this);
         RenderSystem::Update(dt, &camera);

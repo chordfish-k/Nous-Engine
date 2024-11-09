@@ -16,6 +16,9 @@ namespace Nous
 
 	void RenderSystem::Update(Timestep dt, EditorCamera* camera)
 	{
+        if (!s_Scene)
+            return;
+
         // 2DäÖÈ¾
         Camera* mainCamera = camera;
         glm::mat4 cameraTransform;
@@ -46,12 +49,12 @@ namespace Nous
 
             // Sprites
             {
-                auto group = s_Scene->GetAllEntitiesWith<CTransform, CSpriteRenderer>();
-                for (auto ent : group)
+                auto view = s_Scene->GetAllEntitiesWith<CTransform, CSpriteRenderer>();
+                for (auto ent : view)
                 {
-                    auto [transform, sprite] = group.get<CTransform, CSpriteRenderer>(ent);
-
-                    Renderer2D::DrawSprite(transform, sprite, (int)ent);
+                    auto [transform, sprite] = view.get<CTransform, CSpriteRenderer>(ent);
+                    auto worldTransform = transform.ParentTransform * transform.GetTransform();
+                    Renderer2D::DrawSprite(worldTransform, sprite, (int)ent);
                 }
             }
 
@@ -61,7 +64,6 @@ namespace Nous
                 for (auto ent : view)
                 {
                     auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
-
                     Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
                 }
 

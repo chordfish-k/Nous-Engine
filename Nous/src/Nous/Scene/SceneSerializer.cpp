@@ -200,13 +200,8 @@ namespace Nous {
             out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
             out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 
-            // Children
-            out << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
-            for (auto& uid : tc.Children)
-            {
-                out << (uint64_t) uid;
-            }
-            out << YAML::EndSeq;
+            out << YAML::Key << "Parent" << YAML::Value << tc.Parent;
+            out << YAML::Key << "Open" << YAML::Value << tc.Open;
 
             out << YAML::EndMap; // CTransform
         }
@@ -468,14 +463,13 @@ namespace Nous {
                 tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.Scale = transformComponent["Scale"].as<glm::vec3>();
 
-                auto& children = transformComponent["Children"];
-                if (children && children.IsSequence())
-                {
-                    for (auto& id : children)
-                    {
-                        tc.Children.push_back(id.as<uint64_t>());
-                    }
-                }
+                if (transformComponent["Open"])
+                    tc.Open = transformComponent["Open"].as<bool>();
+
+                auto parent = transformComponent["Parent"];
+                tc.Parent = parent ? parent.as<UUID>() : 0;
+                if (tc.Parent == 0)
+                    m_Scene->m_RootEntityMap[uuid] = deserializedEntity;
             }
 
             auto cameraComponent = entity["CCamera"];
@@ -635,6 +629,19 @@ namespace Nous {
                 auto& ap = deserializedEntity.AddComponent<CAnimPlayer>();
                 ap.AnimClip = animPlayer["AnimClip"].as<AssetHandle>();
                 ap.Type = animPlayer["Type"].as<int>() == 0 ? AssetType::AnimClip : AssetType::AnimMachine;
+            }
+        }
+
+        // 组织transform节点树
+        auto& es = m_Scene->GetAllEntitiesWith<CTransform>();
+        for (auto& e : es)
+        {
+            Entity entity{ e, m_Scene.get()};
+            auto& tr = entity.GetTransform();
+            if (tr.Parent)
+            {
+                Entity parent = m_Scene->GetEntityByUUID(tr.Parent);
+                parent.GetTransform().Children.push_back(entity.GetUUID());
             }
         }
         return true;

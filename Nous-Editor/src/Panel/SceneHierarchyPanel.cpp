@@ -37,10 +37,11 @@ namespace Nous {
 
         if (m_Context)
         {
-            m_Context->m_Registry.each([&](auto entityID)
+            for (auto& [uuid, entityID] : m_Context->m_RootEntityMap)
             {
-                DrawEntityNode(entityID);
-            });
+                if (DrawEntityNode(entityID))
+                    break;
+            }
 
             if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
                 m_Context->SetSelectedEntity({});
@@ -48,12 +49,16 @@ namespace Nous {
             if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
             {
                 if (ImGui::MenuItem("Create Empty Entity"))
-                    m_Context->CreateEntity("Empty Entity");
-
+                {
+                   Entity entity = m_Context->CreateEntity("Empty Entity");
+                   m_Context->m_RootEntityMap[entity.GetUUID()] = entity;
+                }
                 ImGui::EndPopup();
             }
         }
         ImGui::End();
+
+
 
         // TODO 分离到新的类
         ImGui::Begin("Properties");
@@ -62,8 +67,10 @@ namespace Nous {
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::DrawEntityNode(entt::entity entityID)
+    bool SceneHierarchyPanel::DrawEntityNode(entt::entity entityID)
     {
+        bool changed = false;
+
         Entity entity{ entityID, m_Context.get() };
         auto& tag = entity.GetComponent<CTag>();
         auto& transform = entity.GetComponent<CTransform>();
@@ -72,36 +79,82 @@ namespace Nous {
         if (m_Context->GetSelectedEntity() == entity) flags |= ImGuiTreeNodeFlags_Selected;
         if (transform.Children.size() > 0) flags |= ImGuiTreeNodeFlags_OpenOnArrow;
         else flags |= ImGuiTreeNodeFlags_Leaf;
+        if (transform.Open) flags |= ImGuiTreeNodeFlags_DefaultOpen;
 
-        bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+        transform.Open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
         if (ImGui::IsItemClicked())
         {
             m_Context->SetSelectedEntity(entity);
         }
 
-        // 右键 标记删除
+        // 右键
         bool entityDeleted = false;
         if (ImGui::BeginPopupContextItem())
         {
+            // 标记删除
             if (ImGui::MenuItem("Delete Entity"))
                 entityDeleted = true;
 
+            // 移动到根
+            if (ImGui::MenuItem("Move to Root"))
+            {
+                UUID idSource = entity.GetUUID();
+                auto& transformSource = m_Context->GetEntityByUUID(idSource).GetTransform();
+                if (transformSource.Parent)
+                {
+                    auto& parent = m_Context->GetEntityByUUID(transformSource.Parent).GetTransform();
+                    parent.Children.erase(std::find(parent.Children.begin(), parent.Children.end(), idSource));
+
+                    transformSource.Parent = 0;
+                    m_Context->m_RootEntityMap[idSource] = entity;
+                    changed = true;
+                }
+            }
             ImGui::EndPopup();
         }
 
-        if (opened)
+        // 拖动
+        if (ImGui::BeginDragDropSource())
         {
-            /*ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-            bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
-            if (opened)
+            UUID id = entity.GetUUID();
+            ImGui::SetDragDropPayload("TRANSFORM_NODE", &id, sizeof(id));
+            ImGui::Text("%s", tag.Tag.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TRANSFORM_NODE"))
             {
-                ImGui::TreePop();
-            }*/
-            
+                UUID idTarget = entity.GetUUID();
+                UUID idSource = *(UUID*)payload->Data;
+                if (idTarget != idSource)
+                {
+                    auto& transformTarget = transform;
+                    auto& transformSource = m_Context->GetEntityByUUID(idSource).GetTransform();
+                    if (transformSource.Parent)
+                    {
+                        auto& parent = m_Context->GetEntityByUUID(transformSource.Parent).GetTransform();
+                        parent.Children.erase(std::find(parent.Children.begin(), parent.Children.end(), idSource));
+                    }
+                    else
+                    {
+                        m_Context->m_RootEntityMap.erase(idSource);
+                    }
+                    transformTarget.Children.push_back(idSource);
+                    transformSource.Parent = idTarget;
+                    changed = true;
+                }
+            }
+        }
+
+        if (transform.Open)
+        {
             for (auto& uid : transform.Children)
             {
                 Entity entityChild = m_Context->GetEntityByUUID(uid);
-                DrawEntityNode(entityChild);
+                if (DrawEntityNode(entityChild))
+                    break;
             }
 
             ImGui::TreePop();
@@ -114,6 +167,8 @@ namespace Nous {
             if (m_Context->GetSelectedEntity() == entity)
                 m_Context->SetSelectedEntity({});
         }
+
+        return changed;
     }
 
     template<typename T, typename UIFunction>

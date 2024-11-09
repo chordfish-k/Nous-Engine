@@ -77,6 +77,7 @@ namespace Nous {
         AnimMachineEditorPanel m_AnimMachineEditorPanel;
 
         bool m_ShowPhysicsColliders = false;
+        bool m_ShowRuntimePhysicsColliders = false;
 
         enum class SceneState
         {

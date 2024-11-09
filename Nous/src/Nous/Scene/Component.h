@@ -34,6 +34,9 @@ namespace Nous {
         glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
         glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
         glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+        glm::mat4 ParentTransform{ 1.0f };
+        UUID Parent = 0;
+        bool Open = true;
         std::vector<UUID> Children;
 
         CTransform() = default;

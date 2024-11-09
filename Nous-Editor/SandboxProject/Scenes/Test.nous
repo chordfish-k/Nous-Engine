@@ -1,13 +1,113 @@
 Scene: Untitled
 Entities:
-  - Entity: 450477536504913341
+  - Entity: 17280005958706717882
     CTag:
-      Tag: Empty Entity
+      Tag: W
+    CTransform:
+      Translation: [4.13466787, -4.30498028, 0]
+      Rotation: [0, 0, 0]
+      Scale: [8.29364014, 0.728833914, 1]
+      Parent: 0
+      Open: true
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 17287698656999062186
+    CTag:
+      Tag: Camera
     CTransform:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
+      Parent: 0
+      Open: true
+    CCamera:
+      Camera:
+        ProjectionType: 1
+        PerspFOV: 0.785398185
+        PerspNear: 0.00999999978
+        PerspFar: 1000
+        OrthoSize: 10
+        OrthoNear: -10
+        OrthoFar: 10
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 15279175617207494478
+    CTag:
+      Tag: G
+    CTransform:
+      Translation: [0, 1, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.999999881, 0.99999994, 1]
+      Parent: 3388500320992033018
+      Open: false
     CSpriteRenderer:
-      Color: [1, 1, 1, 1]
-      TextureHandle: 10548005792465007447
+      Color: [0, 1, 0, 1]
+      TextureHandle: 0
       TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+  - Entity: 6793929575012209167
+    CTag:
+      Tag: R
+    CTransform:
+      Translation: [1, 0, 0]
+      Rotation: [0, 0, 0.0122173047]
+      Scale: [1.00000012, 1, 1]
+      Parent: 15279175617207494478
+      Open: true
+    CSpriteRenderer:
+      Color: [1, 0, 0, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 3388500320992033018
+    CTag:
+      Tag: B
+    CTransform:
+      Translation: [4.19999981, 3.23622084, 0]
+      Rotation: [0, 0, 2.38935566]
+      Scale: [1, 0.99999994, 1]
+      Parent: 0
+      Open: true
+    CSpriteRenderer:
+      Color: [0, 0, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5

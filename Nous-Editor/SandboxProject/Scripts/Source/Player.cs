@@ -44,7 +44,10 @@ namespace Sandbox
 
         private Dictionary<ulong, Vector2> m_Collisions;
         private Dictionary<ulong, Panel> m_StandingPanel;
-        
+
+        private float m_TotalDt = 0.0f;
+        private int m_CountFrame = 50;
+        private int m_FrameCD = 0;
         void OnCreate()
         {
             m_Transform = GetComponent<CTransform>();
@@ -177,7 +180,16 @@ namespace Sandbox
                 NousConsole.Log("YES");
             }
 
-            m_Text.Text = "" + dt;
+
+            m_TotalDt += dt;
+            m_FrameCD++;
+            if (m_FrameCD == m_CountFrame)
+            {
+                float fps =  m_CountFrame / m_TotalDt;
+                m_Text.Text = "" + fps;
+                m_FrameCD = 0;
+                m_TotalDt = 0;
+            }
             m_Rigidbody.LinearVelocity = Velocity;
 
             // 设置动画状态机
