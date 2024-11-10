@@ -10,6 +10,7 @@ namespace Nous
 	{
 		None = 0,
 		Scene,
+		Prefab,
 		Texture2D,
 		AnimClip,
 		AnimMachine

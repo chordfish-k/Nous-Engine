@@ -37,6 +37,8 @@ namespace Nous {
         glm::mat4 ParentTransform{ 1.0f };
         UUID Parent = 0;
         bool Open = true;
+        bool HideChild = false;
+        AssetHandle PrefabAsset = 0;
         std::vector<UUID> Children;
 
         CTransform() = default;

@@ -203,6 +203,9 @@ namespace Nous {
             out << YAML::Key << "Parent" << YAML::Value << tc.Parent;
             out << YAML::Key << "Open" << YAML::Value << tc.Open;
 
+            out << YAML::Key << "PrefabAsset" << YAML::Value << tc.PrefabAsset;
+            out << YAML::Key << "HideChild" << YAML::Value << tc.HideChild;
+
             out << YAML::EndMap; // CTransform
         }
 
@@ -392,6 +395,185 @@ namespace Nous {
         out << YAML::EndMap; // Entity
     }
 
+    static bool DeserializeEntity(YAML::Node& node, Entity entity)
+    {
+        auto cameraComponent = node["CCamera"];
+        if (cameraComponent)
+        {
+            auto& cc = entity.AddComponent<CCamera>();
+
+            auto cameraProps = cameraComponent["Camera"];
+            cc.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
+
+            cc.Camera.SetPerspFOV(cameraProps["PerspFOV"].as<float>());
+            cc.Camera.SetPerspNearClip(cameraProps["PerspNear"].as<float>());
+            cc.Camera.SetPerspFarClip(cameraProps["PerspFar"].as<float>());
+
+            cc.Camera.SetOrthoSize(cameraProps["OrthoSize"].as<float>());
+            cc.Camera.SetOrthoNearClip(cameraProps["OrthoNear"].as<float>());
+            cc.Camera.SetOrthoFarClip(cameraProps["OrthoFar"].as<float>());
+
+            cc.Primary = cameraComponent["Primary"].as<bool>();
+            cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+        }
+
+        auto scriptComponent = node["CMonoScript"];
+        if (scriptComponent)
+        {
+            auto& sc = entity.AddComponent<CMonoScript>();
+            sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+
+            auto scriptFields = scriptComponent["ScriptFields"];
+            Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+
+            if (scriptFields && entityClass)
+            {
+                const auto& fields = entityClass->GetFields();
+                auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+
+                for (auto scriptField : scriptFields)
+                {
+                    std::string name = scriptField["Name"].as<std::string>();
+                    std::string typeString = scriptField["Type"].as<std::string>();
+                    ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+                    ScriptFieldInstance& fieldInstance = entityFields[name];
+
+                    // NS_CORE_ASSERT(fields.find(name) != fields.end());
+                    if (fields.find(name) == fields.end())
+                        continue;
+
+                    fieldInstance.Field = fields.at(name);
+
+                    switch (type)
+                    {
+                        READ_SCRIPT_FIELD(Float, float);
+                        READ_SCRIPT_FIELD(Double, double);
+                        READ_SCRIPT_FIELD(Bool, bool);
+                        READ_SCRIPT_FIELD(Char, char);
+                        READ_SCRIPT_FIELD(Byte, int8_t);
+                        READ_SCRIPT_FIELD(Short, int16_t);
+                        READ_SCRIPT_FIELD(Int, int32_t);
+                        READ_SCRIPT_FIELD(Long, int64_t);
+                        READ_SCRIPT_FIELD(UByte, uint8_t);
+                        READ_SCRIPT_FIELD(UShort, uint16_t);
+                        READ_SCRIPT_FIELD(UInt, uint32_t);
+                        READ_SCRIPT_FIELD(ULong, uint64_t);
+                        READ_SCRIPT_FIELD(Vector2, glm::vec2);
+                        READ_SCRIPT_FIELD(Vector3, glm::vec3);
+                        READ_SCRIPT_FIELD(Vector4, glm::vec4);
+                        READ_SCRIPT_FIELD(Entity, UUID);
+                    }
+                }
+            }
+        }
+
+        auto spriteRendererComponent = node["CSpriteRenderer"];
+        if (spriteRendererComponent)
+        {
+            auto& src = entity.AddComponent<CSpriteRenderer>();
+            src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+
+            if (spriteRendererComponent["TextureHandle"])
+                src.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
+
+            if (spriteRendererComponent["TilingFactor"])
+                src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+
+            if (spriteRendererComponent["SheetWidth"])
+                src.SheetWidth = spriteRendererComponent["SheetWidth"].as<int>();
+
+            if (spriteRendererComponent["SheetHeight"])
+                src.SheetHeight = spriteRendererComponent["SheetHeight"].as<int>();
+
+            if (spriteRendererComponent["Index"])
+                src.Index = spriteRendererComponent["Index"].as<int>();
+        }
+
+        auto circleRendererComponent = node["CCircleRenderer"];
+        if (circleRendererComponent)
+        {
+            auto& crc = entity.AddComponent<CCircleRenderer>();
+            crc.Color = circleRendererComponent["Color"].as<glm::vec4>();
+            crc.Thickness = circleRendererComponent["Thickness"].as<float>();
+            crc.Fade = circleRendererComponent["Fade"].as<float>();
+        }
+
+        auto rigidbody2DComponent = node["CRigidbody2D"];
+        if (rigidbody2DComponent)
+        {
+            auto& rb2d = entity.AddComponent<CRigidbody2D>();
+            rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
+            rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+        }
+
+        auto boxCollider2DComponent = node["CBoxCollider2D"];
+        if (boxCollider2DComponent)
+        {
+            auto& bc2d = entity.AddComponent<CBoxCollider2D>();
+            bc2d.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
+            bc2d.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+            bc2d.Density = boxCollider2DComponent["Density"].as<float>();
+            bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
+            bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+            bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+        }
+
+        auto circleCollider2D = node["CCircleCollider2D"];
+        if (circleCollider2D)
+        {
+            auto& cc2d = entity.AddComponent<CCircleCollider2D>();
+            cc2d.Offset = circleCollider2D["Offset"].as<glm::vec2>();
+            cc2d.Radius = circleCollider2D["Radius"].as<float>();
+            cc2d.Density = circleCollider2D["Density"].as<float>();
+            cc2d.Friction = circleCollider2D["Friction"].as<float>();
+            cc2d.Restitution = circleCollider2D["Restitution"].as<float>();
+            cc2d.RestitutionThreshold = circleCollider2D["RestitutionThreshold"].as<float>();
+        }
+
+        auto textRenderer = node["CTextRenderer"];
+        if (textRenderer)
+        {
+            auto& tc = entity.AddComponent<CTextRenderer>();
+            tc.TextString = textRenderer["TextString"].as<std::string>();
+            tc.Color = textRenderer["Color"].as<glm::vec4>();
+            tc.Kerning = textRenderer["Kerning"].as<float>();
+            tc.LineSpacing = textRenderer["LineSpacing"].as<float>();
+        }
+
+        auto animPlayer = node["CAnimPlayer"];
+        if (animPlayer)
+        {
+            auto& ap = entity.AddComponent<CAnimPlayer>();
+            ap.AnimClip = animPlayer["AnimClip"].as<AssetHandle>();
+            ap.Type = animPlayer["Type"].as<int>() == 0 ? AssetType::AnimClip : AssetType::AnimMachine;
+        }
+    
+        return true;
+    }
+
+    static void ReconstructEntityTree(Scene* scene)
+    {
+        // 组织transform节点树
+        auto& es = scene->GetAllEntitiesWith<CTransform>();
+        for (auto& e : es)
+        {
+            Entity entity{ e, scene };
+            auto& tr = entity.GetTransform();
+            tr.Children.clear();
+        }
+        for (auto& e : es)
+        {
+            Entity entity{ e, scene };
+            auto& tr = entity.GetTransform();
+            if (tr.Parent)
+            {
+                Entity parent = scene->GetEntityByUUID(tr.Parent);
+                parent.GetTransform().Children.push_back(entity.GetUUID());
+            }
+        }
+    }
+
     void SceneSerializer::Serialize(const std::filesystem::path& filepath)
     {
         YAML::Emitter out;
@@ -404,6 +586,38 @@ namespace Nous {
 
             SerializeEntity(out, entity);
         });
+        out << YAML::EndSeq;
+        out << YAML::EndMap;
+
+        std::ofstream fout(filepath);
+        fout << out.c_str();
+    }
+
+    void SceneSerializer::SerializeFrom(const std::filesystem::path& filepath, UUID root)
+    {
+        YAML::Emitter out;
+        out << YAML::BeginMap;
+        out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+
+        std::vector<UUID> entities;
+        entities.push_back(root);
+        int front = 0;
+        while (front < entities.size())
+        {
+            auto id = entities[front++];
+            Entity entity = m_Scene->GetEntityByUUID(id);
+            if (!entity)
+                continue;
+
+            SerializeEntity(out, entity);
+
+            for (auto& cid : entity.GetTransform().Children)
+            {
+                entities.push_back(cid);
+            }
+        }
+        
+
         out << YAML::EndSeq;
         out << YAML::EndMap;
 
@@ -465,182 +679,97 @@ namespace Nous {
                 tc.Parent = parent ? parent.as<UUID>() : 0;
                 if (tc.Parent == 0)
                     m_Scene->m_RootEntityMap[uuid] = deserializedEntity;
+
+                if (transformComponent["PrefabAsset"])
+                    tc.PrefabAsset = transformComponent["PrefabAsset"].as<AssetHandle>();
+
+                if (transformComponent["HideChild"])
+                    tc.HideChild = transformComponent["HideChild"].as<bool>();
             }
-
-            auto cameraComponent = entity["CCamera"];
-            if (cameraComponent)
-            {
-                auto& cc = deserializedEntity.AddComponent<CCamera>();
-
-                auto cameraProps = cameraComponent["Camera"];
-                cc.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraProps["ProjectionType"].as<int>());
-
-                cc.Camera.SetPerspFOV(cameraProps["PerspFOV"].as<float>());
-                cc.Camera.SetPerspNearClip(cameraProps["PerspNear"].as<float>());
-                cc.Camera.SetPerspFarClip(cameraProps["PerspFar"].as<float>());
-
-                cc.Camera.SetOrthoSize(cameraProps["OrthoSize"].as<float>());
-                cc.Camera.SetOrthoNearClip(cameraProps["OrthoNear"].as<float>());
-                cc.Camera.SetOrthoFarClip(cameraProps["OrthoFar"].as<float>());
-
-                cc.Primary = cameraComponent["Primary"].as<bool>();
-                cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
-            }
-
-            auto scriptComponent = entity["CMonoScript"];
-            if (scriptComponent)
-            {
-                auto& sc = deserializedEntity.AddComponent<CMonoScript>();
-                sc.ClassName = scriptComponent["ClassName"].as<std::string>();
-                
-                auto scriptFields = scriptComponent["ScriptFields"];
-                Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
-
-                if (scriptFields && entityClass)
-                {
-                    const auto& fields = entityClass->GetFields();
-                    auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
-
-                    for (auto scriptField : scriptFields)
-                    {
-                        std::string name = scriptField["Name"].as<std::string>();
-                        std::string typeString = scriptField["Type"].as<std::string>();
-                        ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
-
-                        ScriptFieldInstance& fieldInstance = entityFields[name];
-
-                        // NS_CORE_ASSERT(fields.find(name) != fields.end());
-                        if (fields.find(name) == fields.end())
-                            continue;
-
-                        fieldInstance.Field = fields.at(name);
-
-                        switch (type)
-                        {
-                            READ_SCRIPT_FIELD(Float,    float       );
-                            READ_SCRIPT_FIELD(Double,   double      );
-                            READ_SCRIPT_FIELD(Bool,     bool        );
-                            READ_SCRIPT_FIELD(Char,     char        );
-                            READ_SCRIPT_FIELD(Byte,     int8_t      );
-                            READ_SCRIPT_FIELD(Short,    int16_t     );
-                            READ_SCRIPT_FIELD(Int,      int32_t     );
-                            READ_SCRIPT_FIELD(Long,     int64_t     );
-                            READ_SCRIPT_FIELD(UByte,    uint8_t     );
-                            READ_SCRIPT_FIELD(UShort,   uint16_t    );
-                            READ_SCRIPT_FIELD(UInt,     uint32_t    );
-                            READ_SCRIPT_FIELD(ULong,    uint64_t    );
-                            READ_SCRIPT_FIELD(Vector2,  glm::vec2   );
-                            READ_SCRIPT_FIELD(Vector3,  glm::vec3   );
-                            READ_SCRIPT_FIELD(Vector4,  glm::vec4   );
-                            READ_SCRIPT_FIELD(Entity,   UUID        );
-                        }
-                    }
-                }
-            }
-
-            auto spriteRendererComponent = entity["CSpriteRenderer"];
-            if (spriteRendererComponent)
-            {
-                auto& src = deserializedEntity.AddComponent<CSpriteRenderer>();
-                src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
-
-                if (spriteRendererComponent["TexturePath"])
-                {
-                    /*std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
-                    auto path = Project::GetAssetsFileSystemPath(texturePath);
-                    src.Texture = Texture2D::Create(path);*/
-                }
-
-                if (spriteRendererComponent["TextureHandle"])
-                    src.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
-
-                if (spriteRendererComponent["TilingFactor"])
-                    src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
-
-                if (spriteRendererComponent["SheetWidth"])
-                    src.SheetWidth = spriteRendererComponent["SheetWidth"].as<int>();
-
-                if (spriteRendererComponent["SheetHeight"])
-                    src.SheetHeight = spriteRendererComponent["SheetHeight"].as<int>();
-
-                if (spriteRendererComponent["Index"])
-                    src.Index = spriteRendererComponent["Index"].as<int>();
-            }
-
-            auto circleRendererComponent = entity["CCircleRenderer"];
-            if (circleRendererComponent)
-            {
-                auto& crc = deserializedEntity.AddComponent<CCircleRenderer>();
-                crc.Color = circleRendererComponent["Color"].as<glm::vec4>();
-                crc.Thickness = circleRendererComponent["Thickness"].as<float>();
-                crc.Fade = circleRendererComponent["Fade"].as<float>();
-            }
-
-            auto rigidbody2DComponent = entity["CRigidbody2D"];
-            if (rigidbody2DComponent)
-            {
-                auto& rb2d = deserializedEntity.AddComponent<CRigidbody2D>();
-                rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
-                rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
-            }
-
-            auto boxCollider2DComponent = entity["CBoxCollider2D"];
-            if (boxCollider2DComponent)
-            {
-                auto& bc2d = deserializedEntity.AddComponent<CBoxCollider2D>();
-                bc2d.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
-                bc2d.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
-                bc2d.Density = boxCollider2DComponent["Density"].as<float>();
-                bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
-                bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
-                bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
-            }
-
-            auto circleCollider2D = entity["CCircleCollider2D"];
-            if (circleCollider2D)
-            {
-                auto& cc2d = deserializedEntity.AddComponent<CCircleCollider2D>();
-                cc2d.Offset = circleCollider2D["Offset"].as<glm::vec2>();
-                cc2d.Radius = circleCollider2D["Radius"].as<float>();
-                cc2d.Density = circleCollider2D["Density"].as<float>();
-                cc2d.Friction = circleCollider2D["Friction"].as<float>();
-                cc2d.Restitution = circleCollider2D["Restitution"].as<float>();
-                cc2d.RestitutionThreshold = circleCollider2D["RestitutionThreshold"].as<float>();
-            }
-
-            auto textRenderer = entity["CTextRenderer"];
-            if (textRenderer)
-            {
-                auto& tc = deserializedEntity.AddComponent<CTextRenderer>();
-                tc.TextString = textRenderer["TextString"].as<std::string>();
-                tc.Color = textRenderer["Color"].as<glm::vec4>();
-                tc.Kerning = textRenderer["Kerning"].as<float>();
-                tc.LineSpacing = textRenderer["LineSpacing"].as<float>();
-            }
-
-            auto animPlayer = entity["CAnimPlayer"];
-            if (animPlayer)
-            {
-                auto& ap = deserializedEntity.AddComponent<CAnimPlayer>();
-                ap.AnimClip = animPlayer["AnimClip"].as<AssetHandle>();
-                ap.Type = animPlayer["Type"].as<int>() == 0 ? AssetType::AnimClip : AssetType::AnimMachine;
-            }
+            DeserializeEntity(entity, deserializedEntity);
         }
 
-        // 组织transform节点树
-        auto& es = m_Scene->GetAllEntitiesWith<CTransform>();
-        for (auto& e : es)
-        {
-            Entity entity{ e, m_Scene.get()};
-            auto& tr = entity.GetTransform();
-            if (tr.Parent)
-            {
-                Entity parent = m_Scene->GetEntityByUUID(tr.Parent);
-                parent.GetTransform().Children.push_back(entity.GetUUID());
-            }
-        }
+        ReconstructEntityTree(m_Scene.get());
+
         return true;
     }
+
+    // 用于prefab
+    bool SceneSerializer::DeserializeTo(AssetHandle sceneHandle, UUID to)
+    {
+        auto filepath = Project::GetActiveAssetDirectory() / Project::GetActive()->GetEditorAssetManager()->GetFilePath(sceneHandle);
+        if (to == 0)
+        {
+            return Deserialize(filepath);
+        }
+
+        YAML::Node data;
+        try
+        {
+            data = YAML::LoadFile(filepath.string());
+        }
+        catch (YAML::ParserException& e)
+        {
+            NS_CORE_ERROR("无法加载 .nous 文件 '{0}'\n     {1}", filepath, e.what());
+            return false;
+        }
+
+        NS_CORE_TRACE("正在解析场景文件 '{0}'", filepath);
+
+        std::unordered_map<UUID, UUID> uuidMap;
+
+        auto entities = data["Entities"];
+        if (!entities)
+            return false;
+
+        for (auto entity : entities)
+        {
+            // 保持树结构，但替换uuid
+            uint64_t uuid = entity["Entity"].as<uint64_t>();
+            uuid = uuidMap[uuid];
+
+            std::string name;
+            auto tagComponent = entity["CTag"];
+            if (tagComponent)
+                name = tagComponent["Tag"].as<std::string>();
+
+            NS_CORE_TRACE("解析实体 ID = {0}, name = {1}", uuid, name);
+
+            Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+
+            auto transformComponent = entity["CTransform"];
+            if (transformComponent)
+            {
+                // 取出实体默认的Transform并赋值
+                auto& tc = deserializedEntity.GetComponent<CTransform>();
+                tc.Translation = transformComponent["Translation"].as<glm::vec3>();
+                tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
+                tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+
+                if (transformComponent["Open"])
+                    tc.Open = transformComponent["Open"].as<bool>();
+
+                auto parent = transformComponent["Parent"];
+                // 如果有parent字段，就读取，否则设置为0
+                tc.Parent = parent ? parent.as<UUID>() : 0;
+                // 如果Parent是0(根)，则设置为to，否则使用map进行映射替换
+                tc.Parent = tc.Parent == 0 ? to : uuidMap[tc.Parent];
+
+                //TODO 作为prefab，默认只有一个根entity，后续应该做限制
+                if (tc.Parent == to)
+                {
+                    tc.PrefabAsset = sceneHandle;
+                    tc.HideChild = true;
+                }
+            }
+            DeserializeEntity(entity, deserializedEntity);
+        }
+
+        ReconstructEntityTree(m_Scene.get());
+
+        return true;
+    }
+
 
     bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath)
     {
@@ -648,4 +777,5 @@ namespace Nous {
         NS_CORE_ASSERT(false);
         return false;
     }
+
 }

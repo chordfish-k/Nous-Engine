@@ -20,6 +20,9 @@ namespace Nous
 		// 3. 根据比较情况更新缓存
 
 		auto absolutePath = m_Project->GetAssetAbsolutePath(assetPath);
+		if (!std::filesystem::exists(absolutePath))
+			return nullptr;
+
 		std::filesystem::file_time_type lastWriteTime = std::filesystem::last_write_time(absolutePath);
 		uint64_t timestamp = std::chrono::duration_cast<std::chrono::seconds>(lastWriteTime.time_since_epoch()).count();
 		

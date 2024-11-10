@@ -3,6 +3,7 @@
 #include "Nous/Core/Application.h"
 #include "Nous/Asset/AssetManager.h"
 #include "Nous/Asset/AssetMetadata.h"
+#include "Nous/Scene/SceneSerializer.h"
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Asset/TextureImporter.h"
 #include "Nous/Anim/AnimClip.h"
@@ -20,10 +21,15 @@
 #endif
 
 namespace Nous {
+    SceneHierarchyPanel::SceneHierarchyPanel()
+        : SceneHierarchyPanel(nullptr)
+    {
+    }
 
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
     {
         SetContext(scene);
+        EditorEventEmitter::AddObserver(this);
     }
 
     void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
@@ -67,6 +73,12 @@ namespace Nous {
         ImGui::End();
     }
 
+    void SceneHierarchyPanel::OnEditorEvent(EditorEvent& e)
+    {
+        EditorEventDispatcher dispatcher(e);
+        dispatcher.Dispatch<SavePrefabEvent>(NS_BIND_EVENT_FN(SceneHierarchyPanel::OnSavePrefab));
+    }
+
     bool SceneHierarchyPanel::DrawEntityNode(entt::entity entityID)
     {
         bool changed = false;
@@ -75,13 +87,14 @@ namespace Nous {
         auto& tag = entity.GetComponent<CTag>();
         auto& transform = entity.GetComponent<CTransform>();
 
+        bool canBeOpen = transform.Children.size() > 0 && !transform.HideChild;
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;// 让一整行TreeNode都能够被点击
         if (m_Context->GetSelectedEntity() == entity) flags |= ImGuiTreeNodeFlags_Selected;
-        if (transform.Children.size() > 0) flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+        if (canBeOpen) flags |= ImGuiTreeNodeFlags_OpenOnArrow;
         else flags |= ImGuiTreeNodeFlags_Leaf;
-        if (transform.Open) flags |= ImGuiTreeNodeFlags_DefaultOpen;
+        if (transform.Open && canBeOpen) flags |= ImGuiTreeNodeFlags_DefaultOpen;
 
-        transform.Open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+        transform.Open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s%s", tag.Tag.c_str(), transform.PrefabAsset ? "[Prefab]" : "");
         if (ImGui::IsItemClicked())
         {
             m_Context->SetSelectedEntity(entity);
@@ -109,6 +122,12 @@ namespace Nous {
                     m_Context->m_RootEntityMap[idSource] = entity;
                     changed = true;
                 }
+            }
+
+            if (transform.PrefabAsset)
+            {
+                if (ImGui::MenuItem("Toggle Children"))
+                    transform.HideChild = !transform.HideChild;
             }
             ImGui::EndPopup();
         }
@@ -146,15 +165,34 @@ namespace Nous {
                     changed = true;
                 }
             }
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
+            {
+                UUID idTarget = entity.GetUUID();
+                AssetHandle handle_ = *(AssetHandle*)payload->Data;
+                if (AssetManager::GetAssetType(handle_) == AssetType::Prefab)
+                {
+                    // 当作Prefab嵌入
+                    // 反序列化
+                    SceneSerializer serializer(m_Context);
+                    serializer.DeserializeTo(handle_, idTarget);
+                    // 保存资源句柄
+                    
+                    changed = true;
+                }
+            }
+            ImGui::EndDragDropTarget();
         }
 
         if (transform.Open)
         {
-            for (auto& uid : transform.Children)
+            if (canBeOpen)
             {
-                Entity entityChild = m_Context->GetEntityByUUID(uid);
-                if (DrawEntityNode(entityChild))
-                    break;
+                for (auto& uid : transform.Children)
+                {
+                    Entity entityChild = m_Context->GetEntityByUUID(uid);
+                    if (DrawEntityNode(entityChild))
+                        break;
+                }
             }
 
             ImGui::TreePop();
@@ -258,6 +296,15 @@ namespace Nous {
 
         DrawComponent<CTransform>("CTransform", entity, [](auto& component)
         {
+            if (component.PrefabAsset)
+            {
+                float width = ImGui::GetContentRegionAvailWidth();
+                if (ImGui::Button("Reload Prefab", {width, 0}))
+                {
+                    NS_TRACE("Reload Prefab {}", component.PrefabAsset);
+                }
+            }
+            
             UI::DrawVec3Control("Position", component.Translation);
             glm::vec3 rotation = glm::degrees(component.Rotation);
             UI::DrawVec3Control("Rotation", rotation);
@@ -553,6 +600,14 @@ namespace Nous {
                 component.Type = outType;
             }
         });
+    }
+
+    void SceneHierarchyPanel::OnSavePrefab(SavePrefabEvent& e)
+    {
+        Entity rootEntity = m_Context->GetEntityByUUID(e.Root);
+        std::filesystem::path path = e.Dir / (rootEntity.GetName() + ".nsprefab");
+        SceneSerializer serializer(m_Context);
+        serializer.SerializeFrom(path, rootEntity.GetUUID());
     }
 
     template<typename T>

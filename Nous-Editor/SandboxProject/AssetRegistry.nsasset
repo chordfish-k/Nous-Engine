@@ -38,6 +38,9 @@ AssetRegistry:
   - Handle: 5620785090944541535
     FilePath: Textures/character_run_right.png
     Type: AssetType::Texture2D
+  - Handle: 5750553146363201437
+    FilePath: Prefabs/B.nsprefab
+    Type: AssetType::Prefab
   - Handle: 6301804288407615871
     FilePath: Anim/test_single.nsani
     Type: AssetType::AnimClip

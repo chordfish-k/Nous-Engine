@@ -10,6 +10,7 @@ namespace Nous
 {
     static std::map<std::filesystem::path, AssetType> s_AssetExtensionMap = {
         { ".nous", AssetType::Scene},
+        { ".nsprefab", AssetType::Prefab},
         { ".png", AssetType::Texture2D},
         { ".jpg", AssetType::Texture2D},
         { ".jpeg", AssetType::Texture2D},
@@ -192,9 +193,13 @@ namespace Nous
 
         for (const auto& node : rootNode)
         {
+            std::string relativePath = node["FilePath"].as<std::string>();
+            std::filesystem::path path = Project::GetActiveAssetDirectory() / relativePath;
+            if (!std::filesystem::exists(path))
+                continue;
             AssetHandle handle = node["Handle"].as<uint64_t>();
             auto& metadata = reg[handle];
-            metadata.FilePath = node["FilePath"].as<std::string>();
+            metadata.FilePath = relativePath;
             metadata.Type = AssetTypeFromString(node["Type"].as<std::string>());
         }
 
