@@ -183,6 +183,15 @@ namespace Nous
 		return 0;
 	}
 
+	static void Entity_GetWorldTranslation(UUID entityID, glm::vec3* result)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		auto& tr = entity.GetTransform();
+		auto worldPos = tr.ParentTransform * tr.GetTransform() * glm::vec4(tr.Translation, 1.0f);
+		*result = glm::vec3(worldPos.x, worldPos.y, tr.Translation.z);
+	}
+
 	// Transform£∫ªÒ»°Œª“∆
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
 	{
@@ -197,7 +206,8 @@ namespace Nous
 		NS_CORE_ASSERT_ENTITYID(entityID);
 
 		auto& tr = entity.GetComponent<CTransform>();
-		tr.Translation = *translation;
+		glm::vec3 pos = *translation;
+		tr.Translation = pos;
 		TransformSystem::SetSubtreeDirty(scene, entity);
 	}
 
@@ -209,6 +219,11 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body * body = (b2Body*)rb2d.RuntimeBody;
+		if (!body)
+		{
+			PhysicsSystem::SetupRigidbody(entity);
+			body = (b2Body*)rb2d.RuntimeBody;
+		}
 		body->ApplyLinearImpulse(b2Vec2(impluse->x, impluse->y), b2Vec2(point->x, point->y), wake);
 	}
 
@@ -220,6 +235,11 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		if (!body)
+		{
+			PhysicsSystem::SetupRigidbody(entity);
+			body = (b2Body*)rb2d.RuntimeBody;
+		}
 		body->ApplyLinearImpulseToCenter(b2Vec2(impluse->x, impluse->y), wake);
 	}
 
@@ -230,6 +250,11 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		if (!body)
+		{
+			PhysicsSystem::SetupRigidbody(entity);
+			body = (b2Body*)rb2d.RuntimeBody;
+		}
 		const b2Vec2& linearVelocity = body->GetLinearVelocity();
 		*outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
 	}
@@ -241,6 +266,11 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		if (!body)
+		{
+			PhysicsSystem::SetupRigidbody(entity);
+			body = (b2Body*)rb2d.RuntimeBody;
+		}
 		body->SetLinearVelocity({inLinearVelocity->x, inLinearVelocity->y});
 	}
 
@@ -251,6 +281,11 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		if (!body)
+		{
+			PhysicsSystem::SetupRigidbody(entity);
+			body = (b2Body*)rb2d.RuntimeBody;
+		}
 		return Utils::Rigidbody2DTypeFromBox2DBody(body->GetType());
 	}
 
@@ -261,6 +296,11 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		if (!body)
+		{
+			PhysicsSystem::SetupRigidbody(entity);
+			body = (b2Body*)rb2d.RuntimeBody;
+		}
 		body->SetType(Utils::Rigidbody2DTypeToBox2DBody(bodyType));
 	}
 
@@ -384,11 +424,17 @@ namespace Nous
 			UUID outRoot;
 			serializer.DeserializeTo(prefabID, 0, &outRoot);
 			Entity e = scene->GetEntityByUUID(outRoot);
-			auto& tr = e.GetTransform();
-			tr.Translation = glm::vec3(0.0f);
 
 			if (e.HasComponent<CMonoScript>())
+			{
 				ScriptEngine::OnCreateEntity(e);
+				ScriptEngine::OnStartEntity(e);
+			}
+
+			if (e.HasComponent<CRigidbody2D>())
+			{
+				//PhysicsSystem::SetupRigidbody(e, nullptr);
+			}
 
 			*newEntity = outRoot;
 		}
@@ -461,7 +507,8 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Entity_AddChild);
 		NS_ADD_INTERNAL_CALL(Entity_GetChildAt);
 		NS_ADD_INTERNAL_CALL(Entity_GetChildCount);
-
+		NS_ADD_INTERNAL_CALL(Entity_GetWorldTranslation);
+		
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
 

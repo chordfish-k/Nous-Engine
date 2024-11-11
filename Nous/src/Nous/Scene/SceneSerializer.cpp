@@ -740,11 +740,9 @@ namespace Nous {
         }
         catch (YAML::ParserException& e)
         {
-            NS_CORE_ERROR("无法加载 .nous 文件 '{0}'\n     {1}", filepath, e.what());
             return false;
         }
 
-        NS_CORE_TRACE("正在解析场景文件 '{0}'", filepath);
 
         std::unordered_map<UUID, UUID> uuidMap;
 
@@ -762,8 +760,6 @@ namespace Nous {
             auto tagComponent = entity["CTag"];
             if (tagComponent)
                 name = tagComponent["Tag"].as<std::string>();
-
-            NS_CORE_TRACE("解析实体 ID = {0}, name = {1}", uuid, name);
 
             Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
@@ -793,6 +789,11 @@ namespace Nous {
                     if (outRootUUID)
                     {
                         *outRootUUID = uuid;
+                    }
+
+                    if (to == 0)
+                    {
+                        m_Scene->m_RootEntityMap[uuid] = deserializedEntity;
                     }
                 }
             }

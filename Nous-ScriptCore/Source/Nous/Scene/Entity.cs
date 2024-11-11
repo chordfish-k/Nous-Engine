@@ -24,7 +24,7 @@ namespace Nous
 
 			set
             {
-				InternalCalls.TransformComponent_SetTranslation(ID, ref value);
+				InternalCalls.TransformComponent_SetTranslation(ID, value);
 			}
         }
 
@@ -93,5 +93,11 @@ namespace Nous
             }
 			return null;
 		}
+
+		public Vector3 GetWorldTranslation()
+        {
+			InternalCalls.Entity_GetWorldTranslation(ID, out Vector3 result);
+			return result;
+        }
 	}
 }

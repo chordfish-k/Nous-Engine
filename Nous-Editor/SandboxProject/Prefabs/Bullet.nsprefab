@@ -1,0 +1,24 @@
+Entities:
+  - Entity: 15627571539570990510
+    CTag:
+      Tag: Bullet
+    CTransform:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.300000012, 0.300000012, 1]
+      Parent: 0
+      Open: true
+      PrefabAsset: 0
+      HideChild: false
+    CMonoScript:
+      ClassName: Sandbox.Bullet
+    CSpriteRenderer:
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Kinematic
+      FixedRotation: false

@@ -47,6 +47,9 @@ AssetRegistry:
   - Handle: 5750553146363201437
     FilePath: Prefabs/B.nsprefab
     Type: AssetType::Prefab
+  - Handle: 5871008579337788077
+    FilePath: Prefabs/Empty Entity.nsprefab
+    Type: AssetType::Prefab
   - Handle: 6301804288407615871
     FilePath: Anim/test_single.nsani
     Type: AssetType::AnimClip
@@ -59,6 +62,9 @@ AssetRegistry:
   - Handle: 6627634050650639938
     FilePath: Anim/idleR.nsani
     Type: AssetType::AnimClip
+  - Handle: 8548564212979728682
+    FilePath: Scenes/Shoot.nous
+    Type: AssetType::Scene
   - Handle: 8863621358159051246
     FilePath: Textures/kid/player_idle_0.png
     Type: AssetType::Texture2D
@@ -71,6 +77,12 @@ AssetRegistry:
   - Handle: 9540628050906475021
     FilePath: Textures/character_jump_left.png
     Type: AssetType::Texture2D
+  - Handle: 10062270957484376825
+    FilePath: Scenes/Shoot.nous
+    Type: AssetType::Scene
+  - Handle: 10063650599177908020
+    FilePath: Prefabs/Bullet.nsprefab
+    Type: AssetType::Prefab
   - Handle: 11289935122047927156
     FilePath: Scenes/Example.nous
     Type: AssetType::Scene
