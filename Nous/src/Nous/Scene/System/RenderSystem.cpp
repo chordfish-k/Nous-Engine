@@ -64,7 +64,7 @@ namespace Nous
                 for (auto ent : view)
                 {
                     auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
-                    Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
+                    Renderer2D::DrawCircle(transform.ParentTransform * transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
                 }
 
             }
@@ -75,8 +75,7 @@ namespace Nous
                 for (auto ent : view)
                 {
                     auto [transform, text] = view.get<CTransform, CTextRenderer>(ent);
-
-                    Renderer2D::DrawString(transform.GetTransform(), text.TextString, text, text.Color, (int)ent);
+                    Renderer2D::DrawString(transform.ParentTransform * transform.GetTransform(), text.TextString, text, text.Color, (int)ent);
                 }
             }
 
