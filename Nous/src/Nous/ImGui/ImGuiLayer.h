@@ -10,7 +10,7 @@ namespace Nous {
     class ImGuiLayer : public Layer
     {
     public:
-        ImGuiLayer();
+        ImGuiLayer(Application* application, const std::string& configFilepath = "imgui.ini");
         ~ImGuiLayer();
 
         void OnAttached() override;
@@ -29,5 +29,6 @@ namespace Nous {
         uint32_t GetActiveWidgetID() const;
     private:
         bool m_BlockEvent = true; // 阻止ImGui的事件
+        std::string m_ConfigFilepath;
     };
 }

@@ -3,10 +3,14 @@
 #include "Nous/Core/Application.h"
 #include "Nous/Asset/AssetManager.h"
 #include "Nous/Asset/AssetMetadata.h"
+#include "Nous/Scene/SceneSerializer.h"
+#include "Nous/Scene/System/TransformSystem.h"
 #include "Nous/Script/ScriptEngine.h"
+#include "Nous/Script/ScriptGlue.h"
 #include "Nous/Asset/TextureImporter.h"
 #include "Nous/Anim/AnimClip.h"
 #include "Nous/UI/UI.h"
+
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -20,16 +24,20 @@
 #endif
 
 namespace Nous {
+    SceneHierarchyPanel::SceneHierarchyPanel()
+        : SceneHierarchyPanel(nullptr)
+    {
+    }
 
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
     {
         SetContext(scene);
+        EditorEventEmitter::AddObserver(this);
     }
 
     void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
     {
         m_Context = scene;
-        //m_Context->SetSelectedEntity({});
     }
 
     void SceneHierarchyPanel::OnImGuiRender()
@@ -38,24 +46,28 @@ namespace Nous {
 
         if (m_Context)
         {
-            m_Context->m_Registry.each([&](auto entityID)
-                                       {
-                                           Entity entity{entityID, m_Context.get()};
-                                           DrawEntityNode(entity);
-                                       });
+            float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+            if (ImGui::Button("Create Entity", { ImGui::GetContentRegionAvailWidth(), lineHeight }))
+            {
+                Entity entity = m_Context->CreateEntity("Empty Entity");
+                m_Context->m_RootEntityMap[entity.GetUUID()] = entity;
+                m_Context->SetSelectedEntity(entity);
+            }
+
+            ImGui::BeginChild("Nodes");
+            for (auto& [uuid, entityID] : m_Context->m_RootEntityMap)
+            {
+                if (DrawEntityNode(entityID))
+                    break;
+            }
 
             if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
                 m_Context->SetSelectedEntity({});
-
-            if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems))
-            {
-                if (ImGui::MenuItem("Create Empty Entity"))
-                    m_Context->CreateEntity("Empty Entity");
-
-                ImGui::EndPopup();
-            }
+            ImGui::EndChild();
         }
         ImGui::End();
+
+
 
         // TODO 分离到新的类
         ImGui::Begin("Properties");
@@ -64,37 +76,136 @@ namespace Nous {
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::DrawEntityNode(Entity entity)
+    void SceneHierarchyPanel::OnEditorEvent(EditorEvent& e)
     {
-        auto& tag = entity.GetComponent<CTag>();
+        EditorEventDispatcher dispatcher(e);
+        dispatcher.Dispatch<SavePrefabEvent>(NS_BIND_EVENT_FN(SceneHierarchyPanel::OnSavePrefab));
+    }
 
-        ImGuiTreeNodeFlags flags = ((m_Context->GetSelectedEntity() == entity) ? ImGuiTreeNodeFlags_Selected : 0)|ImGuiTreeNodeFlags_OpenOnArrow;
-        flags |= ImGuiTreeNodeFlags_SpanAvailWidth; // 让一整行TreeNode都能够被点击
-        bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+    bool SceneHierarchyPanel::DrawEntityNode(entt::entity entityID)
+    {
+        bool changed = false;
+
+        Entity entity{ entityID, m_Context.get() };
+        auto& tag = entity.GetComponent<CTag>();
+        auto& transform = entity.GetComponent<CTransform>();
+
+        bool canBeOpen = transform.Children.size() > 0 && !transform.HideChild;
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;// 让一整行TreeNode都能够被点击
+        if (m_Context->GetSelectedEntity() == entity) flags |= ImGuiTreeNodeFlags_Selected;
+        if (canBeOpen) flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+        else flags |= ImGuiTreeNodeFlags_Leaf;
+        if (transform.Open && canBeOpen) flags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+        transform.Open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s%s", tag.Tag.c_str(), transform.PrefabAsset ? "[Prefab]" : "");
         if (ImGui::IsItemClicked())
         {
             m_Context->SetSelectedEntity(entity);
         }
 
-        // 右键 标记删除
+        // 右键
         bool entityDeleted = false;
         if (ImGui::BeginPopupContextItem())
         {
+            // 标记删除
             if (ImGui::MenuItem("Delete Entity"))
                 entityDeleted = true;
 
+            // 移动到根
+            if (ImGui::MenuItem("Move to Root"))
+            {
+                UUID idSource = entity.GetUUID();
+                auto& transformSource = m_Context->GetEntityByUUID(idSource).GetTransform();
+                if (transformSource.Parent)
+                {
+                    auto& parent = m_Context->GetEntityByUUID(transformSource.Parent).GetTransform();
+                    parent.Children.erase(std::find(parent.Children.begin(), parent.Children.end(), idSource));
+
+                    transformSource.Parent = 0;
+                    transformSource.ParentTransform = glm::mat4(1.0f);
+                    m_Context->m_RootEntityMap[idSource] = entity;
+
+                    TransformSystem::SetSubtreeDirty(m_Context.get(), entityID);
+
+                    changed = true;
+                }
+            }
+
+            if (transform.PrefabAsset)
+            {
+                if (ImGui::MenuItem("Toggle Children"))
+                    transform.HideChild = !transform.HideChild;
+            }
             ImGui::EndPopup();
         }
 
-        if (opened)
+        // 拖动
+        if (ImGui::BeginDragDropSource())
         {
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+            UUID id = entity.GetUUID();
+            ImGui::SetDragDropPayload("TRANSFORM_NODE", &id, sizeof(id));
+            ImGui::Text("%s", tag.Tag.c_str());
+            ImGui::EndDragDropSource();
+        }
 
-            bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
-            if (opened)
+        if (ImGui::BeginDragDropTarget() && transform.PrefabAsset == 0)
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TRANSFORM_NODE"))
             {
-                ImGui::TreePop();
+                UUID idTarget = entity.GetUUID();
+                UUID idSource = *(UUID*)payload->Data;
+                if (idTarget != idSource)
+                {
+                    auto& transformTarget = transform;
+                    Entity eSource = m_Context->GetEntityByUUID(idSource);
+                    auto& transformSource = eSource.GetTransform();
+                    if (transformSource.Parent)
+                    {
+                        auto& parent = m_Context->GetEntityByUUID(transformSource.Parent).GetTransform();
+                        parent.Children.erase(std::find(parent.Children.begin(), parent.Children.end(), idSource));
+                    }
+                    else
+                    {
+                        m_Context->m_RootEntityMap.erase(idSource);
+                    }
+                    transformTarget.Children.push_back(idSource);
+                    transformSource.Parent = idTarget;
+
+                    TransformSystem::SetSubtreeDirty(m_Context.get(), eSource);
+
+                    changed = true;
+                }
             }
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("RESOURCE_BROWSER_ITEM"))
+            {
+                UUID idTarget = entity.GetUUID();
+                AssetHandle handle_ = *(AssetHandle*)payload->Data;
+                if (AssetManager::GetAssetType(handle_) == AssetType::Prefab)
+                {
+                    // 当作Prefab嵌入
+                    // 反序列化
+                    SceneSerializer serializer(m_Context);
+                    serializer.DeserializeTo(handle_, idTarget);
+                    // 保存资源句柄
+                    
+                    changed = true;
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (transform.Open)
+        {
+            if (canBeOpen)
+            {
+                for (auto& uid : transform.Children)
+                {
+                    Entity entityChild = m_Context->GetEntityByUUID(uid);
+                    if (DrawEntityNode(entityChild))
+                        break;
+                }
+            }
+
             ImGui::TreePop();
         }
 
@@ -104,13 +215,20 @@ namespace Nous {
             m_Context->DestroyEntity(entity);
             if (m_Context->GetSelectedEntity() == entity)
                 m_Context->SetSelectedEntity({});
+            changed = true;
         }
+
+        return changed;
     }
 
     template<typename T, typename UIFunction>
     static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
     {
-        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+        const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen 
+            | ImGuiTreeNodeFlags_Framed 
+            | ImGuiTreeNodeFlags_SpanAvailWidth 
+            | ImGuiTreeNodeFlags_AllowItemOverlap 
+            | ImGuiTreeNodeFlags_FramePadding;
         if (entity.HasComponent<T>())
         {
             auto& component = entity.GetComponent<T>();
@@ -187,13 +305,27 @@ namespace Nous {
             ImGui::EndPopup();
         }
 
-        DrawComponent<CTransform>("CTransform", entity, [](auto& component)
+        DrawComponent<CTransform>("CTransform", entity, [&](auto& component)
         {
-            UI::DrawVec3Control("Position", component.Translation);
+            if (component.PrefabAsset)
+            {
+                float width = ImGui::GetContentRegionAvailWidth();
+                if (ImGui::Button("Reload Prefab", {width, 0}))
+                {
+                    NS_TRACE("Reload Prefab {}", component.PrefabAsset);
+                }
+            }
+            
+            bool changed = false;
+
+            if (UI::DrawVec3Control("Position", component.Translation)) changed = true;
             glm::vec3 rotation = glm::degrees(component.Rotation);
-            UI::DrawVec3Control("Rotation", rotation);
+            if (UI::DrawVec3Control("Rotation", rotation)) changed = true;
             component.Rotation = glm::radians(rotation);
-            UI::DrawVec3Control("Scale", component.Scale, 1.0f);
+            if (UI::DrawVec3Control("Scale", component.Scale, 1.0f)) changed = true;
+
+            if (changed)
+                TransformSystem::SetSubtreeDirty(m_Context.get(), entity);
         });
 
         DrawComponent<CCamera>("CCamera", entity, [](auto& component){
@@ -271,7 +403,7 @@ namespace Nous {
                         if (field.Type == ScriptFieldType::Float)
                         {
                             auto data = scriptInstance->GetFieldValue<float>(name);
-                            if (UI::DrawFloatControl(name.c_str(), &data))
+                            if (UI::DrawFloatControl(name, &data))
                             {
                                 scriptInstance->SetFieldValue(name, data);
                             }
@@ -279,7 +411,7 @@ namespace Nous {
                         if (field.Type == ScriptFieldType::Vector2)
                         {
                             auto data = scriptInstance->GetFieldValue<glm::vec2>(name);
-                            if (UI::DrawVec2Control(name.c_str(), data))
+                            if (UI::DrawVec2Control(name, data))
                             {
                                 scriptInstance->SetFieldValue(name, data);
                             }
@@ -287,83 +419,113 @@ namespace Nous {
                         else if (field.Type == ScriptFieldType::Bool)
                         {
                             auto data = scriptInstance->GetFieldValue<bool>(name);
-                            if (UI::DrawCheckbox(name.c_str(), &data))
+                            if (UI::DrawCheckbox(name, &data))
                             {
+                                scriptInstance->SetFieldValue(name, data);
+                            }
+                        }
+                        else if (field.Type == ScriptFieldType::Prefab)
+                        {
+                            auto data = scriptInstance->GetFieldValue<AssetHandleWrapper>(name);
+                            AssetHandle handle = data.Handle;
+                            if (UI::DrawAssetDragDropBox(name, AssetManager::GetAssetFileName(handle), &handle, AssetType::Prefab))
+                            {
+                                data.Handle = handle;
                                 scriptInstance->SetFieldValue(name, data);
                             }
                         }
                     }
                 }
             }
-            else
+            else if (scriptClassExists)
             {
-                if (scriptClassExists)
+                Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+                const auto& fields = entityClass->GetFields();
+                auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+
+                for (const auto& [name, field] : fields)
                 {
-                    Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
-                    const auto& fields = entityClass->GetFields();
-                    auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
-
-                    for (const auto& [name, field] : fields)
+                    // 如果该字段已经缓存
+                    if (entityFields.find(name) != entityFields.end())
                     {
-                        // 如果该字段已经缓存
-                        if (entityFields.find(name) != entityFields.end())
-                        {
-                            ScriptFieldInstance& scriptField = entityFields.at(name);
+                        ScriptFieldInstance& scriptField = entityFields.at(name);
 
-                            // 
-                            if (field.Type == ScriptFieldType::Float)
+                        // 
+                        if (field.Type == ScriptFieldType::Float)
+                        {
+                            auto data = scriptField.GetValue<float>();
+                            if (UI::DrawFloatControl(name, &data))
+                                scriptField.SetValue(data);
+                        }
+                        else if (field.Type == ScriptFieldType::Vector2)
+                        {
+                            auto data = scriptField.GetValue<glm::vec2>();
+                            if (UI::DrawVec2Control(name, data))
+                                scriptField.SetValue(data);
+                        }
+                        else if (field.Type == ScriptFieldType::Bool)
+                        {
+                            auto data = scriptField.GetValue<bool>();
+                            if (UI::DrawCheckbox(name, &data))
+                                scriptField.SetValue(data);
+                        }
+                        else if (field.Type == ScriptFieldType::Prefab)
+                        {
+                            auto data = scriptField.GetValue<AssetHandleWrapper>();
+                            AssetHandle handle = data.Handle;
+                            if (UI::DrawAssetDragDropBox(name, AssetManager::GetAssetFileName(handle), &handle, AssetType::Prefab))
                             {
-                                auto data = scriptField.GetValue<float>();
-                                if (UI::DrawFloatControl(name.c_str(), &data))
-                                    scriptField.SetValue(data);
-                            }
-                            else if (field.Type == ScriptFieldType::Vector2)
-                            {
-                                auto data = scriptField.GetValue<glm::vec2>();
-                                if (UI::DrawVec2Control(name.c_str(), data))
-                                    scriptField.SetValue(data);
-                            }
-                            else if (field.Type == ScriptFieldType::Bool)
-                            {
-                                auto data = scriptField.GetValue<bool>();
-                                if (UI::DrawCheckbox(name.c_str(), &data))
-                                    scriptField.SetValue(data);
+                                data.Handle = handle;
+                                scriptField.SetValue(data);
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (field.Type == ScriptFieldType::Float)
                         {
-                            if (field.Type == ScriptFieldType::Float)
+                            float data = 0.0f;
+                            if (UI::DrawFloatControl(name, &data))
                             {
-                                float data = 0.0f;
-                                if (UI::DrawFloatControl(name.c_str(), &data))
-                                {
-                                    ScriptFieldInstance& scriptField = entityFields[name];
+                                ScriptFieldInstance& scriptField = entityFields[name];
 
-                                    scriptField.Field = field;
-                                    scriptField.SetValue(data);
-                                }
+                                scriptField.Field = field;
+                                scriptField.SetValue(data);
                             }
-                            else if (field.Type == ScriptFieldType::Vector2)
+                        }
+                        else if (field.Type == ScriptFieldType::Vector2)
+                        {
+                            glm::vec2 data(0.0f);
+                            if (UI::DrawVec2Control(name, data))
                             {
-                                glm::vec2 data(0.0f);
-                                if (UI::DrawVec2Control(name.c_str(), data))
-                                {
-                                    ScriptFieldInstance& scriptField = entityFields[name];
+                                ScriptFieldInstance& scriptField = entityFields[name];
 
-                                    scriptField.Field = field;
-                                    scriptField.SetValue(data);
-                                }
+                                scriptField.Field = field;
+                                scriptField.SetValue(data);
                             }
-                            else if (field.Type == ScriptFieldType::Bool)
+                        }
+                        else if (field.Type == ScriptFieldType::Bool)
+                        {
+                            bool data = false;
+                            if (UI::DrawCheckbox(name, &data))
                             {
-                                bool data = false;
-                                if (UI::DrawCheckbox(name.c_str(), &data))
-                                {
-                                    ScriptFieldInstance& scriptField = entityFields[name];
+                                ScriptFieldInstance& scriptField = entityFields[name];
 
-                                    scriptField.Field = field;
-                                    scriptField.SetValue(data);
-                                }
+                                scriptField.Field = field;
+                                scriptField.SetValue(data);
+                            }
+                        }
+                        else if (field.Type == ScriptFieldType::Prefab)
+                        {
+                            AssetHandleWrapper data{0};
+                            AssetHandle handle = data.Handle;
+                            if (UI::DrawAssetDragDropBox(name, AssetManager::GetAssetFileName(handle), &handle, AssetType::Prefab))
+                            {
+                                ScriptFieldInstance& scriptField = entityFields[name];
+
+                                scriptField.Field = field;
+                                data.Handle = handle;
+                                scriptField.SetValue(data);
                             }
                         }
                     }
@@ -379,17 +541,7 @@ namespace Nous {
             bool isTextureValid = false;
             if (component.Texture != 0)
             {
-                if (AssetManager::IsAssetHandleValid(component.Texture)
-                    && AssetManager::GetAssetType(component.Texture) == AssetType::Texture2D)
-                {
-                    const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetMetadata(component.Texture);
-                    btnLabel = metadata.FilePath.filename().string();
-                    isTextureValid = true;
-                }
-                else
-                {
-                    btnLabel = "Invalid";
-                }
+                btnLabel = AssetManager::GetAssetFileName(component.Texture);
             }
 
             AssetHandle handle = component.Texture;
@@ -484,6 +636,14 @@ namespace Nous {
                 component.Type = outType;
             }
         });
+    }
+
+    void SceneHierarchyPanel::OnSavePrefab(SavePrefabEvent& e)
+    {
+        Entity rootEntity = m_Context->GetEntityByUUID(e.Root);
+        std::filesystem::path path = e.Dir / (rootEntity.GetName() + ".nsprefab");
+        SceneSerializer serializer(m_Context);
+        serializer.SerializeFrom(path, rootEntity.GetUUID());
     }
 
     template<typename T>

@@ -22,6 +22,18 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string Entity_GetName(ulong entityID, out string name);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_SetParent(ulong entityID, ulong parentID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_AddChild(ulong entityID, ulong childID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static int Entity_GetChildCount(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static ulong Entity_GetChildAt(ulong entityID, int index);
 		#endregion
 
 		#region TransformComponent
@@ -85,6 +97,14 @@ namespace Nous
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void AnimPlayerComponent_SetBool(ulong entityID, string key, bool value);
 		#endregion AnimPlayerComponent
+
+		#region Prefab
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Prefab_GetFilePath(ulong handle);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Prefab_Instantate(ulong prefabID, out ulong newEntity);
+		#endregion
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);

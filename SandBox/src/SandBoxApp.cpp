@@ -1,6 +1,9 @@
 ﻿#include "Nous.h"
 #include "Nous/Core/EntryPoint.h"
 
+#include "Nous/Renderer/Renderer.h"
+#include "Nous/Script/ScriptEngine.h"
+
 #include "SandBox2D.h"
 
 namespace Nous {
@@ -11,12 +14,15 @@ namespace Nous {
         Sandbox(const ApplicationSpecification& specification)
             : Application(specification)
         {
-            PushLayer(new SandBox2D());
+            ScriptEngine::Init();
+            Renderer::Init();
+            PushLayer(new SandBox2D(this, specification));
         }
 
         ~Sandbox()
         {
-
+            Renderer::Shutdown();
+            ScriptEngine::Shutdown();
         }
     };
 

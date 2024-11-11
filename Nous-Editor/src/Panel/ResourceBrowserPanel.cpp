@@ -57,6 +57,8 @@ namespace Nous
         ImGui::SameLine();
         ImGui::SliderFloat("Icon Size", &thumbnailSize, 16, 512);
 
+        ImGui::BeginChild("Icons", {0, 0}, false);
+
         ImGui::Columns(columnCount, 0, false);
 
         if (m_Mode == Mode::Asset)
@@ -220,6 +222,21 @@ namespace Nous
         }
 
         ImGui::Columns(1);
+
+        ImGui::EndChild();
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TRANSFORM_NODE"))
+            {
+                UUID uuid = *(UUID*)payload->Data;
+
+                SavePrefabEvent event{ uuid , m_CurrentDirectory };
+                EditorEventEmitter::Emit(event);
+            }
+            ImGui::EndDragDropTarget();
+        }
+        
         ImGui::End();
     }
 

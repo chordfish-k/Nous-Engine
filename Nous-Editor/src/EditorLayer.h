@@ -18,6 +18,7 @@ namespace Nous {
     {
     public:
         EditorLayer();
+        EditorLayer(Application* application, const ApplicationSpecification& spec);
         virtual ~EditorLayer() = default;
 
         virtual void OnAttached() override;
@@ -76,6 +77,7 @@ namespace Nous {
         AnimMachineEditorPanel m_AnimMachineEditorPanel;
 
         bool m_ShowPhysicsColliders = false;
+        bool m_ShowRuntimePhysicsColliders = false;
 
         enum class SceneState
         {

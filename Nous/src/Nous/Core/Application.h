@@ -27,6 +27,9 @@ namespace Nous {
     struct ApplicationSpecification
     {
         std::string Name = "Nous Application";
+        std::string ImguiConfigFile = "imgui.ini";
+        unsigned int Width = 1600;
+        unsigned int Height = 900;
         std::string WorkingDirectory;
         ApplicationCommandLineArgs CommandLineArgs;
     };

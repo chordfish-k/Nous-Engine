@@ -7,11 +7,10 @@
 
 extern Nous::Application* Nous::CreateApplication(ApplicationCommandLineArgs args);
 
-
 int main(int argc, char** argv)
 {
     bool toFile = false;
-    for (int i = 1; i < argc; i++)
+    for (int i = 2; i < argc; i++)
     {
         if (strcmp(argv[i], "--log") == 0)
         {

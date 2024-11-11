@@ -10,6 +10,7 @@ namespace Nous {
     {
         OpenScene = 0,
         AssetFileDoubleClick,
+        SavePrefab,
         ConsoleClear
     };
 
@@ -37,6 +38,15 @@ namespace Nous {
         ConsoleClearEvent() {}
 
         EDITOR_EVENT_CLASS_TYPE(ConsoleClear);
+    };
+
+    struct SavePrefabEvent : public EditorEvent
+    {
+        UUID Root;
+        std::filesystem::path Dir;
+        SavePrefabEvent(const UUID& root, const std::filesystem::path& dir) : Root(root), Dir(dir) {};
+
+        EDITOR_EVENT_CLASS_TYPE(SavePrefab);
     };
 
     struct AssetFileDoubleClickEvent : public EditorEvent

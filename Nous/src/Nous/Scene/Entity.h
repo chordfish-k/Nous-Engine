@@ -63,6 +63,7 @@ namespace Nous {
 
         UUID GetUUID() { return GetComponent<CUuid>().ID; }
         std::string GetName() { return GetComponent<CTag>().Tag; }
+        CTransform& GetTransform() { return GetComponent<CTransform>(); }
 
         bool operator==(const Entity& other) const {
             return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;

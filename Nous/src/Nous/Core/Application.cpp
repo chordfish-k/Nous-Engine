@@ -23,13 +23,11 @@ namespace Nous {
         if (!m_Specification.WorkingDirectory.empty())
             std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-        m_Window = Window::Create(WindowProps(m_Specification.Name));
+        m_Window = Window::Create(WindowProps(m_Specification.Name, m_Specification.Width, m_Specification.Height));
         m_Window->SetEventCallback(NS_BIND_EVENT_FN(Application::OnEvent));
 
-        Renderer::Init();
-
         // 创建ImGui层
-        m_ImGuiLayer = new ImGuiLayer();
+        m_ImGuiLayer = new ImGuiLayer(this, m_Specification.ImguiConfigFile);
         PushOverlay(m_ImGuiLayer);
 
     }
@@ -37,9 +35,6 @@ namespace Nous {
     Application::~Application()
     {
         NS_PROFILE_FUNCTION();
-
-        ScriptEngine::Shutdown();
-        Renderer::Shutdown();
     }
 
     void Application::OnEvent(Event& e)

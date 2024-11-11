@@ -15,6 +15,7 @@ namespace Nous
 	static std::map<AssetType, AssetImportFunction> s_AssetImportFunctions = {
 		{ AssetType::Texture2D, TextureImporter::ImportTexture2D },
 		{ AssetType::Scene, SceneImporter::ImportScene },
+		{ AssetType::Prefab, SceneImporter::ImportScene },
 		{ AssetType::AnimClip, AnimClipImporter::ImportAnimClip },
 		{ AssetType::AnimMachine, AnimMachineImporter::ImportAnimMachine }
 	};

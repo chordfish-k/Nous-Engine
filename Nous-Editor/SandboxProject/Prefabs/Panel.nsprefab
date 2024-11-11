@@ -1,0 +1,33 @@
+Entities:
+  - Entity: 13957864780229522697
+    CTag:
+      Tag: Panel
+    CTransform:
+      Translation: [-0.275163293, 1.34978044, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.31410885, 0.121454932, 1]
+      Parent: 0
+      Open: true
+      PrefabAsset: 0
+      HideChild: false
+    CMonoScript:
+      ClassName: Sandbox.Panel
+      ScriptFields:
+        []
+    CSpriteRenderer:
+      Color: [0.832740188, 0.567648828, 0.177809313, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      SheetWidth: 0
+      SheetHeight: 0
+      Index: 0
+    CRigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    CBoxCollider2D:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 1
+      Restitution: 0
+      RestitutionThreshold: 50

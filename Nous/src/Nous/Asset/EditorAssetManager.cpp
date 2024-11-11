@@ -10,6 +10,7 @@ namespace Nous
 {
     static std::map<std::filesystem::path, AssetType> s_AssetExtensionMap = {
         { ".nous", AssetType::Scene},
+        { ".nsprefab", AssetType::Prefab},
         { ".png", AssetType::Texture2D},
         { ".jpg", AssetType::Texture2D},
         { ".jpeg", AssetType::Texture2D},
@@ -139,14 +140,24 @@ namespace Nous
     void EditorAssetManager::SerializeAssetRegistry()
     {
         auto path = Project::GetActiveAssetRegistryPath();
+        EditorAssetManager::SerializeAssetRegistry(m_AssetRegistry, path);
+    }
 
+    bool EditorAssetManager::DeserializeAssetRegistry()
+    {
+        auto path = Project::GetActiveAssetRegistryPath();
+        return EditorAssetManager::DeserializeAssetRegistry(m_AssetRegistry, path);
+    }
+
+    void EditorAssetManager::SerializeAssetRegistry(AssetRegistry& reg, const std::filesystem::path& filepath)
+    {
         YAML::Emitter out;
         {
             out << YAML::BeginMap; // Root
             out << YAML::Key << "AssetRegistry" << YAML::Value;
 
             out << YAML::BeginSeq;
-            for (const auto& [handle, metadata] : m_AssetRegistry)
+            for (auto& [handle, metadata] : reg)
             {
                 out << YAML::BeginMap;
                 out << YAML::Key << "Handle" << YAML::Value << handle;
@@ -159,21 +170,20 @@ namespace Nous
             out << YAML::EndMap; // Root
         }
 
-        std::ofstream fout(path);
+        std::ofstream fout(filepath);
         fout << out.c_str();
     }
 
-    bool EditorAssetManager::DeserializeAssetRegistry()
+    bool EditorAssetManager::DeserializeAssetRegistry(AssetRegistry& reg, const std::filesystem::path& filepath)
     {
-        auto path = Project::GetActiveAssetRegistryPath();
         YAML::Node data;
         try
         {
-            data = YAML::LoadFile(path.string());
+            data = YAML::LoadFile(filepath.string());
         }
         catch (const std::exception& e)
         {
-            NS_CORE_ERROR("无法加载资源注册表 '{0}'\n  {1}", path, e.what());
+            NS_CORE_ERROR("无法加载资源注册表 '{0}'\n  {1}", filepath, e.what());
             return false;
         }
 
@@ -183,9 +193,13 @@ namespace Nous
 
         for (const auto& node : rootNode)
         {
+            std::string relativePath = node["FilePath"].as<std::string>();
+            std::filesystem::path path = Project::GetActiveAssetDirectory() / relativePath;
+            if (!std::filesystem::exists(path))
+                continue;
             AssetHandle handle = node["Handle"].as<uint64_t>();
-            auto& metadata = m_AssetRegistry[handle];
-            metadata.FilePath = node["FilePath"].as<std::string>();
+            auto& metadata = reg[handle];
+            metadata.FilePath = relativePath;
             metadata.Type = AssetTypeFromString(node["Type"].as<std::string>());
         }
 

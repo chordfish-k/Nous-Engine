@@ -40,7 +40,9 @@ namespace Nous
 		{"System.UInt64",	ScriptFieldType::ULong	},
 
 		{"Nous.Entity",		ScriptFieldType::Entity	},
+		{"Nous.Prefab",		ScriptFieldType::Prefab	},
 		{"Nous.Vector2",	ScriptFieldType::Vector2},
+		{"Nous.Vector3",	ScriptFieldType::Vector3},
 	};
 
 	namespace Utils
@@ -215,6 +217,9 @@ namespace Nous
 
 	void ScriptEngine::ShutdownMono()
 	{
+		if (!s_Data)
+			return;
+
 		mono_domain_set(mono_get_root_domain(), false);
 
 		if (s_Data->AppDomain)
@@ -284,17 +289,21 @@ namespace Nous
 
 	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
-		NS_CORE_TRACE("加载dll: {}", filepath.string());
-		s_Data->AppAssemblyFilePath = filepath;
-		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
-		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
-		if (s_Data->CoreAssembly == nullptr)
-			return false;
+		if (std::filesystem::exists(filepath))
+		{
+			NS_CORE_TRACE("加载dll: {}", filepath.string());
+			s_Data->AppAssemblyFilePath = filepath;
+			s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+			s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+			if (s_Data->CoreAssembly == nullptr)
+				return false;
 
-		// 监视文件变动并重载
-		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
-		s_Data->AssemblyReloadPending = false;
-		return true;
+			// 监视文件变动并重载
+			s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
+			s_Data->AssemblyReloadPending = false;
+			return true;
+		}
+		return false;
 	}
 
 	std::vector<std::string> ScriptEngine::FindDependencies()

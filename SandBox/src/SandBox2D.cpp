@@ -14,9 +14,14 @@ namespace Nous
     static Ref<Font> s_Font;
 
     SandBox2D::SandBox2D()
-        : Layer("SandBox2D")
+        : Layer(nullptr, "SandBox2D")
     {
         s_Font = Font::GetDefault();
+    }
+
+    SandBox2D::SandBox2D(Application* application, const ApplicationSpecification& spec)
+        : Layer(application, "SandBox2D")
+    {
     }
 
     void SandBox2D::OnAttached()
@@ -110,6 +115,15 @@ namespace Nous
         DockingSpace::BeginDocking();
         // Viewport
         m_ViewportPanel.OnImGuiRender();
+
+        ImGui::Begin("Settings");
+
+        bool vsync = Application::Get().GetWindow().IsVSync();
+        if (ImGui::Checkbox("vsync", &vsync))
+        {
+            Application::Get().GetWindow().SetVSync(vsync);
+        }
+        ImGui::End();
 
         DockingSpace::EndDocking();
     }

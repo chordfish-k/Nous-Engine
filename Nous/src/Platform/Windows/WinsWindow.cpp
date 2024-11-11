@@ -66,6 +66,25 @@ namespace Nous {
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
 
+        // 窗口居中
+        {
+            // 获取屏幕分辨率
+            int screenWidth, screenHeight;
+            glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), NULL, NULL, &screenWidth, &screenHeight);
+
+            // 获取窗口大小
+            int windowWidth, windowHeight;
+            glfwGetWindowSize(m_Window, &windowWidth, &windowHeight);
+
+            // 计算窗口居中位置
+            int xPos = (screenWidth - windowWidth) / 2;
+            int yPos = (screenHeight - windowHeight) / 2;
+
+            // 设置窗口位置
+            glfwSetWindowPos(m_Window, xPos, yPos);
+        }
+        
+
         // 设置GLFW回调
         glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* win, int w, int h)
         {
@@ -175,6 +194,7 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
+        m_Data.VSync = enabled;
         if (enabled)
             glfwSwapInterval(1);
         else

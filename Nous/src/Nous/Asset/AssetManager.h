@@ -31,7 +31,6 @@ namespace Nous
 			return Project::GetActive()->GetAssetManager()->GetAssetType(handle);
 		}
 
-		template<typename T>
 		static std::string GetAssetFileName(AssetHandle handle)
 		{
 			std::string btnLabel = "None";

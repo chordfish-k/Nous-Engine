@@ -5,12 +5,33 @@
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Asset/AssetManager.h"
 
+#include <fstream>
+
 namespace Nous
 {
+	
+
 	Ref<Project> Project::New()
 	{
-		s_ActiveProject = CreateRef<Project>();
-		return s_ActiveProject;
+		return CreateRef<Project>();
+	}
+
+	Ref<Project> Project::New(const std::filesystem::path& path)
+	{
+		auto proj = CreateRef<Project>();
+		auto& config = proj->GetConfig();
+		config.Name = path.filename().string();
+		config.AssetRegistryPath = "AssetRegistry.nsasset";
+		config.ScriptModulePath = std::filesystem::path("Bin\\App") / (config.Name + ".dll");
+		config.AssetDirectory = ".";
+		config.StartScene = 0;
+
+		Ref<EditorAssetManager> editorAssetManager = CreateRef<EditorAssetManager>();
+		proj->m_AssetManager = editorAssetManager;
+		proj->m_ProjectDirectory = path;
+		proj->m_ProjectFilePath = path / (config.Name + ".nsproj");
+
+		return proj;
 	}
 
 	Ref<Project> Project::Load(const std::filesystem::path& path)
@@ -38,6 +59,20 @@ namespace Nous
 		if (serializer.Serialize(path))
 		{
 			s_ActiveProject->m_ProjectDirectory = path.parent_path();
+			return true;
+		}
+		return false;
+	}
+
+	bool Project::SaveNew(Ref<Project> project)
+	{
+		ProjectSerializer serializer(project);
+		if (serializer.Serialize(project->m_ProjectFilePath))
+		{
+			EditorAssetManager::SerializeAssetRegistry(
+				project->GetEditorAssetManager()->GetAssetRegistry(), 
+				project->m_ProjectDirectory / project->GetConfig().AssetRegistryPath);
+
 			return true;
 		}
 		return false;
@@ -136,4 +171,6 @@ namespace Nous
 		}
 
 	}
+
+	
 }

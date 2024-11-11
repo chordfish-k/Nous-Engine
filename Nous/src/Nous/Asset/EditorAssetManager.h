@@ -25,10 +25,13 @@ namespace Nous
 		const AssetMetadata& GetMetadata(AssetHandle handle) const;
 		const std::filesystem::path& GetFilePath(AssetHandle handle) const;
 
-		const AssetRegistry& GetAssetRegistry() const { return m_AssetRegistry; }
+		AssetRegistry& GetAssetRegistry() { return m_AssetRegistry; }
 
 		void SerializeAssetRegistry();
 		bool DeserializeAssetRegistry();
+
+		static void SerializeAssetRegistry(AssetRegistry& reg, const std::filesystem::path& filepath);
+		static bool DeserializeAssetRegistry(AssetRegistry& reg, const std::filesystem::path& filepath);
 
 	private:
 		AssetRegistry m_AssetRegistry;

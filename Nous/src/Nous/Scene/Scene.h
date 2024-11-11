@@ -15,6 +15,8 @@ namespace Nous {
 
     class Entity;
 
+    struct CTransform;
+
     class Scene : public Asset
     {
     public:
@@ -47,6 +49,7 @@ namespace Nous {
 
         Entity GetEntityByUUID(UUID uuid);
         Entity GetEntityByName(std::string_view name);
+        std::unordered_map<UUID, entt::entity>& GetRootEntities() { return m_RootEntityMap; };
 
         Entity GetPrimaryCameraEntity();
         Entity GetSelectedEntity();
@@ -78,6 +81,7 @@ namespace Nous {
         entt::entity m_SelectedEntityID = { entt::null };
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;
+        std::unordered_map<UUID, entt::entity> m_RootEntityMap;
 
         friend class Entity;
         friend class SceneSerializer;

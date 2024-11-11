@@ -35,6 +35,8 @@ namespace Sandbox
         private float m_JumpTimer = 0.0f;
         public Vector2 Velocity;
 
+        public Prefab TestPrefab;
+
         private bool m_IsJumpKeyPress = false;
         private bool m_OnGround = false;
         private bool m_IsJumping = false;
@@ -44,7 +46,10 @@ namespace Sandbox
 
         private Dictionary<ulong, Vector2> m_Collisions;
         private Dictionary<ulong, Panel> m_StandingPanel;
-        
+
+        private float m_TotalDt = 0.0f;
+        private int m_CountFrame = 50;
+        private int m_FrameCD = 0;
         void OnCreate()
         {
             m_Transform = GetComponent<CTransform>();
@@ -53,6 +58,13 @@ namespace Sandbox
 
             m_Collisions = new Dictionary<ulong, Vector2>();
             m_StandingPanel = new Dictionary<ulong, Panel>();
+
+            if (TestPrefab.Handle != 0)
+            {
+                Entity newEntity = TestPrefab.Instantate();
+                newEntity.SetParent(this);
+                newEntity.Translation = new Vector3(0, 0, -1.0f);
+            }
         }
 
         void OnStart()
@@ -168,7 +180,7 @@ namespace Sandbox
 
             // 下落过程比上升过程快
             if (!m_OnGround && Velocity.Y < 0)
-                Velocity.Y -= AccelFalling;
+                Velocity.Y -= AccelFalling * dt;
 
             // 如果在撞墙：不再施加速度，自由滑落
             if (m_OnWallDir == Direction.Left && Velocity.X < 0 || m_OnWallDir == Direction.Right && Velocity.X > 0)
@@ -177,7 +189,16 @@ namespace Sandbox
                 NousConsole.Log("YES");
             }
 
-            m_Text.Text = "" + dt;
+
+            m_TotalDt += dt;
+            m_FrameCD++;
+            if (m_FrameCD == m_CountFrame)
+            {
+                float fps =  m_CountFrame / m_TotalDt;
+                m_Text.Text = "" + fps;
+                m_FrameCD = 0;
+                m_TotalDt = 0;
+            }
             m_Rigidbody.LinearVelocity = Velocity;
 
             // 设置动画状态机
