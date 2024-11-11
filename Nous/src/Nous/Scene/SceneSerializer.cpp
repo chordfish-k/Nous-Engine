@@ -627,7 +627,7 @@ namespace Nous {
         fout << out.c_str();
     }
 
-    void SceneSerializer::SerializeFrom(const std::filesystem::path& filepath, UUID root)
+    void SceneSerializer::SerializePrefabFrom(const std::filesystem::path& filepath, UUID root)
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
@@ -729,7 +729,7 @@ namespace Nous {
     }
 
     // 用于prefab
-    bool SceneSerializer::DeserializeTo(AssetHandle sceneHandle, UUID to, UUID* outRootUUID)
+    bool SceneSerializer::DeserializePrefabTo(AssetHandle sceneHandle, UUID to, UUID* outRootUUID)
     {
         auto filepath = Project::GetActiveAssetDirectory() / Project::GetActive()->GetEditorAssetManager()->GetFilePath(sceneHandle);
 

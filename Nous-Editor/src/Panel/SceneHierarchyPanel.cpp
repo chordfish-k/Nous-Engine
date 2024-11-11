@@ -185,7 +185,7 @@ namespace Nous {
                     // 当作Prefab嵌入
                     // 反序列化
                     SceneSerializer serializer(m_Context);
-                    serializer.DeserializeTo(handle_, idTarget);
+                    serializer.DeserializePrefabTo(handle_, idTarget);
                     // 保存资源句柄
                     
                     changed = true;
@@ -643,7 +643,7 @@ namespace Nous {
         Entity rootEntity = m_Context->GetEntityByUUID(e.Root);
         std::filesystem::path path = e.Dir / (rootEntity.GetName() + ".nsprefab");
         SceneSerializer serializer(m_Context);
-        serializer.SerializeFrom(path, rootEntity.GetUUID());
+        serializer.SerializePrefabFrom(path, rootEntity.GetUUID());
     }
 
     template<typename T>

@@ -422,7 +422,7 @@ namespace Nous
 		{
 			SceneSerializer serializer(scene);
 			UUID outRoot;
-			serializer.DeserializeTo(prefabID, 0, &outRoot);
+			serializer.DeserializePrefabTo(prefabID, 0, &outRoot);
 			Entity e = scene->GetEntityByUUID(outRoot);
 
 			if (e.HasComponent<CMonoScript>())
