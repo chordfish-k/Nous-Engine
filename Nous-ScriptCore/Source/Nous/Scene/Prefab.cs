@@ -22,5 +22,11 @@
             }
             return "";
         }
+
+        public Entity Instantate()
+        {
+            InternalCalls.Prefab_Instantate(Handle, out ulong entityID);
+            return new Entity(entityID);
+        }
     }
 }

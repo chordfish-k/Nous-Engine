@@ -2,6 +2,9 @@ AssetRegistry:
   - Handle: 618681295933084313
     FilePath: Anim/jumpR.nsani
     Type: AssetType::AnimClip
+  - Handle: 700198873422233085
+    FilePath: Prefabs/Square.nsprefab
+    Type: AssetType::Prefab
   - Handle: 809185336578540949
     FilePath: Textures/character_jump_right.png
     Type: AssetType::Texture2D

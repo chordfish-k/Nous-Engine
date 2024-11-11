@@ -24,7 +24,16 @@ namespace Nous
 		internal extern static string Entity_GetName(ulong entityID, out string name);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void Entity_Instantate(ulong entityID, ulong prefabID, out ulong newEntity);
+		internal extern static string Entity_SetParent(ulong entityID, ulong parentID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_AddChild(ulong entityID, ulong childID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static int Entity_GetChildCount(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static ulong Entity_GetChildAt(ulong entityID, int index);
 		#endregion
 
 		#region TransformComponent
@@ -92,6 +101,9 @@ namespace Nous
 		#region Prefab
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string Prefab_GetFilePath(ulong handle);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Prefab_Instantate(ulong prefabID, out ulong newEntity);
 		#endregion
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]

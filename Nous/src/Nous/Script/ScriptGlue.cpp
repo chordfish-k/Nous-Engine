@@ -102,22 +102,85 @@ namespace Nous
 		*name = ScriptEngine::CreateString(e.GetName().c_str());
 	}
 
-	static void Entity_Instantate(UUID entityID, AssetHandle prefabID, UUID* newEntity)
+	static UUID Entity_GetParent(UUID entityID)
+	{
+		return 0;
+	}
+
+	static void Entity_SetParent(UUID entityID, UUID parentID)
 	{
 		NS_CORE_ASSERT_ENTITYID(entityID);
 		NS_CORE_ASSERT(scene);
-		if (AssetManager::IsAssetHandleValid(prefabID))
+		Entity e = { scene->GetEntityByUUID(entityID), scene };
+		UUID& preParent = e.GetTransform().Parent;
+
+		if (preParent)
 		{
-			SceneSerializer serializer(scene);
-			UUID outRoot;
-			serializer.DeserializeTo(prefabID, entityID, &outRoot);
-			Entity e = scene->GetEntityByUUID(outRoot);
-			auto& tr = e.GetTransform();
-			tr.Translation = glm::vec3(0.0f);
-			auto instance = ScriptEngine::GetEntityScriptInstance(outRoot);
-			instance->InvokeOnCreate();
-			*newEntity = outRoot;
+			Entity preParentE = scene->GetEntityByUUID(preParent);
+			auto& children = preParentE.GetTransform().Children;
+			auto it = std::find(children.begin(), children.end(), entityID);
+			if (it != children.end())
+				children.erase(it);
 		}
+		else
+		{
+			auto& roots = scene->GetRootEntities();
+			if (roots.find(entityID) != roots.end())
+				roots.erase(entityID);
+		}
+
+		Entity newParentE = scene->GetEntityByUUID(parentID);
+		if (newParentE)
+		{
+			preParent = parentID;
+			newParentE.GetTransform().Children.push_back(entityID);
+		}
+	}
+
+	static void Entity_AddChild(UUID entityID, UUID childID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		Entity e = { scene->GetEntityByUUID(entityID), scene };
+		Entity childE = scene->GetEntityByUUID(childID);
+		UUID& preParent = childE.GetTransform().Parent;
+
+		if (preParent)
+		{
+			Entity preParentE = scene->GetEntityByUUID(preParent);
+			auto& children = preParentE.GetTransform().Children;
+			auto it = std::find(children.begin(), children.end(), childID);
+			if (it != children.end())
+				children.erase(it);
+		}
+		else
+		{
+			auto& roots = scene->GetRootEntities();
+			if (roots.find(childID) != roots.end())
+				roots.erase(childID);
+		}
+
+		preParent = entityID;
+		e.GetTransform().Children.push_back(childID);
+	}
+
+	static int Entity_GetChildCount(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		return entity.GetTransform().Children.size();
+	}
+
+	static uint64_t Entity_GetChildAt(UUID entityID, int index)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		auto& tr = entity.GetTransform();
+		if (tr.Children.size() > index && index >= 0)
+		{
+			return tr.Children.at(index);
+		}
+		return 0;
 	}
 
 	// Transform：获取位移
@@ -135,8 +198,6 @@ namespace Nous
 
 		auto& tr = entity.GetComponent<CTransform>();
 		tr.Translation = *translation;
-		tr.Dirty = true;
-
 		TransformSystem::SetSubtreeDirty(scene, entity);
 	}
 
@@ -313,6 +374,26 @@ namespace Nous
 			return ScriptEngine::CreateString("");
 	}
 
+	static void Prefab_Instantate(AssetHandle prefabID, UUID* newEntity)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		NS_CORE_ASSERT(scene);
+		if (AssetManager::IsAssetHandleValid(prefabID))
+		{
+			SceneSerializer serializer(scene);
+			UUID outRoot;
+			serializer.DeserializeTo(prefabID, 0, &outRoot);
+			Entity e = scene->GetEntityByUUID(outRoot);
+			auto& tr = e.GetTransform();
+			tr.Translation = glm::vec3(0.0f);
+
+			if (e.HasComponent<CMonoScript>())
+				ScriptEngine::OnCreateEntity(e);
+
+			*newEntity = outRoot;
+		}
+	}
+
 	// 输入：键盘按键按下
 	static bool Input_IsKeyDown(KeyCode keycode)
 	{
@@ -375,7 +456,11 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Entity_HasComponent);
 		NS_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 		NS_ADD_INTERNAL_CALL(Entity_GetName);
-		NS_ADD_INTERNAL_CALL(Entity_Instantate);
+		NS_ADD_INTERNAL_CALL(Entity_SetParent);
+		NS_ADD_INTERNAL_CALL(Entity_GetParent);
+		NS_ADD_INTERNAL_CALL(Entity_AddChild);
+		NS_ADD_INTERNAL_CALL(Entity_GetChildAt);
+		NS_ADD_INTERNAL_CALL(Entity_GetChildCount);
 
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
@@ -400,6 +485,8 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetBool);
 
 		NS_ADD_INTERNAL_CALL(Prefab_GetFilePath);
+		NS_ADD_INTERNAL_CALL(Prefab_Instantate);
+
 
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
 

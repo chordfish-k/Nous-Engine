@@ -732,10 +732,6 @@ namespace Nous {
     bool SceneSerializer::DeserializeTo(AssetHandle sceneHandle, UUID to, UUID* outRootUUID)
     {
         auto filepath = Project::GetActiveAssetDirectory() / Project::GetActive()->GetEditorAssetManager()->GetFilePath(sceneHandle);
-        if (to == 0)
-        {
-            return Deserialize(filepath);
-        }
 
         YAML::Node data;
         try

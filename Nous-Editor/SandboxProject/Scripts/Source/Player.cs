@@ -35,7 +35,7 @@ namespace Sandbox
         private float m_JumpTimer = 0.0f;
         public Vector2 Velocity;
 
-        public Prefab Prefab;
+        public Prefab TestPrefab;
 
         private bool m_IsJumpKeyPress = false;
         private bool m_OnGround = false;
@@ -58,14 +58,18 @@ namespace Sandbox
 
             m_Collisions = new Dictionary<ulong, Vector2>();
             m_StandingPanel = new Dictionary<ulong, Panel>();
+
+            if (TestPrefab.Handle != 0)
+            {
+                Entity newEntity = TestPrefab.Instantate();
+                newEntity.SetParent(this);
+                newEntity.Translation = new Vector3(0, 0, -1.0f);
+            }
         }
 
         void OnStart()
         {
             m_Text = FindEntityByName("Text")?.As<TheText>();
-            //if (Prefab.Handle != 0)
-                //Instantate(Prefab);
-            //NousConsole.Log($"Prefab: {Prefab.GetFilePath()}");
         }
 
         void OnUpdate(float dt)

@@ -67,12 +67,31 @@ namespace Nous
 			return instance as T;
         }
 
-		public Entity Instantate(Prefab prefab)
+		public void SetParent(Entity parent)
         {
-			InternalCalls.Entity_Instantate(ID, prefab.Handle, out ulong entityID);
-			Entity e = new Entity(entityID);
-			
-			return e;
+			InternalCalls.Entity_SetParent(ID, parent.ID);
+        }
+
+		public void AddChild(Entity child)
+		{
+			InternalCalls.Entity_AddChild(ID, child.ID);
+		}
+
+		public int GetChildCount()
+		{
+			return InternalCalls.Entity_GetChildCount(ID);
+		}
+
+		public Entity GetChildAt(int index)
+		{
+			if (index >= 0)
+            {
+				ulong child = InternalCalls.Entity_GetChildAt(ID, index);
+				if (child == 0)
+					return null;
+				return new Entity(child);
+            }
+			return null;
 		}
 	}
 }
