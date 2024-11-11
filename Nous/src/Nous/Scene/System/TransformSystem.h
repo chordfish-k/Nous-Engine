@@ -8,5 +8,7 @@ namespace Nous
 	{
 	public:
 		static void Update(Scene* scene);
+
+		static void SetSubtreeDirty(Scene* scene, entt::entity entity);
 	};
 }

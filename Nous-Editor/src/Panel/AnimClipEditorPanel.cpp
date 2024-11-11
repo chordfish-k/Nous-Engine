@@ -108,7 +108,7 @@ namespace Nous
 		{
 			// Image
 			AssetHandle handle = s_Clip->ImageHandle;
-			if (UI::DrawAssetDragDropBox("Image", AssetManager::GetAssetFileName<Texture2D>(handle), &handle, AssetType::Texture2D))
+			if (UI::DrawAssetDragDropBox("Image", AssetManager::GetAssetFileName(handle), &handle, AssetType::Texture2D))
 				s_Clip->ImageHandle = handle;
 
 			// Spec
@@ -164,7 +164,7 @@ namespace Nous
 				}
 				else if (s_Clip->Type == AnimClipType::Single)
 				{
-					std::string name = AssetManager::GetAssetFileName<Texture2D>(frame.ImageHandle);
+					std::string name = AssetManager::GetAssetFileName(frame.ImageHandle);
 					ImGui::Button(name.c_str(), { availW / 2 - padx, lineHeight });
 					if (ImGui::BeginDragDropTarget())
 					{

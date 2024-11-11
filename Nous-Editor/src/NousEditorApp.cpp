@@ -18,6 +18,7 @@ namespace Nous {
         NousEditor(const ApplicationSpecification& spec)
             : Application(spec)
         {
+            ScriptEngine::Init();
             Renderer::Init();
             PushLayer(new EditorLayer(this, spec));
         }
@@ -48,6 +49,8 @@ namespace Nous {
             spec.Name = "Nous Editor";
             spec.CommandLineArgs = args;
             spec.ImguiConfigFile = "editor.ini";
+
+            Console::Init();
             return new NousEditor(spec);
         }
         else
@@ -59,6 +62,7 @@ namespace Nous {
             spec.Width = 300;
             spec.Height = 200;
             spec.ImguiConfigFile = "luncher.ini";
+
             return new NousEditorLuncher(spec);
         }
         

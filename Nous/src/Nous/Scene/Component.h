@@ -38,6 +38,8 @@ namespace Nous {
         UUID Parent = 0;
         bool Open = true;
         bool HideChild = false;
+        bool Dirty = true;
+        bool HasRigidBody = false;
         AssetHandle PrefabAsset = 0;
         std::vector<UUID> Children;
 

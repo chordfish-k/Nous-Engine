@@ -665,6 +665,10 @@ namespace Nous
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         m_ViewportPanel.SetContext(m_ActiveScene);
+
+        fpsTotal = 0;
+        fpsC = fpsCC;
+
     }
 
     void EditorLayer::OnSceneSimulate()

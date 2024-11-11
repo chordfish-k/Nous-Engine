@@ -66,5 +66,13 @@ namespace Nous
 			object instance = InternalCalls.Entity_GetScriptInstance(ID);
 			return instance as T;
         }
+
+		public Entity Instantate(Prefab prefab)
+        {
+			InternalCalls.Entity_Instantate(ID, prefab.Handle, out ulong entityID);
+			Entity e = new Entity(entityID);
+			
+			return e;
+		}
 	}
 }

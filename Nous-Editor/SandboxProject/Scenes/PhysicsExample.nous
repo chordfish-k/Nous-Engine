@@ -8,6 +8,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -38,6 +40,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -68,6 +72,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -98,6 +104,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -128,6 +136,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -158,6 +168,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -193,6 +205,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -228,6 +242,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -258,6 +274,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -288,6 +306,8 @@ Entities:
       Scale: [13.8000002, 0.400000006, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -314,12 +334,14 @@ Entities:
       Scale: [1, 1, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Player
       ScriptFields:
         - Name: AccelFalling
           Type: Float
-          Data: 0.200000003
+          Data: 10
         - Name: CoyoteTime
           Type: Float
           Data: 0.100000001
@@ -332,6 +354,9 @@ Entities:
         - Name: MinJumpSpeed
           Type: Float
           Data: 2
+        - Name: Prefab
+          Type: Prefab
+          Data: 2240635507524881865
         - Name: Speed
           Type: Float
           Data: 3
@@ -364,6 +389,8 @@ Entities:
       Scale: [13.8000002, 1, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CSpriteRenderer:
       Color: [0.360553145, 0.709163308, 0.172346443, 1]
       TextureHandle: 0
@@ -390,6 +417,8 @@ Entities:
       Scale: [1, 1, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CSpriteRenderer:
       Color: [0.999989986, 1, 0.999990046, 1]
       TextureHandle: 5215514554843654355
@@ -416,6 +445,8 @@ Entities:
       Scale: [1, 1, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CCamera:
       Camera:
         ProjectionType: 1
@@ -442,6 +473,8 @@ Entities:
       Scale: [1.31410885, 0.121454932, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.Panel
       ScriptFields:
@@ -472,6 +505,8 @@ Entities:
       Scale: [1, 9.19999981, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -498,6 +533,8 @@ Entities:
       Scale: [1, 9.19999981, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CSpriteRenderer:
       Color: [0.832740188, 0.567648828, 0.177809313, 1]
       TextureHandle: 0
@@ -524,6 +561,8 @@ Entities:
       Scale: [1, 1, 1]
       Parent: 0
       Open: true
+      PrefabAsset: 0
+      HideChild: false
     CMonoScript:
       ClassName: Sandbox.TheText
     CTextRenderer:

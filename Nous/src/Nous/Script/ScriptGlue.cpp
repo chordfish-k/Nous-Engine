@@ -6,16 +6,18 @@
 #include "Nous/Core/Console.h"
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Entity.h"
-
+#include "Nous/Scene/SceneSerializer.h"
 #include "Nous/Core/KeyCodes.h"
 #include "Nous/Core/Input.h"
 
 #include "Nous/Physics/Physics2D.h"
 
 #include "Nous/Scene/System/PhysicsSystem.h"
+#include "Nous/Scene/System/TransformSystem.h"
 
 #include "Nous/Asset/AssetManager.h"
 #include "Nous/Anim/AnimMachine.h"
+
 
 #include "mono/metadata/object.h"
 #include "mono/metadata/reflection.h"
@@ -100,6 +102,24 @@ namespace Nous
 		*name = ScriptEngine::CreateString(e.GetName().c_str());
 	}
 
+	static void Entity_Instantate(UUID entityID, AssetHandle prefabID, UUID* newEntity)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		if (AssetManager::IsAssetHandleValid(prefabID))
+		{
+			SceneSerializer serializer(scene);
+			UUID outRoot;
+			serializer.DeserializeTo(prefabID, entityID, &outRoot);
+			Entity e = scene->GetEntityByUUID(outRoot);
+			auto& tr = e.GetTransform();
+			tr.Translation = glm::vec3(0.0f);
+			auto instance = ScriptEngine::GetEntityScriptInstance(outRoot);
+			instance->InvokeOnCreate();
+			*newEntity = outRoot;
+		}
+	}
+
 	// Transform：获取位移
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
 	{
@@ -113,7 +133,11 @@ namespace Nous
 	{
 		NS_CORE_ASSERT_ENTITYID(entityID);
 
-		entity.GetComponent<CTransform>().Translation = *translation;
+		auto& tr = entity.GetComponent<CTransform>();
+		tr.Translation = *translation;
+		tr.Dirty = true;
+
+		TransformSystem::SetSubtreeDirty(scene, entity);
 	}
 
 	// Rigidbody2D：应用线性冲量（施加力）
@@ -277,6 +301,18 @@ namespace Nous
 		}
 	}
 
+	static MonoString* Prefab_GetFilePath(AssetHandle handle)
+	{
+		bool valid = AssetManager::IsAssetHandleValid(handle);
+		if (valid)
+		{
+			std::string path = Project::GetActive()->GetEditorAssetManager()->GetFilePath(handle).generic_string();
+			return ScriptEngine::CreateString(path.c_str());
+		}
+		else
+			return ScriptEngine::CreateString("");
+	}
+
 	// 输入：键盘按键按下
 	static bool Input_IsKeyDown(KeyCode keycode)
 	{
@@ -339,6 +375,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Entity_HasComponent);
 		NS_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 		NS_ADD_INTERNAL_CALL(Entity_GetName);
+		NS_ADD_INTERNAL_CALL(Entity_Instantate);
 
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
@@ -361,6 +398,8 @@ namespace Nous
 
 		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetFloat);
 		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetBool);
+
+		NS_ADD_INTERNAL_CALL(Prefab_GetFilePath);
 
 		NS_ADD_INTERNAL_CALL(Input_IsKeyDown);
 

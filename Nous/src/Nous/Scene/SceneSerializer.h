@@ -7,6 +7,7 @@ namespace Nous {
     class SceneSerializer
     {
     public:
+        SceneSerializer(Scene* scene);
         SceneSerializer(const Ref<Scene>& scene);
 
         void Serialize(const std::filesystem::path& filepath);
@@ -14,10 +15,10 @@ namespace Nous {
         void SerializeRuntime(const std::filesystem::path& filepath);
 
         bool Deserialize(const std::filesystem::path& filepath);
-        bool DeserializeTo(AssetHandle sceneHandle, UUID to);
+        bool DeserializeTo(AssetHandle sceneHandle, UUID to, UUID* outRootUUID = nullptr);
         bool DeserializeRuntime(const std::filesystem::path& filepath);
     private:
-        Ref<Scene> m_Scene;
+        Scene* m_Scene = nullptr;
     };
 
 }

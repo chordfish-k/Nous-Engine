@@ -22,6 +22,9 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string Entity_GetName(ulong entityID, out string name);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Entity_Instantate(ulong entityID, ulong prefabID, out ulong newEntity);
 		#endregion
 
 		#region TransformComponent
@@ -85,6 +88,11 @@ namespace Nous
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void AnimPlayerComponent_SetBool(ulong entityID, string key, bool value);
 		#endregion AnimPlayerComponent
+
+		#region Prefab
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Prefab_GetFilePath(ulong handle);
+		#endregion
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);

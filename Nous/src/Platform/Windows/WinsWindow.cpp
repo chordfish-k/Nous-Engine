@@ -194,6 +194,7 @@ namespace Nous {
     {
         NS_PROFILE_FUNCTION();
 
+        m_Data.VSync = enabled;
         if (enabled)
             glfwSwapInterval(1);
         else

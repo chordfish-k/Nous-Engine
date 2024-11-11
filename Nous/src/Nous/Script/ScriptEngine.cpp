@@ -40,7 +40,9 @@ namespace Nous
 		{"System.UInt64",	ScriptFieldType::ULong	},
 
 		{"Nous.Entity",		ScriptFieldType::Entity	},
+		{"Nous.Prefab",		ScriptFieldType::Prefab	},
 		{"Nous.Vector2",	ScriptFieldType::Vector2},
+		{"Nous.Vector3",	ScriptFieldType::Vector3},
 	};
 
 	namespace Utils

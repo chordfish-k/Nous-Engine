@@ -5,6 +5,10 @@
 #include "Nous/Scene/Entity.h"
 
 #include "ScriptSystem.h"
+#include "TransformSystem.h"
+
+#include "Nous/Renderer/Renderer2D.h"
+
 
 // Box2D
 #include "box2d/box2d.h"
@@ -20,7 +24,6 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
-#include "Nous/Renderer/Renderer2D.h"
 
 namespace Nous
 {
@@ -88,6 +91,8 @@ namespace Nous
                 rootBody = s_PhysicsWorld->CreateBody(&bodyDef);
                 rootBody->SetFixedRotation(rb2d.FixedRotation);
                 rb2d.RuntimeBody = rootBody;
+
+                transformC.HasRigidBody = true;
             }
             
             
@@ -268,46 +273,11 @@ namespace Nous
         // 物理更新
         if (s_PhysicsWorld)
         {
-#if 0
-            auto view2 = s_Scene->GetAllEntitiesWith<CBoxCollider2D>();
-            for (auto e : view2)
-            {
-                Entity entity = { e, s_Scene };
-                auto& transform = entity.GetComponent<CTransform>();
-                auto& box = entity.GetComponent<CBoxCollider2D>();
-
-                // 更新顶点
-                auto fixture = (b2Fixture*)box.RuntimeFixture;
-                if (!fixture->GetBody()->IsAwake())
-                    continue;
-
-                auto shape = (b2PolygonShape*)fixture->GetShape();
-                float hx = box.Size.x;
-                float hy = box.Size.y;
-                b2Vec2 points[4] =
-                {
-                    {-hx, -hy },
-                    { hx, -hy },
-                    { hx,  hy },
-                    {-hx,  hy }
-                };
-                for (int i = 0; i < shape->m_count; i++)
-                {
-                    auto& p = shape->m_vertices[i];
-                    //glm::vec4 gp = { p.x, p.y, 0, 1 };
-                    glm::vec4 gp = { points[i].x, points[i].y, 0, 1 };
-                    gp = transform.ParentTransform * transform.GetTransform() * gp;
-                    auto pp = fixture->GetBody()->GetLocalPoint({ gp.x, gp.y });
-                    p.x = pp.x;
-                    p.y = pp.y;
-                }
-            }
-#endif
             // 控制物理模拟的迭代次数
-            const int32_t velocityIterations = 6;
-            const int32_t positionIterations = 2;
+            constexpr int32_t velocityIterations = 6;
+            constexpr int32_t positionIterations = 2;
+            
             s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-
             // 从Box2D中取出transform数据
             auto view = s_Scene->GetAllEntitiesWith<CRigidbody2D>();
             for (auto e : view)
@@ -317,11 +287,11 @@ namespace Nous
                 auto& rb2d = entity.GetComponent<CRigidbody2D>();
 
                 b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                if (!body->IsAwake() && rb2d.Type == CRigidbody2D::BodyType::Dynamic)
+                if (!body->IsAwake())
                     continue;
 
                 const auto& position = body->GetPosition();
-                
+
                 glm::mat4 tr = glm::inverse(transform.ParentTransform)
                     * glm::translate(glm::mat4(1.0f), { position.x, position.y, 0 })
                     * glm::toMat4(glm::quat({ 0, 0, body->GetAngle() }));
@@ -336,6 +306,8 @@ namespace Nous
                 transform.Translation.x = translation.x;
                 transform.Translation.y = translation.y;
                 transform.Rotation.z = rotation.z;
+
+                TransformSystem::SetSubtreeDirty(s_Scene, e);
             }
         }
 

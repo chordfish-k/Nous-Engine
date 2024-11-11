@@ -4,6 +4,7 @@
 #include "Nous/Scene/Entity.h"
 #include "Nous/Scene/Component.h"
 #include "Nous/Script/ScriptEngine.h"
+#include "Nous/Script/ScriptGlue.h"
 #include "Nous/Core/UUID.h"
 #include "Nous/Project/Project.h"
 
@@ -105,6 +106,23 @@ namespace YAML {
             return true;
         }
     };
+
+    template<>
+    struct convert<Nous::AssetHandleWrapper>
+    {
+        static Node encode(const Nous::AssetHandleWrapper& wrapper)
+        {
+            Node node;
+            node.push_back((uint64_t)wrapper);
+            return node;
+        }
+
+        static bool decode(const Node& node, Nous::AssetHandleWrapper& wrapper)
+        {
+            wrapper = node.as<uint64_t>();
+            return true;
+        }
+    };
 }
 
 namespace Nous {
@@ -166,8 +184,13 @@ namespace Nous {
         return CRigidbody2D::BodyType::Static;
     }
 
-    SceneSerializer::SceneSerializer(const Ref <Scene>& scene)
+    SceneSerializer::SceneSerializer(Scene* scene)
         : m_Scene(scene)
+    {
+    }
+
+    SceneSerializer::SceneSerializer(const Ref <Scene>& scene)
+        : m_Scene(scene.get())
     {
     }
 
@@ -279,7 +302,11 @@ namespace Nous {
                         WRITE_SCRIPT_FIELD(Vector2, glm::vec2   );
                         WRITE_SCRIPT_FIELD(Vector3, glm::vec3   );
                         WRITE_SCRIPT_FIELD(Vector4, glm::vec4   );
-                        WRITE_SCRIPT_FIELD(Entity,  UUID        );
+                        WRITE_SCRIPT_FIELD(Entity,  UUID);
+                        WRITE_SCRIPT_FIELD(Prefab, AssetHandleWrapper);
+                    /*case ScriptFieldType::Prefab:                    
+                        out << scriptField.GetValue<AssetHandleWrapper>().Handle;            
+                        break;*/
                     }
                     out << YAML::EndMap; // ScriptField
                 }
@@ -463,6 +490,13 @@ namespace Nous {
                         READ_SCRIPT_FIELD(Vector3, glm::vec3);
                         READ_SCRIPT_FIELD(Vector4, glm::vec4);
                         READ_SCRIPT_FIELD(Entity, UUID);
+                        READ_SCRIPT_FIELD(Prefab, AssetHandleWrapper);
+                    //case ScriptFieldType::Prefab:                   
+                    //{                                                  
+                    //    auto data = scriptField["Data"].as<AssetHandleWrapper>();    
+                    //    fieldInstance.SetValue(data);                  
+                    //    break;                                         
+                    //}
                     }
                 }
             }
@@ -580,7 +614,7 @@ namespace Nous {
         out << YAML::BeginMap;
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
         m_Scene->m_Registry.each([&](auto entityID){
-            Entity entity = { entityID, m_Scene.get() };
+            Entity entity = { entityID, m_Scene };
             if (!entity)
                return;
 
@@ -689,13 +723,13 @@ namespace Nous {
             DeserializeEntity(entity, deserializedEntity);
         }
 
-        ReconstructEntityTree(m_Scene.get());
+        ReconstructEntityTree(m_Scene);
 
         return true;
     }
 
     // 用于prefab
-    bool SceneSerializer::DeserializeTo(AssetHandle sceneHandle, UUID to)
+    bool SceneSerializer::DeserializeTo(AssetHandle sceneHandle, UUID to, UUID* outRootUUID)
     {
         auto filepath = Project::GetActiveAssetDirectory() / Project::GetActive()->GetEditorAssetManager()->GetFilePath(sceneHandle);
         if (to == 0)
@@ -760,12 +794,16 @@ namespace Nous {
                 {
                     tc.PrefabAsset = sceneHandle;
                     tc.HideChild = true;
+                    if (outRootUUID)
+                    {
+                        *outRootUUID = uuid;
+                    }
                 }
             }
             DeserializeEntity(entity, deserializedEntity);
         }
 
-        ReconstructEntityTree(m_Scene.get());
+        ReconstructEntityTree(m_Scene);
 
         return true;
     }

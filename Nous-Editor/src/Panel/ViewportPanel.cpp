@@ -1,6 +1,7 @@
 ﻿#include "ViewportPanel.h"
 
 #include "Nous/Core/Application.h"
+#include "Nous/Scene/System/TransformSystem.h"
 
 #include "Panel/SceneHierarchyPanel.h"
 #include "Event/EditorEvent.h"
@@ -163,6 +164,8 @@ namespace Nous
                     }
                     if (m_GizmoType == ImGuizmo::OPERATION::SCALE)
                         tc.Scale = scale;
+
+                    TransformSystem::SetSubtreeDirty(m_Context.get(), selectedEntity);
                 }
             }
         }

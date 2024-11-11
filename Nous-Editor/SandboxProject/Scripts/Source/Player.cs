@@ -35,6 +35,8 @@ namespace Sandbox
         private float m_JumpTimer = 0.0f;
         public Vector2 Velocity;
 
+        public Prefab Prefab;
+
         private bool m_IsJumpKeyPress = false;
         private bool m_OnGround = false;
         private bool m_IsJumping = false;
@@ -61,6 +63,9 @@ namespace Sandbox
         void OnStart()
         {
             m_Text = FindEntityByName("Text")?.As<TheText>();
+            //if (Prefab.Handle != 0)
+                //Instantate(Prefab);
+            //NousConsole.Log($"Prefab: {Prefab.GetFilePath()}");
         }
 
         void OnUpdate(float dt)
@@ -171,7 +176,7 @@ namespace Sandbox
 
             // 下落过程比上升过程快
             if (!m_OnGround && Velocity.Y < 0)
-                Velocity.Y -= AccelFalling;
+                Velocity.Y -= AccelFalling * dt;
 
             // 如果在撞墙：不再施加速度，自由滑落
             if (m_OnWallDir == Direction.Left && Velocity.X < 0 || m_OnWallDir == Direction.Right && Velocity.X > 0)

@@ -9,6 +9,7 @@ namespace Nous
     {
     public:
         SandBox2D();
+        SandBox2D(Application* application, const ApplicationSpecification& spec);
         virtual ~SandBox2D() = default;
 
         virtual void OnAttached() override;

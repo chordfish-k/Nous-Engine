@@ -28,7 +28,7 @@ namespace Nous
 		Bool, Char, Byte, Short, Int, Long,
 		UByte, UShort, UInt, ULong,
 		Vector2, Vector3, Vector4,
-		Entity
+		Entity, Prefab
 	};
 
 	struct ScriptField
@@ -223,6 +223,7 @@ namespace Nous
 				case ScriptFieldType::Vector3:	return "Vector3";
 				case ScriptFieldType::Vector4:	return "Vector4";
 				case ScriptFieldType::Entity:	return "Entity";
+				case ScriptFieldType::Prefab:	return "Prefab";
 			}
 			NS_CORE_ASSERT(false, "未知的脚本字段类型");
 			return "<Invaild>";
@@ -247,6 +248,7 @@ namespace Nous
 			if (type == "Vector3")	return ScriptFieldType::Vector3;
 			if (type == "Vector4")	return ScriptFieldType::Vector4;
 			if (type == "Entity")	return ScriptFieldType::Entity;
+			if (type == "Prefab")	return ScriptFieldType::Prefab;
 
 			NS_CORE_ASSERT(false, "未知的脚本字段类型");
 			return ScriptFieldType::None;

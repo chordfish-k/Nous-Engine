@@ -5,6 +5,9 @@ AssetRegistry:
   - Handle: 809185336578540949
     FilePath: Textures/character_jump_right.png
     Type: AssetType::Texture2D
+  - Handle: 2240635507524881865
+    FilePath: Prefabs/Panel.nsprefab
+    Type: AssetType::Prefab
   - Handle: 2907078287622620602
     FilePath: Textures/kid/player_idle_2.png
     Type: AssetType::Texture2D
