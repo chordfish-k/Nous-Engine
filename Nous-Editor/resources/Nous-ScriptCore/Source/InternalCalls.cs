@@ -22,6 +22,24 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string Entity_GetName(ulong entityID, out string name);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_SetParent(ulong entityID, ulong parentID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_AddChild(ulong entityID, ulong childID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static int Entity_GetChildCount(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static ulong Entity_GetChildAt(ulong entityID, int index);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Entity_GetWorldTranslation(ulong entityID, out Vector3 result);
+
+		/*[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static Vector2 Entity_GetLocalTranslationTo(ulong entityID, Vector2 translation, ulong toID);*/
 		#endregion
 
 		#region TransformComponent
@@ -29,7 +47,7 @@ namespace Nous
 		internal extern static void TransformComponent_GetTranslation(ulong entityID, out Vector3 translation);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void TransformComponent_SetTranslation(ulong entityID, ref Vector3 translation);
+		internal extern static void TransformComponent_SetTranslation(ulong entityID, Vector3 translation);
 		#endregion
 
         #region Rigidbody2DComponent
@@ -85,6 +103,14 @@ namespace Nous
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void AnimPlayerComponent_SetBool(ulong entityID, string key, bool value);
 		#endregion AnimPlayerComponent
+
+		#region Prefab
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Prefab_GetFilePath(ulong handle);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Prefab_Instantate(ulong prefabID, out ulong newEntity);
+		#endregion
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_IsKeyDown(KeyCode keycode);

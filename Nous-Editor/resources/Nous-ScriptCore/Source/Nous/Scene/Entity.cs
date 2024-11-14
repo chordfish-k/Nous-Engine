@@ -24,7 +24,7 @@ namespace Nous
 
 			set
             {
-				InternalCalls.TransformComponent_SetTranslation(ID, ref value);
+				InternalCalls.TransformComponent_SetTranslation(ID, value);
 			}
         }
 
@@ -65,6 +65,39 @@ namespace Nous
         {
 			object instance = InternalCalls.Entity_GetScriptInstance(ID);
 			return instance as T;
+        }
+
+		public void SetParent(Entity parent)
+        {
+			InternalCalls.Entity_SetParent(ID, parent.ID);
+        }
+
+		public void AddChild(Entity child)
+		{
+			InternalCalls.Entity_AddChild(ID, child.ID);
+		}
+
+		public int GetChildCount()
+		{
+			return InternalCalls.Entity_GetChildCount(ID);
+		}
+
+		public Entity GetChildAt(int index)
+		{
+			if (index >= 0)
+            {
+				ulong child = InternalCalls.Entity_GetChildAt(ID, index);
+				if (child == 0)
+					return null;
+				return new Entity(child);
+            }
+			return null;
+		}
+
+		public Vector3 GetWorldTranslation()
+        {
+			InternalCalls.Entity_GetWorldTranslation(ID, out Vector3 result);
+			return result;
         }
 	}
 }

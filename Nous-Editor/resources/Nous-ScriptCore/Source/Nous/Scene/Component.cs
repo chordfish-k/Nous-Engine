@@ -22,7 +22,7 @@ namespace Nous
             }
             set
             {
-                InternalCalls.TransformComponent_SetTranslation(Entity.ID, ref value);
+                InternalCalls.TransformComponent_SetTranslation(Entity.ID, value);
             }
         }
     }

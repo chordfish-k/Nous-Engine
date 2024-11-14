@@ -222,7 +222,7 @@ namespace Nous {
     }
 
     template<typename T, typename UIFunction>
-    static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
+    static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool hasDeleteBtn = true)
     {
         const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen 
             | ImGuiTreeNodeFlags_Framed 
@@ -238,12 +238,15 @@ namespace Nous {
             float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
             ImGui::Separator();
             bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
-            ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
             ImGui::PopStyleVar();
 
-            if (ImGui::Button("x", { lineHeight, lineHeight }))
+            if (hasDeleteBtn)
             {
-                ImGui::OpenPopup("ComponentSettings");
+                ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+                if (ImGui::Button("x", { lineHeight, lineHeight }))
+                {
+                    ImGui::OpenPopup("ComponentSettings");
+                }
             }
 
             bool removeComponent = false;
@@ -326,7 +329,7 @@ namespace Nous {
 
             if (changed)
                 TransformSystem::SetSubtreeDirty(m_Context.get(), entity);
-        });
+        }, false);
 
         DrawComponent<CCamera>("CCamera", entity, [](auto& component){
             auto& camera = component.Camera;
