@@ -3,8 +3,8 @@ project "Nous-ScriptCore"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("../Nous-Editor/resources/scripts")
-	objdir ("../Nous-Editor/resources/scripts/intermediates")
+	targetdir ("../scripts")
+	objdir ("../scripts/intermediates")
 
 	files
 	{

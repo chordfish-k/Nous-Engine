@@ -99,5 +99,10 @@ namespace Nous
 			InternalCalls.Entity_GetWorldTranslation(ID, out Vector3 result);
 			return result;
         }
+
+		public void DestroyEntity()
+        {
+			InternalCalls.Entity_Destroy(ID);
+        }
 	}
 }

@@ -172,13 +172,39 @@ namespace Nous
         // 物理更新
         if (s_PhysicsWorld)
         {
+            auto view = s_Scene->GetAllEntitiesWith<CRigidbody2D>();
+            for (auto e : view)
+            {
+                Entity entity = { e, s_Scene };
+                auto& transform = entity.GetComponent<CTransform>();
+                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                if (!body)
+                {
+                    SetupRigidbody(e);
+                    body = (b2Body*)rb2d.RuntimeBody;
+                }
+
+                auto tr = transform.ParentTransform * transform.GetTransform();
+                // 世界坐标系矩阵结算
+                glm::vec3 scale, rotation, translation, _;
+                glm::vec4 __;
+                glm::quat orientation;
+                glm::decompose(tr, scale, orientation, translation, _, __);
+                rotation = glm::eulerAngles(orientation);
+
+                body->SetTransform({translation.x, translation.y}, rotation.z);
+            }
+
+
             // 控制物理模拟的迭代次数
             constexpr int32_t velocityIterations = 6;
             constexpr int32_t positionIterations = 2;
             
             s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
             // 从Box2D中取出transform数据
-            auto view = s_Scene->GetAllEntitiesWith<CRigidbody2D>();
+            
             for (auto e : view)
             {
                 Entity entity = { e, s_Scene };

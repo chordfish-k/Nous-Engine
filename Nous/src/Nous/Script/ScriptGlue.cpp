@@ -192,6 +192,13 @@ namespace Nous
 		*result = glm::vec3(worldPos.x, worldPos.y, tr.Translation.z);
 	}
 
+	static void Entity_Destroy(uint64_t entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		scene->DestroyEntity(entity);
+	}
+
 	// Transform：获取位移
 	static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outTranslation)
 	{
@@ -266,6 +273,7 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
+		// TODO 判断physicssystem是否运行
 		if (!body)
 		{
 			PhysicsSystem::SetupRigidbody(entity);
@@ -508,6 +516,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Entity_GetChildAt);
 		NS_ADD_INTERNAL_CALL(Entity_GetChildCount);
 		NS_ADD_INTERNAL_CALL(Entity_GetWorldTranslation);
+		NS_ADD_INTERNAL_CALL(Entity_Destroy);
 		
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

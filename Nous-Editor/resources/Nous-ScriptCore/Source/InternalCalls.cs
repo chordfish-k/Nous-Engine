@@ -38,8 +38,8 @@ namespace Nous
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Entity_GetWorldTranslation(ulong entityID, out Vector3 result);
 
-		/*[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static Vector2 Entity_GetLocalTranslationTo(ulong entityID, Vector2 translation, ulong toID);*/
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Entity_Destroy(ulong entityID);
 		#endregion
 
 		#region TransformComponent
