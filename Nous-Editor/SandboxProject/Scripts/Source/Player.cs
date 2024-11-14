@@ -35,10 +35,8 @@ namespace Sandbox
         private float m_JumpTimer = 0.0f;
         public Vector2 Velocity;
 
-        public Prefab TestPrefab;
-
         private bool m_IsJumpKeyPress = false;
-        private bool m_OnGround = false;
+        public bool m_OnGround = false;
         private bool m_IsJumping = false;
 
         private Direction m_OnWallDir = Direction.None;
@@ -58,13 +56,6 @@ namespace Sandbox
 
             m_Collisions = new Dictionary<ulong, Vector2>();
             m_StandingPanel = new Dictionary<ulong, Panel>();
-
-            if (TestPrefab.Handle != 0)
-            {
-                Entity newEntity = TestPrefab.Instantate();
-                newEntity.SetParent(this);
-                newEntity.Translation = new Vector3(0, 0, -1.0f);
-            }
         }
 
         void OnStart()
@@ -212,8 +203,8 @@ namespace Sandbox
         {
             Entity otherEntity = new Entity(otherID);
             
-            m_Collisions[otherID] = normal;
-
+            m_Collisions.Add(otherID, normal);
+            NousConsole.Log($"enter {normal.X} {normal.Y}");
             bool isPanel = otherEntity.Name == "Panel";
             // 检查是否在地面上
             if (normal.Y < 0)
@@ -242,9 +233,11 @@ namespace Sandbox
             Vector2 normal = Vector2.Zero;
             if (m_Collisions.ContainsKey(otherID))
             {
+                
                 normal = m_Collisions[otherID];
                 m_Collisions.Remove(otherID);
             }
+            NousConsole.Log($"exit {normal.X} {normal.Y}");
 
             if (normal == Vector2.Zero)
                 return;
@@ -269,7 +262,7 @@ namespace Sandbox
                 if (m_StandingPanel.Count > 0)
                 { 
                     // 仍然站在平台上，视为没有离开地面
-                    m_OnGround = true;
+                    //m_OnGround = true;
                 }
             }
 

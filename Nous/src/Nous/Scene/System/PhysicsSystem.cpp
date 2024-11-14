@@ -149,6 +149,8 @@ namespace Nous
         static DebugDraw debugDraw;
     }
 
+    static float s_TotalDt = 0;
+
 	void PhysicsSystem::Start(Scene* scene)
 	{
 		s_Scene = scene;
@@ -165,6 +167,8 @@ namespace Nous
         s_PhysicsWorld->SetContactListener(s_ContactListener);
         Utils::debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_centerOfMassBit);
         s_PhysicsWorld->SetDebugDraw(&Utils::debugDraw);
+
+        s_TotalDt = 0.0f;
 	}
 
 	void PhysicsSystem::Update(Timestep dt)
@@ -201,17 +205,19 @@ namespace Nous
             // 控制物理模拟的迭代次数
             constexpr int32_t velocityIterations = 6;
             constexpr int32_t positionIterations = 2;
-            
+#if 0          
             const float physicsTimestep = 1.0 / 60.0f;
-            static float totalDt = 0;
-            totalDt += dt;
-            if (totalDt >= physicsTimestep)
-            {
-                totalDt -= physicsTimestep;
-                s_PhysicsWorld->Step(physicsTimestep, velocityIterations, positionIterations);
-            }
-            // 从Box2D中取出transform数据
             
+            s_TotalDt += dt;
+            if (s_TotalDt >= physicsTimestep)
+            {
+                s_PhysicsWorld->Step(physicsTimestep, velocityIterations, positionIterations);
+                //while (s_TotalDt >= physicsTimestep) 
+                s_TotalDt -= physicsTimestep;
+            }
+#else
+            s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+#endif
             for (auto e : view)
             {
                 Entity entity = { e, s_Scene };
