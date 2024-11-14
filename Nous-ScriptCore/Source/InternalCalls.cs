@@ -34,6 +34,12 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static ulong Entity_GetChildAt(ulong entityID, int index);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Entity_GetWorldTranslation(ulong entityID, out Vector3 result);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Entity_Destroy(ulong entityID);
 		#endregion
 
 		#region TransformComponent
@@ -41,7 +47,7 @@ namespace Nous
 		internal extern static void TransformComponent_GetTranslation(ulong entityID, out Vector3 translation);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		internal extern static void TransformComponent_SetTranslation(ulong entityID, ref Vector3 translation);
+		internal extern static void TransformComponent_SetTranslation(ulong entityID, Vector3 translation);
 		#endregion
 
         #region Rigidbody2DComponent

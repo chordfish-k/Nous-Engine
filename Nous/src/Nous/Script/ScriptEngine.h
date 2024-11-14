@@ -171,6 +171,7 @@ namespace Nous
 		static bool EntityClassExists(const std::string& fullClassName);
 
 		static void OnCreateEntity(Entity entity);
+		static void OnDestoryEntity(Entity entity);
 		static void OnStartEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
 		static void OnCollisionPreSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);

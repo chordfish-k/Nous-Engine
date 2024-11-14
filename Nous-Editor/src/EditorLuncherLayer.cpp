@@ -9,14 +9,14 @@
 namespace Nous
 {
 	static std::filesystem::path s_EditorPath = std::filesystem::current_path();
-	static std::string MakePremakeScript() {
+	static std::string MakePremakeScript(const std::string& projName = "Sandbox") {
 		return std::string() +
-			"local RootDir = \"" + s_EditorPath.generic_string() + "\"" +
-			R"(
-include(RootDir .. "/resources/premake/premake_customization/solution_items.lua")
-workspace "Sandbox"
-	architecture "x86_64"
-	startproject "Sandbox"
+			"local RootDir = \"" + s_EditorPath.generic_string() + "\"\n" +
+	"include(RootDir .. \"/resources/premake/premake_customization/solution_items.lua\")\n"
+	"workspace \""+projName+"\"\n" +
+	"architecture \"x86_64\"\n" +
+	"startproject \""+projName+"\"" +
+R"(
 	configurations
 	{
 		"Debug",
@@ -32,7 +32,9 @@ workspace "Sandbox"
 		"MultiProcessorCompile"
 	}
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-project "Sandbox"
+)" +
+	"project \"" + projName + "\"\n" +
+R"(
 	kind "SharedLib"
 	language "C#"
 	dotnetframework "4.7.2"
@@ -111,7 +113,7 @@ group ""
 					// Ð´³öpremake5
 					auto luaPath = folder / "premake5.lua";
 					std::ofstream fout(luaPath);
-					fout << MakePremakeScript();
+					fout << MakePremakeScript(proj->GetConfig().Name);
 					fout.close();
 
 					// Éú³Ésln

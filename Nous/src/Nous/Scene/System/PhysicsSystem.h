@@ -2,6 +2,7 @@
 
 #include "Nous/Scene/Scene.h"
 
+class b2Body;
 
 namespace Nous
 {
@@ -15,6 +16,9 @@ namespace Nous
 		static void EnableDebugDraw(bool enable);
 
 		static void DisableLastContact();
+
+		static void SetupRigidbody(entt::entity e, b2Body* rootBody = nullptr);
+		static void DeleteRigidbody(entt::entity e);
 	};
 }
 

@@ -398,6 +398,22 @@ namespace Nous
 		}
 	}
 
+	void ScriptEngine::OnDestoryEntity(Entity entity)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			// TODO InvokeOnDestroy
+			//Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			//instance->InvokeOnStart();
+			s_Data->EntityInstances.erase(entityUUID);
+		}
+		else
+		{
+			NS_CORE_ERROR("[ScriptEngine] ÕÒ²»µ½ {0}(id={1}) µÄ ScriptInstance", entity.GetName(), entityUUID);
+		}
+	}
+
 	void ScriptEngine::OnStartEntity(Entity entity)
 	{
 		UUID entityUUID = entity.GetUUID();

@@ -57,107 +57,6 @@ namespace Nous
             return b2_staticBody;
         }
 
-        static void SetupRigidbody(entt::entity e, b2Body* rootBody = nullptr)
-        {
-            Entity entity{ e, s_Scene };
-            auto& transformC = entity.GetComponent<CTransform>();
-            auto transform = transformC.ParentTransform * transformC.GetTransform();
-
-            // 世界坐标系矩阵结算
-            glm::vec3 scale, rotation, translation, _;
-            glm::vec4 __;
-            glm::quat orientation;
-            glm::decompose(transform, scale, orientation, translation, _, __);
-            rotation = glm::eulerAngles(orientation);  // 将弧度转换为度数
-
-            bool hasBody = false;
-            if (entity.HasComponent<CRigidbody2D>())
-            {
-                hasBody = true;
-
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-                b2BodyDef bodyDef;
-                bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
-
-                bodyDef.position.Set(translation.x, translation.y);
-                bodyDef.angle = rotation.z;
-
-                // 将uuid存储在body中
-                b2BodyUserData userData;
-                userData.pointer = entity.GetUUID();
-                bodyDef.userData = userData;
-
-                rootBody = s_PhysicsWorld->CreateBody(&bodyDef);
-                rootBody->SetFixedRotation(rb2d.FixedRotation);
-                rb2d.RuntimeBody = rootBody;
-
-                transformC.HasRigidBody = true;
-            }
-            
-            
-            if (entity.HasComponent<CBoxCollider2D>() && rootBody)
-            {
-                auto& bc2d = entity.GetComponent<CBoxCollider2D>();
-                auto offset = bc2d.Offset;
-                b2PolygonShape boxShape;
-
-                float hx = bc2d.Size.x;
-                float hy = bc2d.Size.y;
-                b2Vec2 points[4] =
-                {
-                    {-hx + offset.x, -hy + offset.y},
-                    { hx + offset.x, -hy + offset.y},
-                    { hx + offset.x,  hy + offset.y},
-                    {-hx + offset.x,  hy + offset.y}
-                };
-
-                for (auto& v : points)
-                {
-                    glm::vec4 vec = { v.x, v.y, 0, 1 };
-                    vec = transform * vec;
-                    auto p = rootBody->GetLocalPoint({vec.x, vec.y});
-                    v.x = p.x;
-                    v.y = p.y;
-                }
-
-
-                boxShape.Set(points, 4);
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &boxShape;
-                fixtureDef.density = bc2d.Density;
-                fixtureDef.friction = bc2d.Friction;
-                fixtureDef.restitution = bc2d.Restitution;
-                fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-                
-                bc2d.RuntimeFixture = rootBody->CreateFixture(&fixtureDef);
-            }
-
-            if (entity.HasComponent<CCircleCollider2D>() && rootBody)
-            {
-                auto& cc2d = entity.GetComponent<CCircleCollider2D>();
-
-                b2CircleShape circleShape;
-                circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
-                circleShape.m_radius = scale.x * cc2d.Radius;
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &circleShape;
-                fixtureDef.density = cc2d.Density;
-                fixtureDef.friction = cc2d.Friction;
-                fixtureDef.restitution = cc2d.Restitution;
-                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-                cc2d.RuntimeFixture = rootBody->CreateFixture(&fixtureDef);
-            }
-
-            for (auto& uid : transformC.Children)
-            {
-                Entity childNode = s_Scene->GetEntityByUUID(uid);
-                SetupRigidbody((entt::entity)childNode, rootBody);
-            }
-        }
-
 
         class DebugDraw : public b2Draw 
         {
@@ -259,7 +158,7 @@ namespace Nous
         // 2.找出范围内所有Collider2D, 将其形状都作为fixture添加到根的body
         for (auto& [uuid, e] : s_Scene->GetRootEntities())
         {
-            Utils::SetupRigidbody(e);
+            SetupRigidbody(e);
         }
 
         s_ContactListener = new ContactListener();
@@ -273,12 +172,6 @@ namespace Nous
         // 物理更新
         if (s_PhysicsWorld)
         {
-            // 控制物理模拟的迭代次数
-            constexpr int32_t velocityIterations = 6;
-            constexpr int32_t positionIterations = 2;
-            
-            s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-            // 从Box2D中取出transform数据
             auto view = s_Scene->GetAllEntitiesWith<CRigidbody2D>();
             for (auto e : view)
             {
@@ -287,6 +180,43 @@ namespace Nous
                 auto& rb2d = entity.GetComponent<CRigidbody2D>();
 
                 b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                if (!body)
+                {
+                    SetupRigidbody(e);
+                    body = (b2Body*)rb2d.RuntimeBody;
+                }
+
+                auto tr = transform.ParentTransform * transform.GetTransform();
+                // 世界坐标系矩阵结算
+                glm::vec3 scale, rotation, translation, _;
+                glm::vec4 __;
+                glm::quat orientation;
+                glm::decompose(tr, scale, orientation, translation, _, __);
+                rotation = glm::eulerAngles(orientation);
+
+                body->SetTransform({translation.x, translation.y}, rotation.z);
+            }
+
+
+            // 控制物理模拟的迭代次数
+            constexpr int32_t velocityIterations = 6;
+            constexpr int32_t positionIterations = 2;
+            
+            s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+            // 从Box2D中取出transform数据
+            
+            for (auto e : view)
+            {
+                Entity entity = { e, s_Scene };
+                auto& transform = entity.GetComponent<CTransform>();
+                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                if (!body)
+                {
+                    SetupRigidbody(e);
+                    body = (b2Body*)rb2d.RuntimeBody;
+                }
                 if (!body->IsAwake())
                     continue;
 
@@ -339,6 +269,114 @@ namespace Nous
     {
         if (s_LastContact)
             s_LastContact->SetEnabled(false);
+    }
+
+    void PhysicsSystem::SetupRigidbody(entt::entity e, b2Body* rootBody)
+    {
+        Entity entity{ e, s_Scene };
+        auto& transformC = entity.GetComponent<CTransform>();
+        auto transform = transformC.ParentTransform * transformC.GetTransform();
+
+        // 世界坐标系矩阵结算
+        glm::vec3 scale, rotation, translation, _;
+        glm::vec4 __;
+        glm::quat orientation;
+        glm::decompose(transform, scale, orientation, translation, _, __);
+        rotation = glm::eulerAngles(orientation);  // 将弧度转换为度数
+
+        bool hasBody = false;
+        if (entity.HasComponent<CRigidbody2D>())
+        {
+            hasBody = true;
+
+            auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+            b2BodyDef bodyDef;
+            bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
+
+            bodyDef.position.Set(translation.x, translation.y);
+            bodyDef.angle = rotation.z;
+
+            // 将uuid存储在body中
+            b2BodyUserData userData;
+            userData.pointer = entity.GetUUID();
+            bodyDef.userData = userData;
+
+            rootBody = s_PhysicsWorld->CreateBody(&bodyDef);
+            rootBody->SetFixedRotation(rb2d.FixedRotation);
+            rb2d.RuntimeBody = rootBody;
+
+            transformC.HasRigidBody = true;
+        }
+
+
+        if (entity.HasComponent<CBoxCollider2D>() && rootBody)
+        {
+            auto& bc2d = entity.GetComponent<CBoxCollider2D>();
+            auto offset = bc2d.Offset;
+            b2PolygonShape boxShape;
+
+            float hx = bc2d.Size.x;
+            float hy = bc2d.Size.y;
+            b2Vec2 points[4] =
+            {
+                {-hx + offset.x, -hy + offset.y},
+                { hx + offset.x, -hy + offset.y},
+                { hx + offset.x,  hy + offset.y},
+                {-hx + offset.x,  hy + offset.y}
+            };
+
+            for (auto& v : points)
+            {
+                glm::vec4 vec = { v.x, v.y, 0, 1 };
+                vec = transform * vec;
+                auto p = rootBody->GetLocalPoint({ vec.x, vec.y });
+                v.x = p.x;
+                v.y = p.y;
+            }
+
+
+            boxShape.Set(points, 4);
+
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &boxShape;
+            fixtureDef.density = bc2d.Density;
+            fixtureDef.friction = bc2d.Friction;
+            fixtureDef.restitution = bc2d.Restitution;
+            fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
+
+            bc2d.RuntimeFixture = rootBody->CreateFixture(&fixtureDef);
+        }
+
+        if (entity.HasComponent<CCircleCollider2D>() && rootBody)
+        {
+            auto& cc2d = entity.GetComponent<CCircleCollider2D>();
+
+            b2CircleShape circleShape;
+            circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
+            circleShape.m_radius = scale.x * cc2d.Radius;
+
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &circleShape;
+            fixtureDef.density = cc2d.Density;
+            fixtureDef.friction = cc2d.Friction;
+            fixtureDef.restitution = cc2d.Restitution;
+            fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+            cc2d.RuntimeFixture = rootBody->CreateFixture(&fixtureDef);
+        }
+
+        for (auto& uid : transformC.Children)
+        {
+            Entity childNode = s_Scene->GetEntityByUUID(uid);
+            SetupRigidbody((entt::entity)childNode, rootBody);
+        }
+    }
+
+    void PhysicsSystem::DeleteRigidbody(entt::entity e)
+    {
+        Entity entity{ e, s_Scene };
+        if (entity.HasComponent<CRigidbody2D>())
+            s_PhysicsWorld->DestroyBody((b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody);
     }
 
     void ContactListener::BeginContact(b2Contact* contact)
