@@ -202,7 +202,14 @@ namespace Nous
             constexpr int32_t velocityIterations = 6;
             constexpr int32_t positionIterations = 2;
             
-            s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+            const float physicsTimestep = 1.0 / 60.0f;
+            static float totalDt = 0;
+            totalDt += dt;
+            if (totalDt >= physicsTimestep)
+            {
+                totalDt -= physicsTimestep;
+                s_PhysicsWorld->Step(physicsTimestep, velocityIterations, positionIterations);
+            }
             // 从Box2D中取出transform数据
             
             for (auto e : view)
@@ -374,6 +381,9 @@ namespace Nous
 
     void PhysicsSystem::DeleteRigidbody(entt::entity e)
     {
+        if (!s_Scene)
+            return;
+
         Entity entity{ e, s_Scene };
         if (entity.HasComponent<CRigidbody2D>())
             s_PhysicsWorld->DestroyBody((b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody);
