@@ -403,7 +403,15 @@ namespace Nous {
                     const auto& fields = scriptInstance->GetScriptClass()->GetFields();
                     for (const auto& [name, field] : fields)
                     {
-                        if (field.Type == ScriptFieldType::Float)
+                        if (field.Type == ScriptFieldType::Int)
+                        {
+                            auto data = scriptInstance->GetFieldValue<int>(name);
+                            if (UI::DrawIntControl(name, &data))
+                            {
+                                scriptInstance->SetFieldValue(name, data);
+                            }
+                        }
+                        else if (field.Type == ScriptFieldType::Float)
                         {
                             auto data = scriptInstance->GetFieldValue<float>(name);
                             if (UI::DrawFloatControl(name, &data))
@@ -411,7 +419,7 @@ namespace Nous {
                                 scriptInstance->SetFieldValue(name, data);
                             }
                         }
-                        if (field.Type == ScriptFieldType::Vector2)
+                        else if (field.Type == ScriptFieldType::Vector2)
                         {
                             auto data = scriptInstance->GetFieldValue<glm::vec2>(name);
                             if (UI::DrawVec2Control(name, data))
@@ -454,7 +462,13 @@ namespace Nous {
                         ScriptFieldInstance& scriptField = entityFields.at(name);
 
                         // 
-                        if (field.Type == ScriptFieldType::Float)
+                        if (field.Type == ScriptFieldType::Int)
+                        {
+                            auto data = scriptField.GetValue<int>();
+                            if (UI::DrawIntControl(name, &data))
+                                scriptField.SetValue(data);
+                        }
+                        else if (field.Type == ScriptFieldType::Float)
                         {
                             auto data = scriptField.GetValue<float>();
                             if (UI::DrawFloatControl(name, &data))
@@ -485,7 +499,18 @@ namespace Nous {
                     }
                     else
                     {
-                        if (field.Type == ScriptFieldType::Float)
+                        if (field.Type == ScriptFieldType::Int)
+                        {
+                            int data = 0;
+                            if (UI::DrawIntControl(name, &data))
+                            {
+                                ScriptFieldInstance& scriptField = entityFields[name];
+
+                                scriptField.Field = field;
+                                scriptField.SetValue(data);
+                            }
+                        }
+                        else if (field.Type == ScriptFieldType::Float)
                         {
                             float data = 0.0f;
                             if (UI::DrawFloatControl(name, &data))
