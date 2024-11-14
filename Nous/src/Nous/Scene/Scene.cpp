@@ -140,16 +140,17 @@ namespace Nous {
         }
 
         ScriptEngine::OnDestoryEntity(entity);
+        PhysicsSystem::DeleteRigidbody(entity);
 
         // 从父节点删除自身
         if (transform.Parent)
         {
-            /*auto& pTr = GetEntityByUUID(transform.Parent).GetTransform();
+            auto& pTr = GetEntityByUUID(transform.Parent).GetTransform();
             auto& it = std::find(pTr.Children.begin(), pTr.Children.end(), uid);
             if (it != pTr.Children.end())
             {
                 pTr.Children.erase(it);
-            }*/
+            }
         }
         else
         {
@@ -157,10 +158,6 @@ namespace Nous {
         }
 
         m_EntityMap.erase(entity.GetUUID());
-        
-        //
-        PhysicsSystem::DeleteRigidbody(entity);
-
         m_Registry.destroy(entity);
     }
 
