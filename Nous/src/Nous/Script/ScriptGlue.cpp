@@ -196,7 +196,7 @@ namespace Nous
 	{
 		NS_CORE_ASSERT_ENTITYID(entityID);
 		NS_CORE_ASSERT(scene);
-		scene->DestroyEntity(entity);
+		scene->DestroyEntityAfterUpdate(entity);
 	}
 
 	// Transform£∫ªÒ»°Œª“∆

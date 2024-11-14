@@ -13,7 +13,7 @@
 
 ### 脚本系统
 
-- [ ] Entity删除
+- [x] Entity删除
 
 ### 资源系统
 
@@ -62,4 +62,5 @@
 - [ ] Save scene as... 初始目录应为项目目录
 - [x] 不能提供CTransform的删除选项
 - [ ] 物理系统正在运行时才能进行SetLinearVelocity等操作
-- [ ] 脚本修改带rigbody的实体无法得到正确反馈
+- [x] 脚本修改带rigbody的实体无法得到正确反馈
+- [ ] ctrl+D复制实体要：复制子实体，复制父实体id

@@ -111,8 +111,11 @@ namespace Nous
         auto entityIDB = s_Scene->GetEntityByUUID(B);
         Entity entityA = { entityIDA, s_Scene };
         Entity entityB = { entityIDB, s_Scene };
-        ScriptEngine::OnCollisionExit(contactPtr, entityA, B);
-        ScriptEngine::OnCollisionExit(contactPtr, entityB, A);
+        // 物体从物理世界移除时，如果此前处于碰撞状态，这个函数也会触发，所以要先判断实体还在不在
+        if (entityA)
+            ScriptEngine::OnCollisionExit(contactPtr, entityA, entityB ? entityB : 0);
+        if (entityB)
+            ScriptEngine::OnCollisionExit(contactPtr, entityB, entityA ? entityA : 0);
     }
 
     void ScriptSystem::OnCollisionEnter(void* contactPtr, UUID A, UUID B, glm::vec2& normal)

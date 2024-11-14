@@ -30,6 +30,7 @@ namespace Nous {
         Entity CreateEntity(const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string(), const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f});
         void DestroyEntity(Entity entity);
+        void DestroyEntityAfterUpdate(Entity entity);
 
         // 暂时
         entt::registry& Reg() { return m_Registry; }
@@ -82,6 +83,8 @@ namespace Nous {
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;
         std::unordered_map<UUID, entt::entity> m_RootEntityMap;
+
+        std::vector<entt::entity> m_EntityToBeDeleted;
 
         friend class Entity;
         friend class SceneSerializer;

@@ -372,6 +372,13 @@ namespace Nous
         }
     }
 
+    void PhysicsSystem::DeleteRigidbody(entt::entity e)
+    {
+        Entity entity{ e, s_Scene };
+        if (entity.HasComponent<CRigidbody2D>())
+            s_PhysicsWorld->DestroyBody((b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody);
+    }
+
     void ContactListener::BeginContact(b2Contact* contact)
     {
         UUID idA = contact->GetFixtureA()->GetBody()->GetUserData().pointer;

@@ -138,22 +138,35 @@ namespace Nous {
         {
             DestroyEntity(GetEntityByUUID(chUid));
         }
+
+        ScriptEngine::OnDestoryEntity(entity);
+
         // 从父节点删除自身
         if (transform.Parent)
         {
-            auto& pTr = GetEntityByUUID(transform.Parent).GetTransform();
+            /*auto& pTr = GetEntityByUUID(transform.Parent).GetTransform();
             auto& it = std::find(pTr.Children.begin(), pTr.Children.end(), uid);
             if (it != pTr.Children.end())
             {
                 pTr.Children.erase(it);
-            }
+            }*/
         }
         else
         {
             m_RootEntityMap.erase(uid);
         }
+
         m_EntityMap.erase(entity.GetUUID());
+        
+        //
+        PhysicsSystem::DeleteRigidbody(entity);
+
         m_Registry.destroy(entity);
+    }
+
+    void Scene::DestroyEntityAfterUpdate(Entity entity)
+    {
+        m_EntityToBeDeleted.push_back(entity);
     }
 
     void Scene::OnRuntimeStart()
@@ -201,6 +214,16 @@ namespace Nous {
         // 物理系统更新之后，实际渲染之前，更新各个transform的世界坐标系矩阵
         TransformSystem::Update(this);
         RenderSystem::Update(dt);
+
+        // 删除要删除的entity
+        if (!m_EntityToBeDeleted.empty())
+        {
+            for (auto e : m_EntityToBeDeleted)
+            {
+                DestroyEntity({e, this});
+            }
+            m_EntityToBeDeleted.clear();
+        }
     }
 
     void Scene::OnUpdateSimulation(Timestep dt, EditorCamera& camera)
@@ -249,6 +272,7 @@ namespace Nous {
         std::string name = entity.GetName();
         Entity newEntity = CreateEntity(name);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
+        // TODO 待改进
         return newEntity;
     }
 
