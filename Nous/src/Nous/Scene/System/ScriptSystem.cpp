@@ -20,15 +20,13 @@ namespace Nous
             auto view = s_Scene->GetAllEntitiesWith<CMonoScript>();
             for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                ScriptEngine::OnCreateEntity(entity);
+                ScriptEngine::OnCreateEntity({ e, s_Scene });
             }
 
             // 全部实例化之后再调用 OnStart
             for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                ScriptEngine::OnStartEntity(entity);
+                ScriptEngine::OnStartEntity({ e, s_Scene });
             }
         }
 	}
@@ -39,15 +37,18 @@ namespace Nous
         if (s_Scene)
         {
             // C# Entity Update
-            auto view = s_Scene->GetAllEntitiesWith<CMonoScript>();
+            auto view = s_Scene->GetAllEntitiesWith<CTransform, CMonoScript>();
             for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                ScriptEngine::OnUpdateEntity(entity, dt);
+                auto& transform = view.get<CTransform>(e);
+                if (!transform.Active)
+                    continue;
+                ScriptEngine::OnUpdateEntity({ e, s_Scene }, dt);
             }
 
             // 原生脚本
-            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script) {
+            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script) 
+            {
                 // 没有脚本实例就先创建
                 if (!script.Instance)
                 {
@@ -67,7 +68,8 @@ namespace Nous
 
         // 执行原生脚本销毁
         {
-            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script) {
+            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script)
+            {
                 if (script.Instance)
                 {
                     script.Instance->OnDestroy();

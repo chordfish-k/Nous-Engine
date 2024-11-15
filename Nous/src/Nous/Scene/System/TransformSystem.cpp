@@ -61,4 +61,16 @@ namespace Nous
 		}
 	}
 
+	void TransformSystem::SetSubtreeActive(Scene* scene, entt::entity entity, bool active)
+	{
+		Entity e{ entity, scene };
+		auto& tr = e.GetTransform();
+		tr.Active = active;
+
+		for (auto& uuid : tr.Children)
+		{
+			SetSubtreeActive(scene, scene->GetEntityByUUID(uuid), active);
+		}
+	}
+
 }

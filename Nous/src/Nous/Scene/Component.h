@@ -40,6 +40,7 @@ namespace Nous {
         bool HideChild = false;
         bool Dirty = true;
         bool HasRigidBody = false;
+        bool Active = true;
         AssetHandle PrefabAsset = 0;
         std::vector<UUID> Children;
 
@@ -142,7 +143,7 @@ namespace Nous {
 
     struct CRigidbody2D
     {
-        enum class BodyType { Static = 0, Dynamic, Kinematic };
+        enum class BodyType { Static = 0, Dynamic, Kinematic, None };
         BodyType Type = BodyType::Static;
         bool FixedRotation = false;
 

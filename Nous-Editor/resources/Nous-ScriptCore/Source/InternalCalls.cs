@@ -24,6 +24,9 @@ namespace Nous
 		internal extern static string Entity_GetName(ulong entityID, out string name);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string Entity_SetName(ulong entityID, string name);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string Entity_SetParent(ulong entityID, ulong parentID);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -40,6 +43,12 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Entity_Destroy(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Entity_SetActive(ulong entityID, bool active);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Entity_IsActive(ulong entityID);
 		#endregion
 
 		#region TransformComponent

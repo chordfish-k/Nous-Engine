@@ -35,7 +35,25 @@ namespace Nous
 				InternalCalls.Entity_GetName(ID, out string name);
 				return name;
 			}
-        }
+
+			set
+			{
+				InternalCalls.Entity_SetName(ID, value);
+			}
+		}
+
+		public bool Active
+		{
+			get
+			{
+				return InternalCalls.Entity_IsActive(ID);
+			}
+
+			set
+            {
+				InternalCalls.Entity_SetActive(ID, value);
+			}
+		}
 
 		public bool HasComponent<T>() where T : Component, new()
         {

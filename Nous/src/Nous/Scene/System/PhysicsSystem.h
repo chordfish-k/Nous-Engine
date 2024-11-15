@@ -19,6 +19,7 @@ namespace Nous
 
 		static void SetupRigidbody(entt::entity e, b2Body* rootBody = nullptr);
 		static void DeleteRigidbody(entt::entity e);
+		static void SetEnableRigidbody(entt::entity e, bool flag = true);
 	};
 }
 

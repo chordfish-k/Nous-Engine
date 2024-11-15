@@ -433,6 +433,10 @@ namespace Nous
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
+			// 非active，阻止调用
+			if (!entity.GetTransform().Active)
+				return;
+
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
 			instance->InvokeOnUpdate((float)dt);
 		}
@@ -447,6 +451,10 @@ namespace Nous
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
+			// 非active，阻止调用
+			if (!entity.GetTransform().Active)
+				return;
+
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
 			instance->InvokeOnCollisionPreSolve(contactPtr, otherID, normal);
 		}
@@ -457,6 +465,10 @@ namespace Nous
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
+			// 非active，阻止调用
+			if (!entity.GetTransform().Active)
+				return;
+
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
 			instance->InvokeOnCollisionPostSolve(contactPtr, otherID, normal);
 		}
@@ -467,6 +479,10 @@ namespace Nous
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
+			// 非active，阻止调用
+			if (!entity.GetTransform().Active)
+				return;
+
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
 			instance->InvokeOnCollisionEnter(contactPtr, otherID, normal);
 		}
@@ -477,6 +493,9 @@ namespace Nous
 		UUID entityUUID = entity.GetUUID();
 		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
 		{
+			if (!entity.GetTransform().Active)
+				return;
+
 			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
 			instance->InvokeOnCollisionExit(contactPtr, otherID);
 		}

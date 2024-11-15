@@ -18,7 +18,6 @@
 #include "Nous/Asset/AssetManager.h"
 #include "Nous/Anim/AnimMachine.h"
 
-
 #include "mono/metadata/object.h"
 #include "mono/metadata/reflection.h"
 
@@ -98,8 +97,14 @@ namespace Nous
 	{
 		NS_CORE_ASSERT_ENTITYID(entityID);
 		NS_CORE_ASSERT(scene);
-		Entity e = { scene->GetEntityByUUID(entityID), scene };
-		*name = ScriptEngine::CreateString(e.GetName().c_str());
+		*name = ScriptEngine::CreateString(entity.GetName().c_str());
+	}
+
+	static void Entity_SetName(UUID entityID, MonoString* name)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		entity.GetComponent<CTag>().Tag = Utils::MonnoStringToString(name);
 	}
 
 	static UUID Entity_GetParent(UUID entityID)
@@ -111,8 +116,7 @@ namespace Nous
 	{
 		NS_CORE_ASSERT_ENTITYID(entityID);
 		NS_CORE_ASSERT(scene);
-		Entity e = { scene->GetEntityByUUID(entityID), scene };
-		UUID& preParent = e.GetTransform().Parent;
+		UUID& preParent = entity.GetTransform().Parent;
 
 		if (preParent)
 		{
@@ -141,7 +145,6 @@ namespace Nous
 	{
 		NS_CORE_ASSERT_ENTITYID(entityID);
 		NS_CORE_ASSERT(scene);
-		Entity e = { scene->GetEntityByUUID(entityID), scene };
 		Entity childE = scene->GetEntityByUUID(childID);
 		UUID& preParent = childE.GetTransform().Parent;
 
@@ -161,7 +164,7 @@ namespace Nous
 		}
 
 		preParent = entityID;
-		e.GetTransform().Children.push_back(childID);
+		entity.GetTransform().Children.push_back(childID);
 	}
 
 	static int Entity_GetChildCount(UUID entityID)
@@ -197,6 +200,20 @@ namespace Nous
 		NS_CORE_ASSERT_ENTITYID(entityID);
 		NS_CORE_ASSERT(scene);
 		scene->DestroyEntityAfterUpdate(entity);
+	}
+
+	static void Entity_SetActive(uint64_t entityID, bool active)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		TransformSystem::SetSubtreeActive(scene, entity, active);
+	}
+
+	static bool Entity_IsActive(uint64_t entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT(scene);
+		return entity.GetTransform().Active;
 	}
 
 	// Transform£∫ªÒ»°Œª“∆
@@ -257,13 +274,16 @@ namespace Nous
 
 		auto& rb2d = entity.GetComponent<CRigidbody2D>();
 		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		if (!body)
+		if (body == nullptr)
 		{
 			PhysicsSystem::SetupRigidbody(entity);
 			body = (b2Body*)rb2d.RuntimeBody;
 		}
-		const b2Vec2& linearVelocity = body->GetLinearVelocity();
-		*outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
+		if (body)
+		{
+			const b2Vec2& linearVelocity = body->GetLinearVelocity();
+			*outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
+		}
 	}
 
 	static void Rigidbody2DComponent_SetLinearVelocity(UUID entityID, glm::vec2* inLinearVelocity)
@@ -279,7 +299,10 @@ namespace Nous
 			PhysicsSystem::SetupRigidbody(entity);
 			body = (b2Body*)rb2d.RuntimeBody;
 		}
-		body->SetLinearVelocity({inLinearVelocity->x, inLinearVelocity->y});
+		if (body)
+		{
+			body->SetLinearVelocity({ inLinearVelocity->x, inLinearVelocity->y });
+		}
 	}
 
 	static CRigidbody2D::BodyType Rigidbody2DComponent_GetType(UUID entityID)
@@ -294,7 +317,11 @@ namespace Nous
 			PhysicsSystem::SetupRigidbody(entity);
 			body = (b2Body*)rb2d.RuntimeBody;
 		}
-		return Utils::Rigidbody2DTypeFromBox2DBody(body->GetType());
+		if (body)
+		{
+			return Utils::Rigidbody2DTypeFromBox2DBody(body->GetType());
+		}
+		return CRigidbody2D::BodyType::None;
 	}
 
 	static void Rigidbody2DComponent_SetType(UUID entityID, CRigidbody2D::BodyType bodyType)
@@ -309,7 +336,10 @@ namespace Nous
 			PhysicsSystem::SetupRigidbody(entity);
 			body = (b2Body*)rb2d.RuntimeBody;
 		}
-		body->SetType(Utils::Rigidbody2DTypeToBox2DBody(bodyType));
+		if (body)
+		{
+			body->SetType(Utils::Rigidbody2DTypeToBox2DBody(bodyType));
+		}
 	}
 
 	static MonoString* TextRendererComponent_GetText(UUID entityID)
@@ -510,6 +540,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Entity_HasComponent);
 		NS_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 		NS_ADD_INTERNAL_CALL(Entity_GetName);
+		NS_ADD_INTERNAL_CALL(Entity_SetName);
 		NS_ADD_INTERNAL_CALL(Entity_SetParent);
 		NS_ADD_INTERNAL_CALL(Entity_GetParent);
 		NS_ADD_INTERNAL_CALL(Entity_AddChild);
@@ -517,6 +548,8 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Entity_GetChildCount);
 		NS_ADD_INTERNAL_CALL(Entity_GetWorldTranslation);
 		NS_ADD_INTERNAL_CALL(Entity_Destroy);
+		NS_ADD_INTERNAL_CALL(Entity_IsActive);
+		NS_ADD_INTERNAL_CALL(Entity_SetActive);
 		
 		NS_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		NS_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

@@ -223,6 +223,8 @@ namespace Nous {
             out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
             out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 
+            out << YAML::Key << "Active" << YAML::Value << tc.Active;
+
             out << YAML::Key << "Parent" << YAML::Value << tc.Parent;
             out << YAML::Key << "Open" << YAML::Value << tc.Open;
 
@@ -659,12 +661,6 @@ namespace Nous {
         fout << out.c_str();
     }
 
-    void SceneSerializer::SerializeRuntime(const std::filesystem::path& filepath)
-    {
-        // 未实现
-        NS_CORE_ASSERT(false);
-    }
-
     bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
     {
         YAML::Node data;
@@ -706,6 +702,9 @@ namespace Nous {
                 tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.Scale = transformComponent["Scale"].as<glm::vec3>();
 
+                if (transformComponent["Active"])
+                    tc.Active = transformComponent["Active"].as<bool>();
+
                 if (transformComponent["Open"])
                     tc.Open = transformComponent["Open"].as<bool>();
 
@@ -740,9 +739,9 @@ namespace Nous {
         }
         catch (YAML::ParserException& e)
         {
+            NS_CORE_ERROR("无法加载 .nsprefab 文件 '{0}'\n     {1}", filepath, e.what());
             return false;
         }
-
 
         std::unordered_map<UUID, UUID> uuidMap;
 
@@ -771,6 +770,9 @@ namespace Nous {
                 tc.Translation = transformComponent["Translation"].as<glm::vec3>();
                 tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+
+                if (transformComponent["Active"])
+                    tc.Active = transformComponent["Active"].as<bool>();
 
                 if (transformComponent["Open"])
                     tc.Open = transformComponent["Open"].as<bool>();
@@ -803,14 +805,6 @@ namespace Nous {
         ReconstructEntityTree(m_Scene);
 
         return true;
-    }
-
-
-    bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath)
-    {
-        // 未实现
-        NS_CORE_ASSERT(false);
-        return false;
     }
 
 }

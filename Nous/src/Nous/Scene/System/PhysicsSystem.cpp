@@ -181,6 +181,7 @@ namespace Nous
             {
                 Entity entity = { e, s_Scene };
                 auto& transform = entity.GetComponent<CTransform>();
+
                 auto& rb2d = entity.GetComponent<CRigidbody2D>();
 
                 b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -199,6 +200,7 @@ namespace Nous
                 rotation = glm::eulerAngles(orientation);
 
                 body->SetTransform({translation.x, translation.y}, rotation.z);
+                body->SetEnabled(transform.Active);
             }
 
 
@@ -222,14 +224,19 @@ namespace Nous
             {
                 Entity entity = { e, s_Scene };
                 auto& transform = entity.GetComponent<CTransform>();
+
                 auto& rb2d = entity.GetComponent<CRigidbody2D>();
 
                 b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                if (!body)
+                if (body == nullptr)
                 {
                     SetupRigidbody(e);
                     body = (b2Body*)rb2d.RuntimeBody;
+
+                    if (body == nullptr)
+                        continue;
                 }
+                
                 if (!body->IsAwake())
                     continue;
 
@@ -288,6 +295,10 @@ namespace Nous
     {
         Entity entity{ e, s_Scene };
         auto& transformC = entity.GetComponent<CTransform>();
+
+        if (!transformC.Active)
+            return;
+
         auto transform = transformC.ParentTransform * transformC.GetTransform();
 
         // 世界坐标系矩阵结算
@@ -393,6 +404,19 @@ namespace Nous
         Entity entity{ e, s_Scene };
         if (entity.HasComponent<CRigidbody2D>())
             s_PhysicsWorld->DestroyBody((b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody);
+    }
+
+    void PhysicsSystem::SetEnableRigidbody(entt::entity e, bool flag)
+    {
+        if (!s_Scene)
+            return;
+
+        Entity entity{ e, s_Scene };
+        if (entity.HasComponent<CRigidbody2D>())
+        {
+            auto body = (b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody;
+            body->SetEnabled(flag);
+        }
     }
 
     void ContactListener::BeginContact(b2Contact* contact)
