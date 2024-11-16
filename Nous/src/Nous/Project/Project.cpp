@@ -64,6 +64,12 @@ namespace Nous
 		return false;
 	}
 
+	bool Project::SaveActive()
+	{
+		SaveActive(s_ActiveProject->m_ProjectFilePath);
+		return false;
+	}
+
 	bool Project::SaveNew(Ref<Project> project)
 	{
 		ProjectSerializer serializer(project);

@@ -10,6 +10,8 @@
 #include "Nous/Asset/SceneImporter.h"
 
 #include "Panel/DockingSpace.h"
+#include "Panel/SceneManagerDialog.h"
+
 #include "Event/EditorEvent.h"
 
 #include "Nous/Scene/System/PhysicsSystem.h"
@@ -173,15 +175,6 @@ namespace Nous
         {
             if (ImGui::BeginMenu("File"))
             {
-                // 打开项目
-                if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
-                    OpenProject();
-
-                if (ImGui::MenuItem("Export...", "", false, m_ActiveScene && !m_ActiveScene->IsRunning()))
-                    Export();
-
-                ImGui::Separator();
-
                 // 新建场景
                 if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                     NewScene();
@@ -199,6 +192,20 @@ namespace Nous
                 if (ImGui::MenuItem("Exit"))
                     Application::Get().Close();
 
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Project"))
+            {
+                // 打开项目
+                if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+                    OpenProject();
+
+                if (ImGui::MenuItem("Export...", "", false, m_ActiveScene && !m_ActiveScene->IsRunning()))
+                    Export();
+
+                if (ImGui::MenuItem("Settings"))
+                    OpenSettings();
                 ImGui::EndMenu();
             }
 
@@ -228,6 +235,8 @@ namespace Nous
         //
         m_AnimClipEditorPanel.OnImGuiRender();
         m_AnimMachineEditorPanel.OnImGuiRender();
+
+        SceneManagerDialog::OnImGuiRender();
 
         // Hierarchy
         m_SceneHierarchyPanel.OnImGuiRender();
@@ -542,6 +551,11 @@ namespace Nous
         Project::ExportProject();
     }
 
+    void EditorLayer::OpenSettings()
+    {
+        SceneManagerDialog::Open();
+    }
+
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();
@@ -550,14 +564,6 @@ namespace Nous
         m_ViewportPanel.SetContext(m_ActiveScene);
 
         m_EditorScenePath = std::filesystem::path();
-    }
-
-    void EditorLayer::OpenScene()
-    {
-        // TODO
-        /*std::string filepath = FileDialogs::OpenFile("Nous Scene (*nous)\0*.nous\0");
-        if (!filepath.empty())
-            OpenScene(filepath);*/
     }
 
     void EditorLayer::OpenScene(AssetHandle handle)

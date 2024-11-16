@@ -43,6 +43,8 @@ namespace Nous {
         void SaveProject();
         void Export();
 
+        void OpenSettings();
+
         void NewScene();
         void OpenScene();
         void OpenScene(AssetHandle handle);

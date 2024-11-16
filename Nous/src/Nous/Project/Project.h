@@ -73,6 +73,7 @@ namespace Nous
 		static Ref<Project> New(const std::filesystem::path& path);
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool SaveActive(const std::filesystem::path& path);
+		static bool SaveActive();
 		static bool SaveNew(Ref<Project> project);
 
 		static void ExportProject();
