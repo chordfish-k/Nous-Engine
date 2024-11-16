@@ -9,6 +9,7 @@ namespace Nous {
     enum class AppEventType
     {
         OpenScene = 0,
+        ChangeRunningScene,
         AssetFileDoubleClick,
         SavePrefab,
         ConsoleClear
@@ -32,7 +33,14 @@ namespace Nous {
 
         EDITOR_EVENT_CLASS_TYPE(OpenScene);
     };
+    
+    struct ChangeRunningSceneEvent : public AppEvent
+    {
+        AssetHandle Handle;
+        ChangeRunningSceneEvent(const AssetHandle& handle) : Handle(handle) {};
 
+        EDITOR_EVENT_CLASS_TYPE(ChangeRunningScene);
+    };
     struct ConsoleClearEvent : public AppEvent
     {
         ConsoleClearEvent() {}

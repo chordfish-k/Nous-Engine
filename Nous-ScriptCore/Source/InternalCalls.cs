@@ -133,5 +133,9 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Physics_Contact_SetEnable(ulong contact, bool enable);
+
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Game_ChangeScene(string sceneName);
 	}
 }

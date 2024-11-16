@@ -152,6 +152,13 @@ namespace Nous
             case SceneState::Play:
             {
                 m_ActiveScene->OnUpdateRuntime(dt);
+
+                // 检查是否需要切换场景
+                if (m_NextScene)
+                {
+                    ChangeRunningScene(m_NextScene);
+                    m_NextScene = 0;
+                }
                 break;
             }
         }
@@ -440,6 +447,14 @@ namespace Nous
         return false;
     }
 
+    void EditorLayer::OnChangeRunningScene(ChangeRunningSceneEvent& e)
+    {
+        if (e.Handle)
+        {
+            m_NextScene = e.Handle;
+        }
+    }
+
     void EditorLayer::OnOverlayRender()
     {
         if (m_SceneState == SceneState::Play)
@@ -571,7 +586,7 @@ namespace Nous
         NS_CORE_ASSERT(handle);
 
         if (m_SceneState != SceneState::Edit)
-            OnSceneStop();
+            StopScene();
 
         Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(handle);
         Ref<Scene> newScene = Scene::Copy(readOnlyScene);
@@ -584,6 +599,25 @@ namespace Nous
         m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetFilePath(handle);
 
         m_EditorCamera.Reset();
+    }
+
+    void EditorLayer::ChangeRunningScene(AssetHandle handle)
+    {
+        NS_CORE_ASSERT(handle);
+
+        if (m_SceneState != SceneState::Play)
+            return;
+
+        m_ActiveScene->OnRuntimeStop();
+
+        Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(handle);
+        Ref<Scene> newScene = Scene::Copy(readOnlyScene);
+
+        m_ActiveScene = newScene;
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
+
+        m_ActiveScene->OnRuntimeStart();
     }
 
     void EditorLayer::SaveScene()
@@ -623,6 +657,42 @@ namespace Nous
         }
     }
 
+    void EditorLayer::PlayScene()
+    {
+        if (m_SceneState == SceneState::Simulate)
+            StopScene();
+
+        ConsoleClearEvent e;
+        AppEventEmitter::Emit(e);
+
+        m_SceneState = SceneState::Play;
+
+        m_ActiveScene = Scene::Copy(m_EditorScene); // 复制一个副本来运行
+        m_ActiveScene->OnRuntimeStart();
+
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
+
+        fpsTotal = 0;
+        fpsC = fpsCC;
+    }
+
+    void EditorLayer::StopScene()
+    {
+        NS_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
+
+        if (m_SceneState == SceneState::Play)
+            m_ActiveScene->OnRuntimeStop();
+        else if (m_SceneState == SceneState::Simulate)
+            m_ActiveScene->OnSimulationStop();
+
+        m_SceneState = SceneState::Edit;
+        m_ActiveScene = m_EditorScene;
+
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_ViewportPanel.SetContext(m_ActiveScene);
+    }
+
     void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path)
     {
         SceneImporter::SaveScene(scene, path);
@@ -632,6 +702,7 @@ namespace Nous
     {
         AppEventDispatcher dispatcher(e);
         dispatcher.Dispatch<OpenSceneEvent>(NS_BIND_EVENT_FN(EditorLayer::OnOpenScene));
+        dispatcher.Dispatch<ChangeRunningSceneEvent>(NS_BIND_EVENT_FN(EditorLayer::OnChangeRunningScene));
         dispatcher.Dispatch<AssetFileDoubleClickEvent>(NS_BIND_EVENT_FN(EditorLayer::OnAssetFileDoubleClick));
     }
 
@@ -660,22 +731,7 @@ namespace Nous
 
     void EditorLayer::OnScenePlay()
     {
-        if (m_SceneState == SceneState::Simulate)
-            OnSceneStop();
-
-        ConsoleClearEvent e;
-        AppEventEmitter::Emit(e);
-
-        m_SceneState = SceneState::Play;
-
-        m_ActiveScene = Scene::Copy(m_EditorScene); // 复制一个副本来运行
-        m_ActiveScene->OnRuntimeStart();
-
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        m_ViewportPanel.SetContext(m_ActiveScene);
-
-        fpsTotal = 0;
-        fpsC = fpsCC;
+        PlayScene();
 
     }
 
@@ -694,20 +750,8 @@ namespace Nous
 
     void EditorLayer::OnSceneStop()
     {
-        NS_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
+        StopScene();
 
-        if (m_SceneState == SceneState::Play)
-            m_ActiveScene->OnRuntimeStop();
-        else if (m_SceneState == SceneState::Simulate)
-            m_ActiveScene->OnSimulationStop();
-
-        m_SceneState = SceneState::Edit;
-
-        m_ActiveScene->OnRuntimeStop();
-        m_ActiveScene = m_EditorScene;
-
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        m_ViewportPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnDuplicateEntity()

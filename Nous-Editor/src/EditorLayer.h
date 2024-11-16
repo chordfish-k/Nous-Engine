@@ -31,7 +31,7 @@ namespace Nous {
         virtual void OnEditorEvent(AppEvent& e) override;
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
-
+        void OnChangeRunningScene(ChangeRunningSceneEvent& e);
         void OnOpenScene(OpenSceneEvent& e);
         void OnAssetFileDoubleClick(AssetFileDoubleClickEvent& e);
         
@@ -47,8 +47,11 @@ namespace Nous {
 
         void NewScene();
         void OpenScene(AssetHandle handle);
+        void ChangeRunningScene(AssetHandle handle);
         void SaveScene();
         void SaveSceneAs();
+        void PlayScene();
+        void StopScene();
 
         void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 
@@ -65,6 +68,7 @@ namespace Nous {
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_ActiveScene;
         Ref<Scene> m_EditorScene;
+        AssetHandle m_NextScene = 0;
         std::filesystem::path m_EditorScenePath;
         
         EditorCamera m_EditorCamera;

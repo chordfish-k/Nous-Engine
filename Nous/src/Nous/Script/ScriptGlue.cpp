@@ -9,6 +9,7 @@
 #include "Nous/Scene/SceneSerializer.h"
 #include "Nous/Core/KeyCodes.h"
 #include "Nous/Core/Input.h"
+#include "Nous/Event/AppEvent.h"
 
 #include "Nous/Physics/Physics2D.h"
 
@@ -499,6 +500,30 @@ namespace Nous
 		return contact->IsEnabled();
 	}
 
+	static void Game_ChangeScene(MonoString* sceneName)
+	{
+		std::string sceneNameStr = Utils::MonnoStringToString(sceneName);
+		//find scene
+		AssetRegistry& reg = Project::GetActive()->GetEditorAssetManager()->GetAssetRegistry();
+		AssetHandle sceneHandle = 0;
+		for (auto& [handle, meta] : reg)
+		{
+			if (meta.FilePath.stem() == sceneNameStr)
+			{
+				sceneHandle = handle;
+			}
+		}
+		if (sceneHandle)
+		{
+			ChangeRunningSceneEvent e(sceneHandle);
+			AppEventEmitter::Emit(e);
+		}
+		else
+		{
+			NS_CORE_ERROR("无法找到场景{}", sceneNameStr);
+		}
+	}
+
 	// 注册组件
 	template<typename... Component>
 	static void RegisterComponent()
@@ -582,5 +607,7 @@ namespace Nous
 		NS_ADD_INTERNAL_CALL(Physics_DisableLastContact);
 		NS_ADD_INTERNAL_CALL(Physics_Contact_IsEnable);
 		NS_ADD_INTERNAL_CALL(Physics_Contact_SetEnable);
+
+		NS_ADD_INTERNAL_CALL(Game_ChangeScene);
 	}
 }
