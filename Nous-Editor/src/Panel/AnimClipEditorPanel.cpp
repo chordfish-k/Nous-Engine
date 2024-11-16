@@ -4,7 +4,7 @@
 #include "Nous/Utils/PlatformUtils.h"
 #include "Nous/Renderer/Texture.h"
 #include "Nous/Asset/AssetManager.h"
-#include "Nous/UI/UI.h"
+#include "Nous/ImGui/UI.h"
 
 #include "Nous/Anim/AnimClipSerializer.h"
 
@@ -91,31 +91,31 @@ namespace Nous
 		// Name
 		static char nameBuffer[64];
 		strcpy_s(nameBuffer, sizeof(nameBuffer), s_Clip->Name.c_str());
-		if (UI::DrawInputText("Name", nameBuffer, sizeof(nameBuffer)))
+		if (EUI::DrawInputText("Name", nameBuffer, sizeof(nameBuffer)))
 			s_Clip->Name = nameBuffer;
 		
 		// Type
 		const char* animClipTypeStrings[] = { "Single", "SpriteSheet" };
 		uint32_t currentIndex = (int)s_Clip->Type;
-		if (UI::DrawCombo("Type", animClipTypeStrings, &currentIndex, 2))
+		if (EUI::DrawCombo("Type", animClipTypeStrings, &currentIndex, 2))
 			s_Clip->Type = (AnimClipType)currentIndex;
 
 		// Loop
-		UI::DrawCheckbox("Loop", &s_Clip->Loop);
+		EUI::DrawCheckbox("Loop", &s_Clip->Loop);
 
 		// Type:SpriteSheet
 		if (s_Clip->Type == AnimClipType::SpriteSheet)
 		{
 			// Image
 			AssetHandle handle = s_Clip->ImageHandle;
-			if (UI::DrawAssetDragDropBox("Image", AssetManager::GetAssetFileName(handle), &handle, AssetType::Texture2D))
+			if (EUI::DrawAssetDragDropBox("Image", AssetManager::GetAssetFileName(handle), &handle, AssetType::Texture2D))
 				s_Clip->ImageHandle = handle;
 
 			// Spec
 			int width = s_Clip->SheetWidth, height = s_Clip->SheetHeight;
-			if (UI::DrawIntControl("Sheet Width", &width) && width > 0)
+			if (EUI::DrawIntControl("Sheet Width", &width) && width > 0)
 				s_Clip->SheetWidth = width;
-			if (UI::DrawIntControl("Sheet Height", &height) && height > 0)
+			if (EUI::DrawIntControl("Sheet Height", &height) && height > 0)
 				s_Clip->SheetHeight = height;
 		}
 		

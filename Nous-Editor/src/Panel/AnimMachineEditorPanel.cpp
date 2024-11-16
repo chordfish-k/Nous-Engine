@@ -4,7 +4,7 @@
 #include "Nous/Utils/PlatformUtils.h"
 #include "Nous/Anim/AnimMachine.h"
 #include "Nous/Anim/AnimMachineSerializer.h"
-#include "Nous/UI/UI.h"
+#include "Nous/ImGui/UI.h"
 
 namespace Nous
 {
@@ -20,7 +20,7 @@ namespace Nous
 		static const char* nodeTypeStrs[2] = { "Node", "Leaf" };
 		uint32_t nodeTypeIndex = (int)node->Type - 1;
 
-		if (UI::DrawCombo("Node Type", nodeTypeStrs, &nodeTypeIndex, 2))
+		if (EUI::DrawCombo("Node Type", nodeTypeStrs, &nodeTypeIndex, 2))
 			node->Type = (ConditionNodeType)(nodeTypeIndex + 1);
 
 		if (type == ConditionNodeType::Leaf)
@@ -29,13 +29,13 @@ namespace Nous
 			static const char* typeStrs[2] = { "Float", "Bool" };
 			uint32_t typeIndex = (int)node->Exp.ValueType  - 1;
 			if (typeIndex >= 2) typeIndex = 0;
-			if (UI::DrawCombo("Value Type", typeStrs, &typeIndex, 2))
+			if (EUI::DrawCombo("Value Type", typeStrs, &typeIndex, 2))
 				node->Exp.ValueType = (ValueType)(typeIndex + 1);
 
 			// VarNam
 			char buffer[32];
 			strcpy_s(buffer, sizeof(buffer), node->Exp.VarName.c_str());
-			if (UI::DrawInputText("Var Name", buffer, sizeof(buffer)))
+			if (EUI::DrawInputText("Var Name", buffer, sizeof(buffer)))
 				node->Exp.VarName = buffer;
 
 			if (node->Exp.ValueType == ValueType::Float)
@@ -43,18 +43,18 @@ namespace Nous
 				// Compare
 				static const char* symbolStrs[6] = {"==", "!=", "<", ">", ">=", "<="};
 				uint32_t symbolIndex = (int)node->Exp.Compare - 1;
-				if (UI::DrawCombo("Compare", symbolStrs, &symbolIndex, 6))
+				if (EUI::DrawCombo("Compare", symbolStrs, &symbolIndex, 6))
 					node->Exp.Compare = (FloatCompareType)(symbolIndex + 1);
 			
 				// TargetValue
 				float value = node->Exp.TargetValue.FloatValue;
-				if (UI::DrawFloatControl("Value", &value))
+				if (EUI::DrawFloatControl("Value", &value))
 					node->Exp.TargetValue.FloatValue = value;
 			}
 			else if(node->Exp.ValueType == ValueType::Bool)
 			{
 				bool value = node->Exp.TargetValue.BoolValue;
-				if (UI::DrawCheckbox("Is True", &value))
+				if (EUI::DrawCheckbox("Is True", &value))
 				{
 					node->Exp.TargetValue.BoolValue = value;
 					node->Exp.Compare = FloatCompareType::Equal;
@@ -67,7 +67,7 @@ namespace Nous
 			static const char* symbolStrs[2] = { "And", "Or" };
 			uint32_t symbolIndex = (int)node->Symbol - 1;
 			if (symbolIndex >= 2) symbolIndex = 0;
-			if (UI::DrawCombo("Symbol", symbolStrs, &symbolIndex, 2))
+			if (EUI::DrawCombo("Symbol", symbolStrs, &symbolIndex, 2))
 				node->Symbol = (BoolCompareType)(symbolIndex + 1);
 
 			if (ImGui::TreeNode(fmt::format("Left##").c_str()))
@@ -164,7 +164,7 @@ namespace Nous
 		// Default State Index
 		{
 			int defaultIndex = s_Machine->DefaultIndex;
-			if (UI::DrawIntControl("Default Index", &defaultIndex) && defaultIndex >= 0 && defaultIndex < s_Machine->GetAllStates().size())
+			if (EUI::DrawIntControl("Default Index", &defaultIndex) && defaultIndex >= 0 && defaultIndex < s_Machine->GetAllStates().size())
 				s_Machine->DefaultIndex = defaultIndex;
 		}
 
@@ -194,7 +194,7 @@ namespace Nous
 					else
 						label = "Invalid";
 				}
-				if (UI::DrawAssetDragDropBox("Clip", label, &clipHandle, AssetType::AnimClip))
+				if (EUI::DrawAssetDragDropBox("Clip", label, &clipHandle, AssetType::AnimClip))
 					state.Clip = clipHandle;
 
 				// Conditions
@@ -220,7 +220,7 @@ namespace Nous
 					if (ImGui::TreeNode(fmt::format("Condition {0} ##{1}", j, i).c_str()))
 					{
 						int nextIndex = con.StateIndex;
-						if (UI::DrawIntControl("Next State", &nextIndex) && nextIndex >= 0 && nextIndex < s_Machine->GetAllStates().size())
+						if (EUI::DrawIntControl("Next State", &nextIndex) && nextIndex >= 0 && nextIndex < s_Machine->GetAllStates().size())
 							con.StateIndex = nextIndex;
 
 						// Condition

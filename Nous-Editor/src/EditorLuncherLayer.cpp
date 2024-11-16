@@ -1,7 +1,7 @@
 #include "EditorLuncherLayer.h"
 
 #include "Nous/Core/Application.h"
-#include "Nous/UI/UI.h"
+#include "Nous/ImGui/UI.h"
 #include "Nous/Utils/PlatformUtils.h"
 
 #include "Panel/DockingSpace.h"

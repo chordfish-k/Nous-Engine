@@ -3,7 +3,7 @@
 
 #include <misc/cpp/imgui_stdlib.h>
 
-namespace Nous::UI
+namespace Nous::EUI
 {
     bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
     {

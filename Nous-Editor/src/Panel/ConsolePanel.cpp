@@ -2,7 +2,7 @@
 #include "ConsolePanel.h"
 
 #include "Nous/Core/Console.h"
-#include <Nous/UI/UI.h>
+#include "Nous/ImGui/UI.h"
 
 namespace Nous
 {
@@ -54,7 +54,7 @@ namespace Nous
                     {1, 0, 0, 1}, // critical
                 };
                 auto& color = colors[(int)line.Level];
-                UI::ScopedStyleColor scopeColor(ImGuiCol_Text, color);
+                EUI::ScopedStyleColor scopeColor(ImGuiCol_Text, color);
                 ImGui::Text(NS_TEXT(msg));
             }
 

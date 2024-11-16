@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <codecvt>
 
-namespace Nous::UI
+namespace Nous::EUI
 {
 	struct ScopedStyleColor
 	{
@@ -54,7 +54,7 @@ namespace Nous::UI
 	}
 
 #define NS_TEXT_S(str) u8##str
-#define NS_TEXT(str) ::Nous::UI::TBS(str).c_str()
+#define NS_TEXT(str) ::Nous::EUI::TBS(str).c_str()
 
 #define NS_IMGUI_FIELD_BEGIN                    \
     ImGui::PushID(label.c_str());               \
