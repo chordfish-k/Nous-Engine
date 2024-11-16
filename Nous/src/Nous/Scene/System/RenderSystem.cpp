@@ -16,6 +16,8 @@ namespace Nous
 
 	void RenderSystem::Update(Timestep dt, EditorCamera* camera)
 	{
+        NS_PROFILE_FUNCTION();
+
         if (!s_Scene)
             return;
 

@@ -33,6 +33,8 @@ namespace Nous
 
 	void ScriptSystem::Update(Timestep dt)
 	{
+        NS_PROFILE_FUNCTION();
+
         // 执行脚本更新
         if (s_Scene)
         {

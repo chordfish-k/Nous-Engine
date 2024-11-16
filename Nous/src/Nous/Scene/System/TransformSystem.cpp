@@ -39,14 +39,17 @@ namespace Nous
 
 	void TransformSystem::Update(Scene* scene)
 	{
+		NS_PROFILE_FUNCTION();
+
 		if (!scene)
 			return;
 
-		for (auto& ent : scene->GetAllEntitiesWith<CTransform>())
+		auto& view = scene->GetAllEntitiesWith<CTransform>();
+
+		for (auto& ent : view)
 		{
 			Utils::CalcParentTransform(scene, {ent, scene});
 		}
-
 	}
 
 	void TransformSystem::SetSubtreeDirty(Scene* scene, entt::entity entity)

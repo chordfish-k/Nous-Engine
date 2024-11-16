@@ -194,7 +194,7 @@ namespace Nous {
     {
     }
 
-    static void SerializeEntity(YAML::Emitter& out, Entity entity)
+    static void SerializeEntity(YAML::Emitter& out, Entity entity, bool isPrefab = false)
     {
         // 必须具有ID组件
         NS_CORE_ASSERT(entity.HasComponent<CUuid>());
@@ -225,7 +225,7 @@ namespace Nous {
 
             out << YAML::Key << "Active" << YAML::Value << tc.Active;
 
-            out << YAML::Key << "Parent" << YAML::Value << tc.Parent;
+            out << YAML::Key << "Parent" << YAML::Value << (isPrefab ? 0 : tc.Parent);
             out << YAML::Key << "Open" << YAML::Value << tc.Open;
 
             out << YAML::Key << "PrefabAsset" << YAML::Value << tc.PrefabAsset;
@@ -637,6 +637,7 @@ namespace Nous {
 
         std::vector<UUID> entities;
         entities.push_back(root);
+        bool isRoot = true;
         int front = 0;
         while (front < entities.size())
         {
@@ -645,7 +646,8 @@ namespace Nous {
             if (!entity)
                 continue;
 
-            SerializeEntity(out, entity);
+            SerializeEntity(out, entity, isRoot);
+            if (isRoot) isRoot = false;
 
             for (auto& cid : entity.GetTransform().Children)
             {

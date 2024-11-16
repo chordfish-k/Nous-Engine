@@ -173,43 +173,47 @@ namespace Nous
 
 	void PhysicsSystem::Update(Timestep dt)
 	{
+        NS_PROFILE_FUNCTION();
+
         // 物理更新
         if (s_PhysicsWorld)
         {
             auto view = s_Scene->GetAllEntitiesWith<CRigidbody2D>();
-            for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                auto& transform = entity.GetComponent<CTransform>();
-
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-                b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                if (!body)
+                NS_PROFILE_SCOPE("Physics Pre-Update");
+                for (auto e : view)
                 {
-                    SetupRigidbody(e);
-                    body = (b2Body*)rb2d.RuntimeBody;
+                    Entity entity = { e, s_Scene };
+                    auto& transform = entity.GetComponent<CTransform>();
+
+                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    if (!body)
+                    {
+                        SetupRigidbody(e);
+                        body = (b2Body*)rb2d.RuntimeBody;
+                    }
+
+                    auto tr = transform.ParentTransform * transform.GetTransform();
+                    // 世界坐标系矩阵结算
+                    glm::vec3 scale, rotation, translation, _;
+                    glm::vec4 __;
+                    glm::quat orientation;
+                    glm::decompose(tr, scale, orientation, translation, _, __);
+                    rotation = glm::eulerAngles(orientation);
+
+                    body->SetTransform({ translation.x, translation.y }, rotation.z);
+                    body->SetEnabled(transform.Active);
                 }
-
-                auto tr = transform.ParentTransform * transform.GetTransform();
-                // 世界坐标系矩阵结算
-                glm::vec3 scale, rotation, translation, _;
-                glm::vec4 __;
-                glm::quat orientation;
-                glm::decompose(tr, scale, orientation, translation, _, __);
-                rotation = glm::eulerAngles(orientation);
-
-                body->SetTransform({translation.x, translation.y}, rotation.z);
-                body->SetEnabled(transform.Active);
             }
-
 
             // 控制物理模拟的迭代次数
             constexpr int32_t velocityIterations = 6;
             constexpr int32_t positionIterations = 2;
 #if 0          
             const float physicsTimestep = 1.0 / 60.0f;
-            
+
             s_TotalDt += dt;
             if (s_TotalDt >= physicsTimestep)
             {
@@ -218,49 +222,55 @@ namespace Nous
                 s_TotalDt -= physicsTimestep;
             }
 #else
-            s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-#endif
-            for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                auto& transform = entity.GetComponent<CTransform>();
+                NS_PROFILE_SCOPE("Box2d Step");
+                s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+            }
+#endif
 
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-                b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                if (body == nullptr)
+            {
+                NS_PROFILE_SCOPE("Physics Update");
+                for (auto e : view)
                 {
-                    SetupRigidbody(e);
-                    body = (b2Body*)rb2d.RuntimeBody;
+                    Entity entity = { e, s_Scene };
+                    auto& transform = entity.GetComponent<CTransform>();
 
+                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
                     if (body == nullptr)
+                    {
+                        SetupRigidbody(e);
+                        body = (b2Body*)rb2d.RuntimeBody;
+
+                        if (body == nullptr)
+                            continue;
+                    }
+
+                    if (!body->IsAwake())
                         continue;
+
+                    const auto& position = body->GetPosition();
+
+                    glm::mat4 tr = glm::inverse(transform.ParentTransform)
+                        * glm::translate(glm::mat4(1.0f), { position.x, position.y, 0 })
+                        * glm::toMat4(glm::quat({ 0, 0, body->GetAngle() }));
+
+                    // 世界坐标系矩阵结算
+                    glm::vec3 scale, rotation, translation, _;
+                    glm::vec4 __;
+                    glm::quat orientation;
+                    glm::decompose(tr, scale, orientation, translation, _, __);
+                    rotation = glm::eulerAngles(orientation);
+
+                    transform.Translation.x = translation.x;
+                    transform.Translation.y = translation.y;
+                    transform.Rotation.z = rotation.z;
+
+                    TransformSystem::SetSubtreeDirty(s_Scene, e);
                 }
-                
-                if (!body->IsAwake())
-                    continue;
-
-                const auto& position = body->GetPosition();
-
-                glm::mat4 tr = glm::inverse(transform.ParentTransform)
-                    * glm::translate(glm::mat4(1.0f), { position.x, position.y, 0 })
-                    * glm::toMat4(glm::quat({ 0, 0, body->GetAngle() }));
-
-                // 世界坐标系矩阵结算
-                glm::vec3 scale, rotation, translation, _;
-                glm::vec4 __;
-                glm::quat orientation;
-                glm::decompose(tr, scale, orientation, translation, _, __);
-                rotation = glm::eulerAngles(orientation);
-
-                transform.Translation.x = translation.x;
-                transform.Translation.y = translation.y;
-                transform.Rotation.z = rotation.z;
-
-                TransformSystem::SetSubtreeDirty(s_Scene, e);
             }
         }
-
         if (s_EnableDebugDraw)
         {
             Entity camera = s_Scene->GetPrimaryCameraEntity();

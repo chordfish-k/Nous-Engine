@@ -214,8 +214,7 @@ namespace Nous
 
         UI_Toolbar();
 
-        // Hierarchy
-        m_SceneHierarchyPanel.OnImGuiRender();
+        
 
         // Resource
         m_ResourceBrowserPanel->OnImGuiRender();
@@ -229,6 +228,9 @@ namespace Nous
         //
         m_AnimClipEditorPanel.OnImGuiRender();
         m_AnimMachineEditorPanel.OnImGuiRender();
+
+        // Hierarchy
+        m_SceneHierarchyPanel.OnImGuiRender();
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show physics colliders (Editor)", &m_ShowPhysicsColliders);

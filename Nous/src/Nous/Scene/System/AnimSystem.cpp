@@ -33,6 +33,8 @@ namespace Nous
 
 	void AnimSystem::Update(Timestep dt)
 	{
+		NS_PROFILE_FUNCTION();
+
 		auto view = s_Scene->GetAllEntitiesWith<CAnimPlayer, CSpriteRenderer>();
 		for (auto& ent : view)
 		{
