@@ -17,6 +17,7 @@ namespace Nous {
         void SetPersp(float FOV, float nearClip, float farClip);
 
         void SetViewportSize(uint32_t width, uint32_t height);
+        float GetAspectRatio() const { return m_AspectRatio; };
 
         float GetOrthoSize() const { return m_OrthoSize; }
         void SetOrthoSize(float size) { if (m_OrthoSize == size) return; m_OrthoSize = size; RecalculateProjection(); }

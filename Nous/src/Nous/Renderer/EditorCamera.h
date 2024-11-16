@@ -23,6 +23,7 @@ namespace Nous {
         void SetDistance(float distance) { m_Distance = distance; }
 
         void SetViewportSize(float width, float height);
+        float GetAspectRatio() const { return m_ViewportWidth / m_ViewportHeight; };
 
         const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
         glm::mat4 GetViewProjectionMatrix() const { return m_Projection * m_ViewMatrix; }

@@ -8,6 +8,10 @@
 namespace Nous
 {
     static Scene* s_Scene = nullptr;
+    static float s_UICameraRatioW = 16.0f;
+    static float s_UICameraRatioH = 9.0f;
+    static float s_UICameraRatio = s_UICameraRatioW / s_UICameraRatioH;
+    static EditorCamera s_UICamera = EditorCamera(30.0f, s_UICameraRatio, 0.1f, 1000.0f);
 
 	void RenderSystem::Start(Scene* scene)
 	{
@@ -95,6 +99,47 @@ namespace Nous
 
                     Renderer2D::DrawString(transform.ParentTransform * transform.GetTransform(), text.TextString, text, text.Color, (int)ent);
                 }
+            }
+
+            auto view = s_Scene->GetAllEntitiesWith<CTransform, CUIButton>();
+            for (auto ent : view)
+            {
+                auto [transform, btn] = view.get<CTransform, CUIButton>(ent);
+
+                if (!transform.Active)
+                    continue;
+
+                float aspect = useEditorCamera ? camera->GetAspectRatio() : ((SceneCamera*)mainCamera)->GetAspectRatio();
+                float offsetX = 0.0f;
+                float offsetY = 0.0f;
+
+                switch (btn.AnchorH)
+                {
+                case UIHorizontalAnchor::Left:  offsetX = -1.0f * aspect;   break;
+                case UIHorizontalAnchor::Right: offsetX = 1.0f * aspect;    break;
+                }
+
+                switch (btn.AnchorV)
+                {
+                case UIVerticalAnchor::Bottom:  offsetY = -1.0f;            break;
+                case UIVerticalAnchor::Top:     offsetY = 1.0f;             break;
+                }
+
+                // 可能通过新的shader，将部分矩阵运算交给gpu
+                glm::mat4 uiTransform(1.0f);
+                // ui 应该是固定在屏幕上，不受摄像机属性影响
+                // 对抗viewproject矩阵
+                if (!useEditorCamera)
+                    uiTransform = glm::inverse(mainCamera->GetProjectionMatrix() * glm::inverse(cameraTransform));
+                else
+                    uiTransform = glm::inverse(camera->GetViewProjectionMatrix());
+                
+                uiTransform *= transform.ParentTransform 
+                    * glm::scale(glm::mat4(1.0f), glm::vec3(btn.Size.x / aspect, btn.Size.y, 1.0f)) // 对抗摄像机长宽比
+                    * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, offsetY, 0)) // 根据锚点进行偏移
+                    * transform.GetTransform();
+
+                Renderer2D::DrawQuad(uiTransform, { 0.5, 0.5, 0.5f, 1 }, (int)ent);
             }
 
             Renderer2D::EndScene();

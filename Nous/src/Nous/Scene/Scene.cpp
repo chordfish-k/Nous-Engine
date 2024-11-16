@@ -393,4 +393,14 @@ namespace Nous {
     void Scene::OnComponentAdded<CTextRenderer>(Entity entity, CTextRenderer& component)
     {
     }
+
+    template<>
+    void Scene::OnComponentAdded<CUIButton>(Entity entity, CUIButton& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CUIText>(Entity entity, CUIText& component)
+    {
+    }
 }

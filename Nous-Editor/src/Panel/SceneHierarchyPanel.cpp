@@ -324,10 +324,12 @@ namespace Nous {
             DisplayAddComponentEntry<CTextRenderer>("CTextRenderer");
             DisplayAddComponentEntry<CAnimPlayer>("CAnimPlayer");
 
+            ImGui::Separator();
+
+            DisplayAddComponentEntry<CUIButton>("CUIButton");
+
             ImGui::EndPopup();
         }
-
-
 
         DrawComponent<CTransform>("CTransform", entity, [&](auto& component)
         {
@@ -684,6 +686,25 @@ namespace Nous {
                 component.AnimClip = handle;
                 component.Type = outType;
             }
+        });
+
+
+        // UI
+
+        DrawComponent<CUIButton>("CUIButton", entity, [](auto& component)
+        {
+            const char* anchorHStrings[] = { "Center", "Left", "Right" };
+            const char* anchorVStrings[] = { "Center", "Top", "Bottom"};
+            uint32_t anchorHIndex = (int)component.AnchorH;
+            uint32_t anchorVIndex = (int)component.AnchorV;
+
+            if (EUI::DrawCombo("Anchor H", anchorHStrings, &anchorHIndex, 3))
+                component.AnchorH = (UIHorizontalAnchor)anchorHIndex;
+
+            if (EUI::DrawCombo("Anchor V", anchorVStrings, &anchorVIndex, 3))
+                component.AnchorV = (UIVerticalAnchor)anchorVIndex;
+
+            EUI::DrawInputTextMultiline("Text", &component.Text);
         });
     }
 

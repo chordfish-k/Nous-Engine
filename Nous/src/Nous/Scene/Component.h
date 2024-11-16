@@ -190,6 +190,27 @@ namespace Nous {
         CCircleCollider2D(const CCircleCollider2D&) = default;
     };
 
+    enum class UIHorizontalAnchor : uint8_t { Center = 0, Left, Right };
+    enum class UIVerticalAnchor : uint8_t { Center = 0, Top, Bottom };
+
+    struct CUI
+    {
+        UIHorizontalAnchor AnchorH = UIHorizontalAnchor::Center;
+        UIVerticalAnchor AnchorV = UIVerticalAnchor::Center;
+        glm::vec2 Size = { 1.0f, 1.0f };
+    };
+
+    struct CUIButton : public CUI
+    {
+        std::string Text = "Button";
+        std::function<void(UUID)> InvokeFunc = nullptr;
+    };
+
+    struct CUIText : public CUI
+    {
+        std::string Text = "Text";
+    };
+
 
     template<typename... Component>
     struct ComponentGroup
@@ -200,5 +221,5 @@ namespace Nous {
         ComponentGroup<CTransform, CSpriteRenderer, CCircleRenderer, 
         CCamera, CNativeScript, CMonoScript, CRigidbody2D, 
         CBoxCollider2D, CCircleCollider2D, CTextRenderer,
-        CAnimPlayer>;
+        CAnimPlayer, CUIButton, CUIText>;
 }
