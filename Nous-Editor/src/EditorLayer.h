@@ -41,6 +41,7 @@ namespace Nous {
         bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
         void SaveProject();
+        void ReloadProject();
         void Export();
 
         void OpenSettings();

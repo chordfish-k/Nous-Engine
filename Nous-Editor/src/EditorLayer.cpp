@@ -208,6 +208,9 @@ namespace Nous
                 if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
                     OpenProject();
 
+                if (ImGui::MenuItem("Reload Project"))
+                    ReloadProject();
+
                 if (ImGui::MenuItem("Export...", "", false, m_ActiveScene && !m_ActiveScene->IsRunning()))
                     Export();
 
@@ -559,6 +562,22 @@ namespace Nous
     void EditorLayer::SaveProject()
     {
         // Project::SaveActive();
+    }
+
+    void EditorLayer::ReloadProject()
+    {
+        if (m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate)
+            StopScene();
+
+        if (Project::Reload())
+        {
+            ScriptEngine::InitApp();
+
+            AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
+            if (startScene)
+                OpenScene(startScene);
+            m_ResourceBrowserPanel = CreateScope<ResourceBrowserPanel>(Project::GetActive());
+        }
     }
 
     void EditorLayer::Export()
