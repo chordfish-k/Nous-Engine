@@ -10,7 +10,7 @@
 
 #include "Nous/Renderer/EditorCamera.h"
 
-#include "Event/Observer.h"
+#include "Nous/Event/Observer.h"
 
 namespace Nous {
 
@@ -28,10 +28,10 @@ namespace Nous {
         virtual void OnImGuiRender() override;
         virtual void OnEvent(Event& event) override;
 
-        virtual void OnEditorEvent(EditorEvent& e) override;
+        virtual void OnEditorEvent(AppEvent& e) override;
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
-
+        void OnChangeRunningScene(ChangeRunningSceneEvent& e);
         void OnOpenScene(OpenSceneEvent& e);
         void OnAssetFileDoubleClick(AssetFileDoubleClickEvent& e);
         
@@ -41,13 +41,18 @@ namespace Nous {
         bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
         void SaveProject();
+        void ReloadProject();
         void Export();
 
+        void OpenSettings();
+
         void NewScene();
-        void OpenScene();
         void OpenScene(AssetHandle handle);
+        void ChangeRunningScene(AssetHandle handle);
         void SaveScene();
         void SaveSceneAs();
+        void PlayScene();
+        void StopScene();
 
         void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 
@@ -64,6 +69,7 @@ namespace Nous {
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_ActiveScene;
         Ref<Scene> m_EditorScene;
+        AssetHandle m_NextScene = 0;
         std::filesystem::path m_EditorScenePath;
         
         EditorCamera m_EditorCamera;

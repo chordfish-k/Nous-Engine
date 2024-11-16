@@ -1,18 +1,18 @@
 #include "pch.h"
-#include "EditorEvent.h"
+#include "AppEvent.h"
 
 #include "Observer.h"
 
 namespace Nous {
 
-    std::vector<Observer*> EditorEventEmitter::observers;
+    std::vector<Observer*> AppEventEmitter::observers;
 
-    void EditorEventEmitter::AddObserver(Observer* observer)
+    void AppEventEmitter::AddObserver(Observer* observer)
     {
         observers.push_back(observer);
     }
 
-    void EditorEventEmitter::Emit(EditorEvent& e)
+    void AppEventEmitter::Emit(AppEvent& e)
     {
         for (auto& obs : observers)
         {

@@ -53,6 +53,11 @@ namespace Nous
 		return nullptr;
 	}
 
+	bool Project::Reload()
+	{
+		return Load(s_ActiveProject->m_ProjectFilePath) != nullptr;
+	}
+
 	bool Project::SaveActive(const std::filesystem::path& path)
 	{
 		ProjectSerializer serializer(s_ActiveProject);
@@ -61,6 +66,12 @@ namespace Nous
 			s_ActiveProject->m_ProjectDirectory = path.parent_path();
 			return true;
 		}
+		return false;
+	}
+
+	bool Project::SaveActive()
+	{
+		SaveActive(s_ActiveProject->m_ProjectFilePath);
 		return false;
 	}
 

@@ -4,7 +4,7 @@
 #include "Nous/Scene/System/TransformSystem.h"
 
 #include "Panel/SceneHierarchyPanel.h"
-#include "Event/EditorEvent.h"
+#include "Nous/Event/AppEvent.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -88,7 +88,7 @@ namespace Nous
             {
                 AssetHandle handle = *(AssetHandle*)payload->Data;
                 OpenSceneEvent event {handle};
-                EditorEventEmitter::Emit(event);
+                AppEventEmitter::Emit(event);
             }
             ImGui::EndDragDropTarget();
         }

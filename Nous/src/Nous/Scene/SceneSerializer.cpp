@@ -194,7 +194,7 @@ namespace Nous {
     {
     }
 
-    static void SerializeEntity(YAML::Emitter& out, Entity entity)
+    static void SerializeEntity(YAML::Emitter& out, Entity entity, bool isPrefab = false)
     {
         // 必须具有ID组件
         NS_CORE_ASSERT(entity.HasComponent<CUuid>());
@@ -223,7 +223,9 @@ namespace Nous {
             out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
             out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 
-            out << YAML::Key << "Parent" << YAML::Value << tc.Parent;
+            out << YAML::Key << "Active" << YAML::Value << tc.Active;
+
+            out << YAML::Key << "Parent" << YAML::Value << (isPrefab ? 0 : tc.Parent);
             out << YAML::Key << "Open" << YAML::Value << tc.Open;
 
             out << YAML::Key << "PrefabAsset" << YAML::Value << tc.PrefabAsset;
@@ -635,6 +637,7 @@ namespace Nous {
 
         std::vector<UUID> entities;
         entities.push_back(root);
+        bool isRoot = true;
         int front = 0;
         while (front < entities.size())
         {
@@ -643,7 +646,8 @@ namespace Nous {
             if (!entity)
                 continue;
 
-            SerializeEntity(out, entity);
+            SerializeEntity(out, entity, isRoot);
+            if (isRoot) isRoot = false;
 
             for (auto& cid : entity.GetTransform().Children)
             {
@@ -657,12 +661,6 @@ namespace Nous {
 
         std::ofstream fout(filepath);
         fout << out.c_str();
-    }
-
-    void SceneSerializer::SerializeRuntime(const std::filesystem::path& filepath)
-    {
-        // 未实现
-        NS_CORE_ASSERT(false);
     }
 
     bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
@@ -706,6 +704,9 @@ namespace Nous {
                 tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.Scale = transformComponent["Scale"].as<glm::vec3>();
 
+                if (transformComponent["Active"])
+                    tc.Active = transformComponent["Active"].as<bool>();
+
                 if (transformComponent["Open"])
                     tc.Open = transformComponent["Open"].as<bool>();
 
@@ -740,9 +741,9 @@ namespace Nous {
         }
         catch (YAML::ParserException& e)
         {
+            NS_CORE_ERROR("无法加载 .nsprefab 文件 '{0}'\n     {1}", filepath, e.what());
             return false;
         }
-
 
         std::unordered_map<UUID, UUID> uuidMap;
 
@@ -771,6 +772,9 @@ namespace Nous {
                 tc.Translation = transformComponent["Translation"].as<glm::vec3>();
                 tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                 tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+
+                if (transformComponent["Active"])
+                    tc.Active = transformComponent["Active"].as<bool>();
 
                 if (transformComponent["Open"])
                     tc.Open = transformComponent["Open"].as<bool>();
@@ -803,14 +807,6 @@ namespace Nous {
         ReconstructEntityTree(m_Scene);
 
         return true;
-    }
-
-
-    bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath)
-    {
-        // 未实现
-        NS_CORE_ASSERT(false);
-        return false;
     }
 
 }

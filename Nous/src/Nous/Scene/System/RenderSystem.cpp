@@ -16,6 +16,8 @@ namespace Nous
 
 	void RenderSystem::Update(Timestep dt, EditorCamera* camera)
 	{
+        NS_PROFILE_FUNCTION();
+
         if (!s_Scene)
             return;
 
@@ -31,8 +33,12 @@ namespace Nous
             {
                 auto [transform, camera] = view.get<CTransform, CCamera>(ent);
 
+                if (!transform.Active)
+                    continue;
+
                 if (!camera.Primary)
                     continue;
+                
                 mainCamera = &camera.Camera;
                 cameraTransform = transform.GetTransform();
                 break;
@@ -53,6 +59,10 @@ namespace Nous
                 for (auto ent : view)
                 {
                     auto [transform, sprite] = view.get<CTransform, CSpriteRenderer>(ent);
+
+                    if (!transform.Active)
+                        continue;
+
                     auto worldTransform = transform.ParentTransform * transform.GetTransform();
                     Renderer2D::DrawSprite(worldTransform, sprite, (int)ent);
                 }
@@ -64,6 +74,10 @@ namespace Nous
                 for (auto ent : view)
                 {
                     auto [transform, circle] = view.get<CTransform, CCircleRenderer>(ent);
+
+                    if (!transform.Active)
+                        continue; 
+                    
                     Renderer2D::DrawCircle(transform.ParentTransform * transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)ent);
                 }
 
@@ -75,6 +89,10 @@ namespace Nous
                 for (auto ent : view)
                 {
                     auto [transform, text] = view.get<CTransform, CTextRenderer>(ent);
+
+                    if (!transform.Active)
+                        continue;
+
                     Renderer2D::DrawString(transform.ParentTransform * transform.GetTransform(), text.TextString, text, text.Color, (int)ent);
                 }
             }

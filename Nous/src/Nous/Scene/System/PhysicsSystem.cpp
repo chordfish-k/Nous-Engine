@@ -149,6 +149,8 @@ namespace Nous
         static DebugDraw debugDraw;
     }
 
+    static float s_TotalDt = 0;
+
 	void PhysicsSystem::Start(Scene* scene)
 	{
 		s_Scene = scene;
@@ -165,82 +167,110 @@ namespace Nous
         s_PhysicsWorld->SetContactListener(s_ContactListener);
         Utils::debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_centerOfMassBit);
         s_PhysicsWorld->SetDebugDraw(&Utils::debugDraw);
+
+        s_TotalDt = 0.0f;
 	}
 
 	void PhysicsSystem::Update(Timestep dt)
 	{
+        NS_PROFILE_FUNCTION();
+
         // 物理更新
         if (s_PhysicsWorld)
         {
             auto view = s_Scene->GetAllEntitiesWith<CRigidbody2D>();
-            for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                auto& transform = entity.GetComponent<CTransform>();
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
-
-                b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                if (!body)
+                NS_PROFILE_SCOPE("Physics Pre-Update");
+                for (auto e : view)
                 {
-                    SetupRigidbody(e);
-                    body = (b2Body*)rb2d.RuntimeBody;
+                    Entity entity = { e, s_Scene };
+                    auto& transform = entity.GetComponent<CTransform>();
+
+                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    if (!body)
+                    {
+                        SetupRigidbody(e);
+                        body = (b2Body*)rb2d.RuntimeBody;
+                    }
+
+                    auto tr = transform.ParentTransform * transform.GetTransform();
+                    // 世界坐标系矩阵结算
+                    glm::vec3 scale, rotation, translation, _;
+                    glm::vec4 __;
+                    glm::quat orientation;
+                    glm::decompose(tr, scale, orientation, translation, _, __);
+                    rotation = glm::eulerAngles(orientation);
+
+                    body->SetTransform({ translation.x, translation.y }, rotation.z);
+                    body->SetEnabled(transform.Active);
                 }
-
-                auto tr = transform.ParentTransform * transform.GetTransform();
-                // 世界坐标系矩阵结算
-                glm::vec3 scale, rotation, translation, _;
-                glm::vec4 __;
-                glm::quat orientation;
-                glm::decompose(tr, scale, orientation, translation, _, __);
-                rotation = glm::eulerAngles(orientation);
-
-                body->SetTransform({translation.x, translation.y}, rotation.z);
             }
-
 
             // 控制物理模拟的迭代次数
             constexpr int32_t velocityIterations = 6;
             constexpr int32_t positionIterations = 2;
-            
-            s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
-            // 从Box2D中取出transform数据
-            
-            for (auto e : view)
+#if 0          
+            const float physicsTimestep = 1.0 / 60.0f;
+
+            s_TotalDt += dt;
+            if (s_TotalDt >= physicsTimestep)
             {
-                Entity entity = { e, s_Scene };
-                auto& transform = entity.GetComponent<CTransform>();
-                auto& rb2d = entity.GetComponent<CRigidbody2D>();
+                s_PhysicsWorld->Step(physicsTimestep, velocityIterations, positionIterations);
+                //while (s_TotalDt >= physicsTimestep) 
+                s_TotalDt -= physicsTimestep;
+            }
+#else
+            {
+                NS_PROFILE_SCOPE("Box2d Step");
+                s_PhysicsWorld->Step(dt, velocityIterations, positionIterations);
+            }
+#endif
 
-                b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                if (!body)
+            {
+                NS_PROFILE_SCOPE("Physics Update");
+                for (auto e : view)
                 {
-                    SetupRigidbody(e);
-                    body = (b2Body*)rb2d.RuntimeBody;
+                    Entity entity = { e, s_Scene };
+                    auto& transform = entity.GetComponent<CTransform>();
+
+                    auto& rb2d = entity.GetComponent<CRigidbody2D>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    if (body == nullptr)
+                    {
+                        SetupRigidbody(e);
+                        body = (b2Body*)rb2d.RuntimeBody;
+
+                        if (body == nullptr)
+                            continue;
+                    }
+
+                    if (!body->IsAwake())
+                        continue;
+
+                    const auto& position = body->GetPosition();
+
+                    glm::mat4 tr = glm::inverse(transform.ParentTransform)
+                        * glm::translate(glm::mat4(1.0f), { position.x, position.y, 0 })
+                        * glm::toMat4(glm::quat({ 0, 0, body->GetAngle() }));
+
+                    // 世界坐标系矩阵结算
+                    glm::vec3 scale, rotation, translation, _;
+                    glm::vec4 __;
+                    glm::quat orientation;
+                    glm::decompose(tr, scale, orientation, translation, _, __);
+                    rotation = glm::eulerAngles(orientation);
+
+                    transform.Translation.x = translation.x;
+                    transform.Translation.y = translation.y;
+                    transform.Rotation.z = rotation.z;
+
+                    TransformSystem::SetSubtreeDirty(s_Scene, e);
                 }
-                if (!body->IsAwake())
-                    continue;
-
-                const auto& position = body->GetPosition();
-
-                glm::mat4 tr = glm::inverse(transform.ParentTransform)
-                    * glm::translate(glm::mat4(1.0f), { position.x, position.y, 0 })
-                    * glm::toMat4(glm::quat({ 0, 0, body->GetAngle() }));
-
-                // 世界坐标系矩阵结算
-                glm::vec3 scale, rotation, translation, _;
-                glm::vec4 __;
-                glm::quat orientation;
-                glm::decompose(tr, scale, orientation, translation, _, __);
-                rotation = glm::eulerAngles(orientation);
-
-                transform.Translation.x = translation.x;
-                transform.Translation.y = translation.y;
-                transform.Rotation.z = rotation.z;
-
-                TransformSystem::SetSubtreeDirty(s_Scene, e);
             }
         }
-
         if (s_EnableDebugDraw)
         {
             Entity camera = s_Scene->GetPrimaryCameraEntity();
@@ -275,6 +305,10 @@ namespace Nous
     {
         Entity entity{ e, s_Scene };
         auto& transformC = entity.GetComponent<CTransform>();
+
+        if (!transformC.Active)
+            return;
+
         auto transform = transformC.ParentTransform * transformC.GetTransform();
 
         // 世界坐标系矩阵结算
@@ -374,9 +408,25 @@ namespace Nous
 
     void PhysicsSystem::DeleteRigidbody(entt::entity e)
     {
+        if (!s_Scene)
+            return;
+
         Entity entity{ e, s_Scene };
         if (entity.HasComponent<CRigidbody2D>())
             s_PhysicsWorld->DestroyBody((b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody);
+    }
+
+    void PhysicsSystem::SetEnableRigidbody(entt::entity e, bool flag)
+    {
+        if (!s_Scene)
+            return;
+
+        Entity entity{ e, s_Scene };
+        if (entity.HasComponent<CRigidbody2D>())
+        {
+            auto body = (b2Body*)entity.GetComponent<CRigidbody2D>().RuntimeBody;
+            body->SetEnabled(flag);
+        }
     }
 
     void ContactListener::BeginContact(b2Contact* contact)

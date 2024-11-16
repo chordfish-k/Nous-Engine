@@ -1,13 +1,13 @@
 #pragma once
 
-#include "EditorEvent.h"
+#include "AppEvent.h"
 
 namespace Nous {
 
     class Observer
     {
     public:
-        virtual void OnEditorEvent(EditorEvent& e) = 0;
+        virtual void OnEditorEvent(AppEvent& e) = 0;
     };
 
 }

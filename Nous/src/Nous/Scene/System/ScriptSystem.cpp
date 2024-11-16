@@ -20,34 +20,37 @@ namespace Nous
             auto view = s_Scene->GetAllEntitiesWith<CMonoScript>();
             for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                ScriptEngine::OnCreateEntity(entity);
+                ScriptEngine::OnCreateEntity({ e, s_Scene });
             }
 
             // 全部实例化之后再调用 OnStart
             for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                ScriptEngine::OnStartEntity(entity);
+                ScriptEngine::OnStartEntity({ e, s_Scene });
             }
         }
 	}
 
 	void ScriptSystem::Update(Timestep dt)
 	{
+        NS_PROFILE_FUNCTION();
+
         // 执行脚本更新
         if (s_Scene)
         {
             // C# Entity Update
-            auto view = s_Scene->GetAllEntitiesWith<CMonoScript>();
+            auto view = s_Scene->GetAllEntitiesWith<CTransform, CMonoScript>();
             for (auto e : view)
             {
-                Entity entity = { e, s_Scene };
-                ScriptEngine::OnUpdateEntity(entity, dt);
+                auto& transform = view.get<CTransform>(e);
+                if (!transform.Active)
+                    continue;
+                ScriptEngine::OnUpdateEntity({ e, s_Scene }, dt);
             }
 
             // 原生脚本
-            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script) {
+            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script) 
+            {
                 // 没有脚本实例就先创建
                 if (!script.Instance)
                 {
@@ -67,7 +70,8 @@ namespace Nous
 
         // 执行原生脚本销毁
         {
-            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script) {
+            s_Scene->GetAllEntitiesWith<CNativeScript>().each([=](auto ent, auto& script)
+            {
                 if (script.Instance)
                 {
                     script.Instance->OnDestroy();
@@ -113,9 +117,9 @@ namespace Nous
         Entity entityB = { entityIDB, s_Scene };
         // 物体从物理世界移除时，如果此前处于碰撞状态，这个函数也会触发，所以要先判断实体还在不在
         if (entityA)
-            ScriptEngine::OnCollisionExit(contactPtr, entityA, entityB ? entityB : 0);
+            ScriptEngine::OnCollisionExit(contactPtr, entityA, entityB ? B : 0);
         if (entityB)
-            ScriptEngine::OnCollisionExit(contactPtr, entityB, entityA ? entityA : 0);
+            ScriptEngine::OnCollisionExit(contactPtr, entityB, entityA ? A : 0);
     }
 
     void ScriptSystem::OnCollisionEnter(void* contactPtr, UUID A, UUID B, glm::vec2& normal)

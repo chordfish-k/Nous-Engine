@@ -8,7 +8,7 @@ namespace Nous
 {
     ConsolePanel::ConsolePanel()
     {
-        EditorEventEmitter::AddObserver(this);
+        AppEventEmitter::AddObserver(this);
     }
 
     void ConsolePanel::OnImGuiRender()
@@ -91,9 +91,9 @@ namespace Nous
         Console::Clear();
     }
 
-    void ConsolePanel::OnEditorEvent(EditorEvent& e)
+    void ConsolePanel::OnEditorEvent(AppEvent& e)
     {
-        EditorEventDispatcher dispatcher(e);
+        AppEventDispatcher dispatcher(e);
         dispatcher.Dispatch<ConsoleClearEvent>(NS_BIND_EVENT_FN(ConsolePanel::OnConsoleClear));
     }
 

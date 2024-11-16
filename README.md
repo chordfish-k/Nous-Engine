@@ -45,7 +45,8 @@
 - [x] 一个启动程序页面，显示打开或新建项目
 - [x] 新建项目会创建.nsproj & .nsasset，不需要创建premake5.lua & WinGen.bat，这两个在编辑器程序上执行
 - [x] 打包成可游玩的游戏，具体操作是修改Sandbox子项目，让它只保留runtime并将framebuffer进行渲染
-- [ ] 项目基本设置：初始场景
+- [x] 项目基本设置：初始场景选择
+- [x] 场景转换
 
 ### 其它
 
@@ -63,4 +64,5 @@
 - [x] 不能提供CTransform的删除选项
 - [ ] 物理系统正在运行时才能进行SetLinearVelocity等操作
 - [x] 脚本修改带rigbody的实体无法得到正确反馈
+- [ ] Log字符串无法显示中文
 - [ ] ctrl+D复制实体要：复制子实体，复制父实体id

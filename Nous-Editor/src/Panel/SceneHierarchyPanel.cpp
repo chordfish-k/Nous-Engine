@@ -32,7 +32,7 @@ namespace Nous {
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
     {
         SetContext(scene);
-        EditorEventEmitter::AddObserver(this);
+        AppEventEmitter::AddObserver(this);
     }
 
     void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
@@ -76,9 +76,9 @@ namespace Nous {
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::OnEditorEvent(EditorEvent& e)
+    void SceneHierarchyPanel::OnEditorEvent(AppEvent& e)
     {
-        EditorEventDispatcher dispatcher(e);
+        AppEventDispatcher dispatcher(e);
         dispatcher.Dispatch<SavePrefabEvent>(NS_BIND_EVENT_FN(SceneHierarchyPanel::OnSavePrefab));
     }
 
@@ -97,7 +97,16 @@ namespace Nous {
         else flags |= ImGuiTreeNodeFlags_Leaf;
         if (transform.Open && canBeOpen) flags |= ImGuiTreeNodeFlags_DefaultOpen;
 
-        transform.Open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s%s", tag.Tag.c_str(), transform.PrefabAsset ? "[Prefab]" : "");
+        void* id = (void*)(uint64_t)(uint32_t)entity;
+
+        // Non-Active color
+        {
+            UI::ScopedStyleColor color(ImGuiCol_Text, 
+                transform.Active ? ImVec4{1, 1, 1, 1} : ImVec4{ 0.6, 0.6, 0.6, 1 });
+
+            transform.Open = ImGui::TreeNodeEx(id, flags, "%s %s", tag.Tag.c_str(), transform.PrefabAsset ? "[Prefab]" : "");
+        }
+
         if (ImGui::IsItemClicked())
         {
             m_Context->SetSelectedEntity(entity);
@@ -271,6 +280,16 @@ namespace Nous {
 
     void SceneHierarchyPanel::DrawComponents(Entity entity)
     {
+        {
+            auto& tr = entity.GetTransform();
+            if (ImGui::Checkbox("##Active", &tr.Active))
+            {
+                TransformSystem::SetSubtreeActive(m_Context.get(), entity, tr.Active);
+            }
+        }
+
+        ImGui::SameLine();
+
         // Name
         {
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
@@ -307,6 +326,8 @@ namespace Nous {
 
             ImGui::EndPopup();
         }
+
+
 
         DrawComponent<CTransform>("CTransform", entity, [&](auto& component)
         {
