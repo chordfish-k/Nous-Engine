@@ -4,7 +4,7 @@
 #include "Nous/Project/Project.h"
 #include "Nous/Asset/TextureImporter.h"
 
-#include "Event/EditorEvent.h"
+#include "Nous/Event/AppEvent.h"
 
 #include <imgui.h>
 
@@ -138,7 +138,7 @@ namespace Nous
                     {
                         // 发送资源双击事件
                         AssetFileDoubleClickEvent event{ m_TreeNodes[treeNodeIndex].Handle };
-                        EditorEventEmitter::Emit(event);
+                        AppEventEmitter::Emit(event);
                     }
                 }
 
@@ -232,7 +232,7 @@ namespace Nous
                 UUID uuid = *(UUID*)payload->Data;
 
                 SavePrefabEvent event{ uuid , m_CurrentDirectory };
-                EditorEventEmitter::Emit(event);
+                AppEventEmitter::Emit(event);
             }
             ImGui::EndDragDropTarget();
         }

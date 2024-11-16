@@ -6,7 +6,7 @@
 
 namespace Nous {
 
-    enum class EditorEventType
+    enum class AppEventType
     {
         OpenScene = 0,
         AssetFileDoubleClick,
@@ -14,18 +14,18 @@ namespace Nous {
         ConsoleClear
     };
 
-    struct EditorEvent
+    struct AppEvent
     {
-        virtual EditorEventType GetEventType() const = 0;
+        virtual AppEventType GetEventType() const = 0;
         virtual const char* GetName() const = 0;
     };
 
-#define EDITOR_EVENT_CLASS_TYPE(type) static EditorEventType GetStaticType() { return EditorEventType::type; } \
-								virtual EditorEventType GetEventType() const override { return GetStaticType(); } \
+#define EDITOR_EVENT_CLASS_TYPE(type) static AppEventType GetStaticType() { return AppEventType::type; } \
+								virtual AppEventType GetEventType() const override { return GetStaticType(); } \
 								virtual const char* GetName() const override { return #type; }
 
     // EVENT
-    struct OpenSceneEvent : public EditorEvent
+    struct OpenSceneEvent : public AppEvent
     {
         AssetHandle Handle;
         OpenSceneEvent(const AssetHandle& handle) : Handle(handle) {};
@@ -33,14 +33,14 @@ namespace Nous {
         EDITOR_EVENT_CLASS_TYPE(OpenScene);
     };
 
-    struct ConsoleClearEvent : public EditorEvent
+    struct ConsoleClearEvent : public AppEvent
     {
         ConsoleClearEvent() {}
 
         EDITOR_EVENT_CLASS_TYPE(ConsoleClear);
     };
 
-    struct SavePrefabEvent : public EditorEvent
+    struct SavePrefabEvent : public AppEvent
     {
         UUID Root;
         std::filesystem::path Dir;
@@ -49,7 +49,7 @@ namespace Nous {
         EDITOR_EVENT_CLASS_TYPE(SavePrefab);
     };
 
-    struct AssetFileDoubleClickEvent : public EditorEvent
+    struct AssetFileDoubleClickEvent : public AppEvent
     {
         AssetHandle Handle;
         AssetFileDoubleClickEvent(const AssetHandle& handle) : Handle(handle) {};
@@ -60,22 +60,22 @@ namespace Nous {
 
     class Observer;
 
-    class EditorEventEmitter
+    class AppEventEmitter
     {
     public:
         static void AddObserver(Observer* observer);
-        static void Emit(EditorEvent& e);
+        static void Emit(AppEvent& e);
 
     private:
         static std::vector<Observer*> observers;
     };
 
-    class EditorEventDispatcher
+    class AppEventDispatcher
     {
         template<typename T>
         using EventFn = std::function<void(T&)>;
     public:
-        EditorEventDispatcher(EditorEvent& event)
+        AppEventDispatcher(AppEvent& event)
             :m_Event(event)
         {
         }
@@ -87,7 +87,7 @@ namespace Nous {
                 func(static_cast<T&>(m_Event));
         }
     private:
-        EditorEvent& m_Event;
+        AppEvent& m_Event;
     };
 
 }

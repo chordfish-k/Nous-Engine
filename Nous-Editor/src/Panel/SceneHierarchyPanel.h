@@ -4,7 +4,7 @@
 #include "Nous/Scene/Scene.h"
 #include "Nous/Scene/Entity.h"
 
-#include "Event/Observer.h"
+#include "Nous/Event/Observer.h"
 
 namespace Nous {
 
@@ -17,7 +17,7 @@ namespace Nous {
         void SetContext(const Ref<Scene>& scene);
 
         void OnImGuiRender();
-        virtual void OnEditorEvent(EditorEvent& e) override;
+        virtual void OnEditorEvent(AppEvent& e) override;
     private:
         template<typename T>
         void DisplayAddComponentEntry(const std::string& entryName);

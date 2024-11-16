@@ -10,7 +10,7 @@
 
 #include "Nous/Renderer/EditorCamera.h"
 
-#include "Event/Observer.h"
+#include "Nous/Event/Observer.h"
 
 namespace Nous {
 
@@ -28,7 +28,7 @@ namespace Nous {
         virtual void OnImGuiRender() override;
         virtual void OnEvent(Event& event) override;
 
-        virtual void OnEditorEvent(EditorEvent& e) override;
+        virtual void OnEditorEvent(AppEvent& e) override;
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
 
@@ -46,7 +46,6 @@ namespace Nous {
         void OpenSettings();
 
         void NewScene();
-        void OpenScene();
         void OpenScene(AssetHandle handle);
         void SaveScene();
         void SaveSceneAs();

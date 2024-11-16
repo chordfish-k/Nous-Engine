@@ -32,7 +32,7 @@ namespace Nous {
     SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
     {
         SetContext(scene);
-        EditorEventEmitter::AddObserver(this);
+        AppEventEmitter::AddObserver(this);
     }
 
     void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
@@ -76,9 +76,9 @@ namespace Nous {
         ImGui::End();
     }
 
-    void SceneHierarchyPanel::OnEditorEvent(EditorEvent& e)
+    void SceneHierarchyPanel::OnEditorEvent(AppEvent& e)
     {
-        EditorEventDispatcher dispatcher(e);
+        AppEventDispatcher dispatcher(e);
         dispatcher.Dispatch<SavePrefabEvent>(NS_BIND_EVENT_FN(SceneHierarchyPanel::OnSavePrefab));
     }
 

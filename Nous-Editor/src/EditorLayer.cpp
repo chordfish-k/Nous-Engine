@@ -12,7 +12,7 @@
 #include "Panel/DockingSpace.h"
 #include "Panel/SceneManagerDialog.h"
 
-#include "Event/EditorEvent.h"
+#include "Nous/Event/AppEvent.h"
 
 #include "Nous/Scene/System/PhysicsSystem.h"
 
@@ -28,14 +28,14 @@ namespace Nous
     EditorLayer::EditorLayer()
         : Layer(nullptr, "EditorLayer")
     {
-        EditorEventEmitter::AddObserver(this);
+        AppEventEmitter::AddObserver(this);
         s_Font = Font::GetDefault();
     }
 
     EditorLayer::EditorLayer(Application* application, const ApplicationSpecification& spec)
         : Layer(application, "EditorLayer")
     {
-        EditorEventEmitter::AddObserver(this);
+        AppEventEmitter::AddObserver(this);
         s_Font = Font::GetDefault();
     }
 
@@ -628,9 +628,9 @@ namespace Nous
         SceneImporter::SaveScene(scene, path);
     }
 
-    void EditorLayer::OnEditorEvent(EditorEvent& e)
+    void EditorLayer::OnEditorEvent(AppEvent& e)
     {
-        EditorEventDispatcher dispatcher(e);
+        AppEventDispatcher dispatcher(e);
         dispatcher.Dispatch<OpenSceneEvent>(NS_BIND_EVENT_FN(EditorLayer::OnOpenScene));
         dispatcher.Dispatch<AssetFileDoubleClickEvent>(NS_BIND_EVENT_FN(EditorLayer::OnAssetFileDoubleClick));
     }
@@ -664,7 +664,7 @@ namespace Nous
             OnSceneStop();
 
         ConsoleClearEvent e;
-        EditorEventEmitter::Emit(e);
+        AppEventEmitter::Emit(e);
 
         m_SceneState = SceneState::Play;
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "Event/Observer.h"
+#include "Nous/Event/Observer.h"
 
 
 
@@ -18,7 +18,7 @@ namespace Nous
 		void Clear();
 		void OnImGuiRender();
 
-		virtual void OnEditorEvent(EditorEvent &e) override;
+		virtual void OnEditorEvent(AppEvent &e) override;
 	private:
 		void OnConsoleClear(const ConsoleClearEvent& e);
 	};
