@@ -9,6 +9,7 @@ namespace Nous
 	public:
 		static void Start(Scene* scene);
 		static void Update(Timestep dt);
+		static void UpdatePhysics(Timestep dt);
 		static void Stop();
 		static void OnCollisionPreSolve(void* contactPtr, UUID A, UUID B, glm::vec2& normal);
 		static void OnCollisionPostSolve(void* contactPtr, UUID A, UUID B, glm::vec2& normal);

@@ -60,16 +60,15 @@ namespace Nous
             // Sprites
             {
                 auto view = s_Scene->GetAllEntitiesWith<CTransform, CSpriteRenderer>();
-                for (auto ent : view)
+                view.each([](auto ent, CTransform &transform, CSpriteRenderer &sprite)
                 {
-                    auto [transform, sprite] = view.get<CTransform, CSpriteRenderer>(ent);
-
-                    if (!transform.Active)
-                        continue;
-
-                    auto worldTransform = transform.ParentTransform * transform.GetTransform();
-                    Renderer2D::DrawSprite(worldTransform, sprite, (int)ent);
-                }
+                    NS_PROFILE_SCOPE("Sprite Render");
+                    if (transform.Active)
+                    {
+                        auto worldTransform = transform.ParentTransform * transform.GetTransform();
+                        Renderer2D::DrawSprite(worldTransform, sprite, (int)ent);
+                    }
+                });
             }
 
             // Circles

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Console.h"
 
-#include "Nous/UI/UI.h"
+#include "Nous/ImGui/UI.h"
 #include "Nous/Core/Log.h"
 
 namespace Nous

@@ -42,6 +42,8 @@ namespace Nous {
 
     void SceneHierarchyPanel::OnImGuiRender()
     {
+        NS_PROFILE_FUNCTION();
+
         ImGui::Begin("Scene Hierarchy");
 
         if (m_Context)

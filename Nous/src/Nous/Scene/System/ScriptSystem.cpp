@@ -64,6 +64,25 @@ namespace Nous
         }
 	}
 
+    void ScriptSystem::UpdatePhysics(Timestep dt)
+    {
+        NS_PROFILE_FUNCTION();
+
+        // 执行脚本更新
+        if (s_Scene)
+        {
+            // C# Entity Update
+            auto view = s_Scene->GetAllEntitiesWith<CTransform, CMonoScript>();
+            for (auto e : view)
+            {
+                auto& transform = view.get<CTransform>(e);
+                if (!transform.Active)
+                    continue;
+                ScriptEngine::OnUpdatePhysicsEntity({ e, s_Scene }, dt);
+            }
+        }
+    }
+
 	void ScriptSystem::Stop()
 	{
         ScriptEngine::OnRuntimeStop();

@@ -25,6 +25,8 @@ namespace Nous
 
     void ResourceBrowserPanel::OnImGuiRender()
     {
+        NS_PROFILE_FUNCTION();
+
         ImGui::Begin("Resources");
 
         ImGui::Text("Mode:");
@@ -35,7 +37,7 @@ namespace Nous
             m_Mode = m_Mode == Mode::Asset ? Mode::FileSystem : Mode::Asset;
         }
 
-        if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory))
+        if (m_CurrentDirectory != m_BaseDirectory)
         {
             ImGui::SameLine();
             if (ImGui::Button("<-"))
@@ -49,7 +51,7 @@ namespace Nous
         static float thumbnailSize = 100.0f; // 缩略图尺寸
         float cellSize = thumbnailSize + padding;
 
-        float panelWidth = ImGui::GetContentRegionAvail().x;
+        const float panelWidth = ImGui::GetContentRegionAvail().x;
         int columnCount = (int) (panelWidth / cellSize);
         if (columnCount < 1)
             columnCount = 1;
@@ -65,11 +67,10 @@ namespace Nous
         {
             TreeNode* node = &m_TreeNodes[0];
 
-            auto currentDir = std::filesystem::relative(m_CurrentDirectory, Project::GetActiveAssetDirectory());
-            for (const auto& p : currentDir)
+            for (const auto& p : m_CurrentDirectory)
             {
                 // 如果只有一级目录
-                if (node->Path == currentDir)
+                if (0 == m_CurrentDirectory.compare(Project::GetActiveAssetDirectory() / node->Path))
                     break;
 
                 if (node->Children.find(p) != node->Children.end())
@@ -86,18 +87,15 @@ namespace Nous
 
             for (const auto& [item, treeNodeIndex] : node->Children)
             {
-                // 非正确路径，待修复
-                std::string itemStr = item.generic_string();
+                const std::string itemStr = item.generic_string();
 
-                std::filesystem::path path = Project::GetActiveAssetDirectory() / currentDir / item;
-                bool isDirectory = std::filesystem::is_directory(path);
+                const bool isDirectory = std::filesystem::is_directory(item);
 
                 // 缩略图 Thumbnail
-                auto relativePath = std::filesystem::relative(path, Project::GetActiveAssetDirectory());
                 Ref<Texture2D> thumbnail = m_DirectoryIcon;
                 if (!isDirectory)
                 {
-                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(relativePath);
+                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(m_CurrentDirectory / item);
                     if (!thumbnail)
                         thumbnail = m_FileIcon;
                 }
@@ -111,7 +109,6 @@ namespace Nous
                 {
                     if (ImGui::MenuItem("Delete"))
                     {
-                        // TODO
                         Project::GetActive()->GetEditorAssetManager()->RemoveAsset(m_TreeNodes[treeNodeIndex].Handle);
                         ClearAssetTree();
                         RefreshAssetTree();
@@ -152,72 +149,74 @@ namespace Nous
         }
         else
         {
+            std::vector<std::filesystem::directory_entry> fileEntries;
+
             // 文件夹
             for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
             {
                 const auto& path = directoryEntry.path();
-                std::string fileNameString = path.filename().string();
+                const std::string &fileNameString = path.filename().string();
 
-                bool isDirectory = directoryEntry.is_directory();
+                const bool isDirectory = directoryEntry.is_directory();
 
                 if (isDirectory)
                 {
                     // 缩略图 Thumbnail
-                    auto relativePath = std::filesystem::relative(path, Project::GetActiveAssetDirectory());
-                    Ref<Texture2D> thumbnail = m_DirectoryIcon;
+                    const Ref<Texture2D> thumbnail = m_DirectoryIcon;
                 
                     ImGui::PushID(fileNameString.c_str());
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                    
                     ImGui::ImageButton((ImTextureID)(uint64_t)thumbnail->GetRendererID(), { thumbnailSize, thumbnailSize }, {0, 1}, {1, 0});
 
                     if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                     {
-                        if (isDirectory)
-                            m_CurrentDirectory /= path.filename();
+                        m_CurrentDirectory /= path.filename();
                     }
+                    
                     ImGui::PopStyleColor();
                     ImGui::TextWrapped("%s", fileNameString.c_str()); // 显示在底部的文件名
                     ImGui::NextColumn();
                     ImGui::PopID();
                 }
-                
+                else
+                {
+                    fileEntries.push_back(directoryEntry);
+                }
             }
 
-            for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+            for (auto& directoryEntry : fileEntries)
             {
-                const auto& path = directoryEntry.path();
-                std::string fileNameString = path.filename().string();
+                NS_PROFILE_SCOPE("FILE");
 
-                bool isDirectory = directoryEntry.is_directory();
+                const auto& path = directoryEntry.path();
+                const std::string &fileNameString = path.filename().string();
 
                 // 缩略图 Thumbnail
-                auto relativePath = std::filesystem::relative(path, Project::GetActiveAssetDirectory());
                 Ref<Texture2D> thumbnail = m_FileIcon;
-                if (!isDirectory)
+
+                thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(path);
+                if (!thumbnail)
+                    thumbnail = m_FileIcon;
+
+                ImGui::PushID(fileNameString.c_str());
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                ImGui::ImageButton((ImTextureID)(uint64_t)thumbnail->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+                if (ImGui::BeginPopupContextItem())
                 {
-                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(relativePath);
-                    if (!thumbnail)
-                        thumbnail = m_FileIcon;
-
-                    ImGui::PushID(fileNameString.c_str());
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-                    ImGui::ImageButton((ImTextureID)(uint64_t)thumbnail->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-
-                    if (ImGui::BeginPopupContextItem())
+                    if (ImGui::MenuItem("Import"))
                     {
-                        if (ImGui::MenuItem("Import"))
-                        {
-                            Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);
-                            RefreshAssetTree();
-                        }
-                        ImGui::EndPopup();
+                        Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
+                        RefreshAssetTree();
                     }
-
-                    ImGui::PopStyleColor();
-                    ImGui::TextWrapped("%s", fileNameString.c_str()); // 显示在底部的文件名
-                    ImGui::NextColumn();
-                    ImGui::PopID();
+                    ImGui::EndPopup();
                 }
+
+                ImGui::PopStyleColor();
+                ImGui::TextWrapped("%s", fileNameString.c_str()); // 显示在底部的文件名
+                ImGui::NextColumn();
+                ImGui::PopID();
             }
         }
 

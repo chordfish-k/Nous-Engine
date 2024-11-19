@@ -103,6 +103,7 @@ namespace Nous
 		void InvokeOnCreate();
 		void InvokeOnStart();
 		void InvokeOnUpdate(float dt);
+		void InvokeOnUpdatePhysics(float dt);
 		void InvokeOnCollisionPreSolve(void* contactPtr, UUID otherID, glm::vec2& normal);
 		void InvokeOnCollisionPostSolve(void* contactPtr, UUID otherID, glm::vec2& normal);
 		void InvokeOnCollisionEnter(void* contactPtr, UUID otherID, glm::vec2& normal);
@@ -141,6 +142,7 @@ namespace Nous
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnStartMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
+		MonoMethod* m_OnUpdatePhysicsMethod = nullptr;
 		MonoMethod* m_OnCollisionPreSolveMethod = nullptr;
 		MonoMethod* m_OnCollisionPostSolveMethod = nullptr;
 		MonoMethod* m_OnCollisionEnterMethod = nullptr;
@@ -174,6 +176,7 @@ namespace Nous
 		static void OnDestoryEntity(Entity entity);
 		static void OnStartEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, Timestep dt);
+		static void OnUpdatePhysicsEntity(Entity entity, Timestep dt);
 		static void OnCollisionPreSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);
 		static void OnCollisionPostSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);
 		static void OnCollisionEnter(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal);

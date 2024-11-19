@@ -81,10 +81,12 @@ namespace Nous
 
     AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
     {
+        const std::filesystem::path path = std::filesystem::relative(filepath, Project::GetActiveAssetDirectory());
+
         AssetHandle handle;
         AssetMetadata metadata;
-        metadata.FilePath = filepath;
-        metadata.Type = GetAssetTypeFromFileExtension(filepath.extension());
+        metadata.FilePath = path;
+        metadata.Type = GetAssetTypeFromFileExtension(path.extension());
         if (metadata.Type == AssetType::None)
             return 0;
 

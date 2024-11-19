@@ -175,6 +175,15 @@ namespace Nous
 	{
         NS_PROFILE_FUNCTION();
 
+        // 尝试降低物理帧，但会出现抽搐问题？可能需要平滑物理模拟？
+#ifdef TEST_PHY_60
+        bool shouldUpdatePhysics = false;
+        static const float physicsTimestep = 1.0 / 60.0f;
+#endif
+        // 控制物理模拟的迭代次数
+        static const int32_t velocityIterations = 6;
+        static const int32_t positionIterations = 2;
+
         // 物理更新
         if (s_PhysicsWorld)
         {
@@ -208,18 +217,17 @@ namespace Nous
                 }
             }
 
-            // 控制物理模拟的迭代次数
-            constexpr int32_t velocityIterations = 6;
-            constexpr int32_t positionIterations = 2;
-#if 0          
-            const float physicsTimestep = 1.0 / 60.0f;
-
+            
+#ifdef TEST_PHY_60        
             s_TotalDt += dt;
             if (s_TotalDt >= physicsTimestep)
             {
+                NS_PROFILE_SCOPE("Box2d Step");
+
                 s_PhysicsWorld->Step(physicsTimestep, velocityIterations, positionIterations);
-                //while (s_TotalDt >= physicsTimestep) 
                 s_TotalDt -= physicsTimestep;
+
+                shouldUpdatePhysics = true;
             }
 #else
             {
@@ -279,6 +287,15 @@ namespace Nous
             s_PhysicsWorld->DebugDraw();
             Renderer2D::EndScene();
         }
+
+#ifdef TEST_PHY_60
+        if (shouldUpdatePhysics)
+        {
+            shouldUpdatePhysics = false;
+         
+            ScriptSystem::UpdatePhysics(physicsTimestep);
+        }
+#endif
 	}
 
 	void PhysicsSystem::Stop()

@@ -446,6 +446,24 @@ namespace Nous
 		}
 	}
 
+	void ScriptEngine::OnUpdatePhysicsEntity(Entity entity, Timestep dt)
+	{
+		UUID entityUUID = entity.GetUUID();
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			// 非active，阻止调用
+			if (!entity.GetTransform().Active)
+				return;
+
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnUpdatePhysics((float)dt);
+		}
+		else
+		{
+			NS_CORE_ERROR("[ScriptEngine] 找不到 {0}(id={1}) 的 ScriptInstance", entity.GetName(), entityUUID);
+		}
+	}
+
 	void ScriptEngine::OnCollisionPreSolve(void* contactPtr, Entity entity, UUID otherID, glm::vec2& normal)
 	{
 		UUID entityUUID = entity.GetUUID();
@@ -625,6 +643,7 @@ namespace Nous
 		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
 		m_OnStartMethod = scriptClass->GetMethod("OnStart", 0);
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+		m_OnUpdatePhysicsMethod = scriptClass->GetMethod("OnUpdatePhysics", 1);
 		m_OnCollisionPreSolveMethod = scriptClass->GetMethod("OnCollisionPreSolve", 3);
 		m_OnCollisionPostSolveMethod = scriptClass->GetMethod("OnCollisionPostSolve", 3);
 		m_OnCollisionEnterMethod = scriptClass->GetMethod("OnCollisionEnter", 3);
@@ -655,6 +674,15 @@ namespace Nous
 		{
 			void* param = &dt;
 			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+		}
+	}
+
+	void ScriptInstance::InvokeOnUpdatePhysics(float dt)
+	{
+		if (m_OnUpdatePhysicsMethod)
+		{
+			void* param = &dt;
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdatePhysicsMethod, &param);
 		}
 	}
 

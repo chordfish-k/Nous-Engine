@@ -237,7 +237,6 @@ namespace Sandbox
                 normal = m_Collisions[otherID];
                 m_Collisions.Remove(otherID);
             }
-            NousConsole.Log($"exit {normal.X} {normal.Y}");
 
             if (normal == Vector2.Zero)
                 return;

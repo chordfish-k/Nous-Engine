@@ -18,13 +18,12 @@ namespace Nous
 		// 1. 读时间戳（最后修改时间）
 		// 2. 和已经存在的缓存图像比较哈希化时间戳
 		// 3. 根据比较情况更新缓存
-
-		auto absolutePath = m_Project->GetAssetAbsolutePath(assetPath);
+		const auto absolutePath = assetPath.is_absolute() ? assetPath : m_Project->GetAssetAbsolutePath(assetPath);
 		if (!std::filesystem::exists(absolutePath))
 			return nullptr;
 
-		std::filesystem::file_time_type lastWriteTime = std::filesystem::last_write_time(absolutePath);
-		uint64_t timestamp = std::chrono::duration_cast<std::chrono::seconds>(lastWriteTime.time_since_epoch()).count();
+		const std::filesystem::file_time_type lastWriteTime = std::filesystem::last_write_time(absolutePath);
+		const uint64_t timestamp = std::chrono::duration_cast<std::chrono::seconds>(lastWriteTime.time_since_epoch()).count();
 		
 		if (m_CacheImages.find(assetPath) != m_CacheImages.end())
 		{
