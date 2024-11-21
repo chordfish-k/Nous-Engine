@@ -100,6 +100,10 @@ namespace Nous
                 }
             }
 
+            Renderer2D::EndScene();
+
+            Renderer2D::BeginUIScene();
+
             auto view = s_Scene->GetAllEntitiesWith<CTransform, CUIButton>();
             for (auto ent : view)
             {
@@ -125,15 +129,8 @@ namespace Nous
                 }
 
                 // 可能通过新的shader，将部分矩阵运算交给gpu
-                glm::mat4 uiTransform(1.0f);
                 // ui 应该是固定在屏幕上，不受摄像机属性影响
-                // 对抗viewproject矩阵
-                if (!useEditorCamera)
-                    uiTransform = glm::inverse(mainCamera->GetProjectionMatrix() * glm::inverse(cameraTransform));
-                else
-                    uiTransform = glm::inverse(camera->GetViewProjectionMatrix());
-                
-                uiTransform *= transform.ParentTransform 
+                glm::mat4 uiTransform = transform.ParentTransform 
                     * glm::scale(glm::mat4(1.0f), glm::vec3(btn.Size.x / aspect, btn.Size.y, 1.0f)) // 对抗摄像机长宽比
                     * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, offsetY, 0)) // 根据锚点进行偏移
                     * transform.GetTransform();

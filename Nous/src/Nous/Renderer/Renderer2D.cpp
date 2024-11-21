@@ -247,6 +247,16 @@ namespace Nous {
         StartBatch();
     }
 
+    void Renderer2D::BeginUIScene()
+    {
+        NS_PROFILE_FUNCTION();
+
+        s_Data.CameraBuffer.ViewProjection = glm::mat4(1.0f);
+        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+
+        StartBatch();
+    }
+
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
         NS_PROFILE_FUNCTION();
