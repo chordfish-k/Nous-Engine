@@ -693,7 +693,7 @@ namespace Nous {
 
         // UI
 
-        DrawComponent<CUIButton>("CUIButton", entity, [](auto& component)
+        DrawComponent<CUIButton>("CUIButton", entity, [](CUIButton& component)
         {
             const char* anchorHStrings[] = { "Center", "Left", "Right" };
             const char* anchorVStrings[] = { "Center", "Top", "Bottom"};
@@ -706,7 +706,32 @@ namespace Nous {
             if (EUI::DrawCombo("Anchor V", anchorVStrings, &anchorVIndex, 3))
                 component.AnchorV = (UIVerticalAnchor)anchorVIndex;
 
-            EUI::DrawInputTextMultiline("Text", &component.Text);
+            EUI::DrawColor4Control("Idle Color", component.IdleColor);
+            EUI::DrawColor4Control("Hover Color", component.HoverColor);
+            EUI::DrawColor4Control("Active Color", component.ActiveColor);
+
+            static char bufferEntity[64];
+            static char bufferFunction[64];
+            strcpy_s(bufferEntity, sizeof(bufferEntity), component.InvokeEntity.c_str());
+            strcpy_s(bufferFunction, sizeof(bufferFunction), component.InvokeFunction.c_str());
+
+            // 要触发的实体名
+            {
+                if (EUI::DrawInputText("Invoke Entity", bufferEntity, sizeof(bufferEntity)))
+                {
+                    component.InvokeEntity = bufferEntity;
+                    return;
+                }
+            }
+
+            // 要触发的实体脚本内方法名
+            {
+                if (EUI::DrawInputText("Invoke Function", bufferFunction, sizeof(bufferFunction)))
+                {
+                    component.InvokeFunction = bufferFunction;
+                    return;
+                }
+            }
         });
     }
 

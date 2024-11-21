@@ -205,13 +205,18 @@ namespace Nous {
 
     struct CUIButton : public CUI
     {
-        std::string Text = "Button";
-        std::function<void(UUID)> InvokeFunc = nullptr;
+        glm::vec4 IdleColor = { 0.6, 0.6, 0.6, 0.8 };
+        glm::vec4 HoverColor = { 0.7, 0.7, 0.7, 0.8 };
+        glm::vec4 ActiveColor = { 0.8, 0.8, 0.8, 0.8 };
+        std::string InvokeEntity;
+        std::string InvokeFunction;
     };
 
     struct CUIText : public CUI
     {
         std::string Text = "Text";
+        glm::vec4 Color = { 1.0, 1.0, 1.0, 1.0 };
+        Ref<Font> FontAsset = Font::GetDefault();
     };
 
 

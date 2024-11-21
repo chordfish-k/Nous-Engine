@@ -172,6 +172,8 @@ namespace Nous
 
 		static bool EntityClassExists(const std::string& fullClassName);
 
+		static void InvokeInstanceMethod(Entity entity, const std::string& methodName);
+
 		static void OnCreateEntity(Entity entity);
 		static void OnDestoryEntity(Entity entity);
 		static void OnStartEntity(Entity entity);

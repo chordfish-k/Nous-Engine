@@ -6,6 +6,8 @@
 #include "Nous/Scene/Entity.h"
 #include "Nous/Core/MouseCodes.h"
 
+#include "Nous/Script/ScriptEngine.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Nous
@@ -70,11 +72,18 @@ namespace Nous
                 {
                     if (!btn.IsPressing)
                     {
-                        NS_CORE_TRACE("YES");
                         btn.IsPressing = true;
 
-                        if (btn.InvokeFunc)
-                            btn.InvokeFunc(e.GetUUID());
+                        // Invoke
+                        Entity invokeEntity = s_Scene->GetEntityByName(btn.InvokeEntity);
+                        if (invokeEntity)
+                        {
+                            ScriptEngine::InvokeInstanceMethod(invokeEntity, btn.InvokeFunction);
+                        }
+                        else
+                        {
+                            NS_CORE_ERROR("找不到实体 {}", btn.InvokeEntity);
+                        }
                     }
                 }
                 else 

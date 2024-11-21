@@ -138,8 +138,15 @@ namespace Nous
                     * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, offsetY, 0)) // 根据锚点进行偏移
                     * transform.GetTransform();
 
-                const glm::vec4 color = btn.IsHovering ? glm::vec4{ 0.6, 0.6, 0.6f, 1 } : glm::vec4{ 0.5, 0.5, 0.5f, 1 };
-                btn.IsHovering = false;
+                glm::vec4 color = btn.IdleColor;
+                if (btn.IsHovering) {
+                    color = btn.HoverColor;
+                    btn.IsHovering = false;
+                }
+                if (btn.IsPressing) {
+                    color = btn.ActiveColor;
+                }
+
                 Renderer2D::DrawQuad(uiTransform, color, (int)ent);
             }
 

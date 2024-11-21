@@ -184,6 +184,52 @@ namespace Nous {
         return CRigidbody2D::BodyType::Static;
     }
 
+    static std::string UIVerticalAnchorToString(UIVerticalAnchor anchor)
+    {
+        switch (anchor)
+        {
+        case UIVerticalAnchor::Center:    return "Center";
+        case UIVerticalAnchor::Top:       return "Top";
+        case UIVerticalAnchor::Bottom:    return "Bottom";
+        }
+        NS_CORE_ASSERT(false, "未知的 vertical anchor");
+        return "";
+    }
+
+    static UIVerticalAnchor UIVerticalAnchorFromString(const std::string& anchorString)
+    {
+        if (anchorString == "Center")    return UIVerticalAnchor::Center;
+        if (anchorString == "Top")   return UIVerticalAnchor::Top;
+        if (anchorString == "Bottom") return UIVerticalAnchor::Bottom;
+
+        NS_CORE_ASSERT(false, "未知的 vertical anchor");
+        return UIVerticalAnchor::Center;
+    }
+
+    static std::string UIHorizontalAnchorToString(UIHorizontalAnchor anchor)
+    {
+        switch (anchor)
+        {
+        case UIHorizontalAnchor::Center:    return "Center";
+        case UIHorizontalAnchor::Left:      return "Left";
+        case UIHorizontalAnchor::Right:     return "Right";
+        }
+        NS_CORE_ASSERT(false, "未知的 horizontal anchor");
+        return "";
+    }
+
+
+
+    static UIHorizontalAnchor UIHorizontalAnchorFromString(const std::string& anchorString)
+    {
+        if (anchorString == "Center")   return UIHorizontalAnchor::Center;
+        if (anchorString == "Left")      return UIHorizontalAnchor::Left;
+        if (anchorString == "Right")   return UIHorizontalAnchor::Right;
+
+        NS_CORE_ASSERT(false, "未知的 vertical anchor");
+        return UIHorizontalAnchor::Center;
+    }
+
     SceneSerializer::SceneSerializer(Scene* scene)
         : m_Scene(scene)
     {
@@ -414,11 +460,31 @@ namespace Nous {
             out << YAML::Key << "CAnimPlayer";
             out << YAML::BeginMap; // CAnimPlayer
 
-            auto& textComponent = entity.GetComponent<CAnimPlayer>();
-            out << YAML::Key << "AnimClip" << YAML::Value << textComponent.AnimClip;
-            out << YAML::Key << "Type" << YAML::Value << (textComponent.Type == AssetType::AnimClip ? 0 : 1);
+            auto& aniComponent = entity.GetComponent<CAnimPlayer>();
+            out << YAML::Key << "AnimClip" << YAML::Value << aniComponent.AnimClip;
+            out << YAML::Key << "Type" << YAML::Value << (aniComponent.Type == AssetType::AnimClip ? 0 : 1);
 
             out << YAML::EndMap; // CAnimPlayer
+        }
+
+        if (entity.HasComponent<CUIButton>())
+        {
+            out << YAML::Key << "CUIButton";
+            out << YAML::BeginMap; // CUIButton
+
+            auto& btnComponent = entity.GetComponent<CUIButton>();
+            out << YAML::Key << "AnchorH" << YAML::Value << UIHorizontalAnchorToString(btnComponent.AnchorH);
+            out << YAML::Key << "AnchorV" << YAML::Value << UIVerticalAnchorToString(btnComponent.AnchorV);
+            out << YAML::Key << "Size" << YAML::Value << btnComponent.Size;
+
+            out << YAML::Key << "IdleColor" << YAML::Value << btnComponent.IdleColor;
+            out << YAML::Key << "HoverColor" << YAML::Value << btnComponent.HoverColor;
+            out << YAML::Key << "ActiveColor" << YAML::Value << btnComponent.ActiveColor;
+
+            out << YAML::Key << "InvokeEntity" << YAML::Value << btnComponent.InvokeEntity;
+            out << YAML::Key << "InvokeFunction" << YAML::Value << btnComponent.InvokeFunction;
+
+            out << YAML::EndMap; // CUIButton
         }
 
         out << YAML::EndMap; // Entity
@@ -583,6 +649,22 @@ namespace Nous {
             auto& ap = entity.AddComponent<CAnimPlayer>();
             ap.AnimClip = animPlayer["AnimClip"].as<AssetHandle>();
             ap.Type = animPlayer["Type"].as<int>() == 0 ? AssetType::AnimClip : AssetType::AnimMachine;
+        }
+
+        auto uiBtn = node["CUIButton"];
+        if (uiBtn)
+        {
+            auto& ui = entity.AddComponent<CUIButton>();
+            ui.AnchorH = UIHorizontalAnchorFromString(uiBtn["AnchorH"].as<std::string>());
+            ui.AnchorV = UIVerticalAnchorFromString(uiBtn["AnchorV"].as<std::string>());
+            ui.Size = uiBtn["Size"].as<glm::vec2>();
+
+            ui.IdleColor = uiBtn["IdleColor"].as<glm::vec4>();
+            ui.HoverColor = uiBtn["HoverColor"].as<glm::vec4>();
+            ui.ActiveColor = uiBtn["ActiveColor"].as<glm::vec4>();
+
+            ui.InvokeEntity = uiBtn["InvokeEntity"].as<std::string>();
+            ui.InvokeFunction = uiBtn["InvokeFunction"].as<std::string>();
         }
     
         return true;

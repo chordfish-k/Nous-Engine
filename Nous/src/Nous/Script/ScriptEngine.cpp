@@ -376,6 +376,27 @@ namespace Nous
 		return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
 	}
 
+	void ScriptEngine::InvokeInstanceMethod(Entity entity, const std::string& methodName)
+	{
+		Ref<ScriptInstance> instance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+		if (instance)
+		{
+			const auto method = instance->GetScriptClass()->GetMethod(methodName, 0);
+			if (method)
+			{
+				instance->GetScriptClass()->InvokeMethod(instance->GetManagedObject(), method, nullptr);
+			}
+			else
+			{
+				NS_CORE_ERROR("找不到实体 {0} 的 {1} 方法", entity.GetName(), methodName);
+			}
+		}
+		else
+		{
+			NS_CORE_ERROR("找不到实体 {0}({1}) 的脚本实例", entity.GetName(), entity.GetUUID());
+		}
+	}
+
 	void ScriptEngine::OnCreateEntity(Entity entity)
 	{
 		const auto& sc = entity.GetComponent<CMonoScript>();
