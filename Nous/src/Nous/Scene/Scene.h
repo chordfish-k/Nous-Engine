@@ -45,6 +45,8 @@ namespace Nous {
         void OnUpdateSimulation(Timestep dt, EditorCamera& camera); // 模拟：用编辑器的摄像机，不使用场景摄像机
         void OnUpdateEditor(Timestep dt, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
+        uint32_t GetViewportWidth() const { return m_ViewportWidth; }
+        uint32_t GetViewportHeight() const { return m_ViewportHeight; }
 
         Entity DuplicateEntity(Entity entity);
 

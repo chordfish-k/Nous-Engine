@@ -198,6 +198,9 @@ namespace Nous {
         UIHorizontalAnchor AnchorH = UIHorizontalAnchor::Center;
         UIVerticalAnchor AnchorV = UIVerticalAnchor::Center;
         glm::vec2 Size = { 1.0f, 1.0f };
+
+        bool IsHovering = false;
+        bool IsPressing = false;
     };
 
     struct CUIButton : public CUI

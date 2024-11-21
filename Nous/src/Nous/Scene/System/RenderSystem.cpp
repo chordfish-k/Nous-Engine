@@ -138,7 +138,9 @@ namespace Nous
                     * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, offsetY, 0)) // 根据锚点进行偏移
                     * transform.GetTransform();
 
-                Renderer2D::DrawQuad(uiTransform, { 0.5, 0.5, 0.5f, 1 }, (int)ent);
+                const glm::vec4 color = btn.IsHovering ? glm::vec4{ 0.6, 0.6, 0.6f, 1 } : glm::vec4{ 0.5, 0.5, 0.5f, 1 };
+                btn.IsHovering = false;
+                Renderer2D::DrawQuad(uiTransform, color, (int)ent);
             }
 
             Renderer2D::EndScene();

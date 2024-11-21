@@ -14,6 +14,7 @@
 #include "Nous/Scene/System/ScriptSystem.h"
 #include "Nous/Scene/System/AnimSystem.h"
 #include "Nous/Scene/System/TransformSystem.h"
+#include "Nous/Scene/System/UISystem.h"
 
 #include <glm/glm.hpp>
 
@@ -175,6 +176,7 @@ namespace Nous {
         ScriptSystem::Start(this);
         PhysicsSystem::Start(this);
         AnimSystem::Start(this);
+        UISystem::Start(this);
         RenderSystem::Start(this);
     }
 
@@ -185,6 +187,7 @@ namespace Nous {
         ScriptSystem::Stop();
         PhysicsSystem::Stop();
         AnimSystem::Stop();
+        UISystem::Stop();
         RenderSystem::Stop();
     }
 
@@ -211,6 +214,8 @@ namespace Nous {
         // 物理系统更新之后，实际渲染之前，更新各个transform的世界坐标系矩阵
         TransformSystem::Update(this);
         RenderSystem::Update(dt);
+
+        UISystem::Update(dt);
 
         // 删除要删除的entity
         if (!m_EntityToBeDeleted.empty())

@@ -2,6 +2,7 @@
 
 #include "Nous/Core/Application.h"
 #include "Nous/Scene/System/TransformSystem.h"
+#include "Nous/Scene/System/UISystem.h"
 
 #include "Panel/SceneHierarchyPanel.h"
 #include "Nous/Event/AppEvent.h"
@@ -17,10 +18,10 @@ namespace Nous
     {
         static bool IsCameraAlignedWithAxis(const glm::quat& cameraOrientation, const glm::vec3& axis) {
             // 获取摄像机的前向量，即方向向量
-            glm::vec3 cameraForward = cameraOrientation * glm::vec3(0.0f, 0.0f, -1.0f);
+            const glm::vec3 cameraForward = cameraOrientation * glm::vec3(0.0f, 0.0f, -1.0f);
 
             // 计算摄像机方向和指定轴的夹角
-            float dotProduct = glm::dot(glm::normalize(cameraForward), glm::normalize(axis));
+            const float dotProduct = glm::dot(glm::normalize(cameraForward), glm::normalize(axis));
 
             // 检查点积是否接近 1 或 -1（与轴平行或反向平行）
             return glm::abs(dotProduct) > 0.999f;
@@ -35,6 +36,7 @@ namespace Nous
     void ViewportPanel::SetFramebuffer(const Ref<Framebuffer>& framebuffer)
     {
         m_Framebuffer = framebuffer;
+        UISystem::SetFramebuffer(framebuffer);
     }
 
     void ViewportPanel::SetContext(const Ref<Scene>& scene)
@@ -63,24 +65,28 @@ namespace Nous
             isOnRunning = m_Context->IsRunning();
         }
 
-        auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-        auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-        auto viewportOffset = ImGui::GetWindowPos(); // 包含标签栏
+        const auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+        const auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+        const auto viewportOffset = ImGui::GetWindowPos(); // 包含标签栏
         m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
         m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
         m_ViewportContentSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+        const ImVec2 mousePos_ = ImGui::GetMousePos();
+        UISystem::SetViewport({ mousePos_.x, mousePos_.y }, m_ViewportBounds[0], m_ViewportContentSize);
+        
 
         // TODO 修复焦点不在Viewport不能用快捷键的bug
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
         Application::Get().GetImGuiLayer()->SetBlockEvent(!m_ViewportHovered);
 
-        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+        const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 
         m_EditorCamera->SetViewportSize(m_ViewportSize.x,  m_ViewportSize.y);
 
-        uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
+        const uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
         ImGui::Image((void*) textureID, {m_ViewportSize.x, m_ViewportSize.y}, {0, 1}, {1, 0});
 
         // 设置拖放目标
@@ -138,10 +144,6 @@ namespace Nous
                 }
 
                 auto orientation = m_EditorCamera->GetOrientation();
-                // Gizmo 的 X、Y 和 Z 轴
-                static constexpr glm::vec3 xAxis(1.0f, 0.0f, 0.0f);
-                static constexpr glm::vec3 yAxis(0.0f, 1.0f, 0.0f);
-                static constexpr glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
 
                 if (ImGuizmo::IsUsing() && m_ShowGizmo)
                 {
