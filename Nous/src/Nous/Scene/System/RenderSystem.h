@@ -12,5 +12,8 @@ namespace Nous
 		static void Update(Timestep dt = 0, EditorCamera* camera = nullptr);
 
 		static void Stop();
+
+		static void ClearAspectCache();
+		static float GetAspectCache();
 	};
 }

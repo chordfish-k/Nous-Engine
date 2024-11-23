@@ -34,13 +34,16 @@ namespace Nous {
         glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
         glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
         glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+        bool Active = true;
+
+        // 不显示的字段
         glm::mat4 ParentTransform{ 1.0f };
         UUID Parent = 0;
         bool Open = true;
         bool HideChild = false;
         bool Dirty = true;
         bool HasRigidBody = false;
-        bool Active = true;
+        uint32_t UIComponetFlag = 0;
         AssetHandle PrefabAsset = 0;
         std::vector<UUID> Children;
 
@@ -195,12 +198,44 @@ namespace Nous {
 
     struct CUI
     {
-        UIHorizontalAnchor AnchorH = UIHorizontalAnchor::Center;
-        UIVerticalAnchor AnchorV = UIVerticalAnchor::Center;
-        glm::vec2 Size = { 1.0f, 1.0f };
-
         bool IsHovering = false;
         bool IsPressing = false;
+    };
+
+    struct CUIAnchor
+    {
+        UIHorizontalAnchor AnchorH = UIHorizontalAnchor::Center;
+        UIVerticalAnchor AnchorV = UIVerticalAnchor::Center;
+
+        float Aspect = 1.0f;
+
+        glm::vec2 GetOffset() const
+        {
+            float offsetX = 0.0f;
+            float offsetY = 0.0f;
+
+            const float k = 1.0f;
+
+            switch (AnchorH)
+            {
+            case UIHorizontalAnchor::Left:  offsetX = -k * Aspect;   break;
+            case UIHorizontalAnchor::Right: offsetX = k * Aspect;    break;
+            }
+
+            switch (AnchorV)
+            {
+            case UIVerticalAnchor::Bottom:  offsetY = -k;            break;
+            case UIVerticalAnchor::Top:     offsetY = k;             break;
+            }
+
+            return { offsetX, offsetY };
+        }
+
+        glm::mat4 GetTranslate() const
+        {
+            auto offset = GetOffset();
+            return glm::translate(glm::mat4(1.0f), { offset.x, offset.y, 0.0f });
+        }
     };
 
     struct CUIButton : public CUI
@@ -229,5 +264,5 @@ namespace Nous {
         ComponentGroup<CTransform, CSpriteRenderer, CCircleRenderer, 
         CCamera, CNativeScript, CMonoScript, CRigidbody2D, 
         CBoxCollider2D, CCircleCollider2D, CTextRenderer,
-        CAnimPlayer, CUIButton, CUIText>;
+        CAnimPlayer, CUIAnchor, CUIButton, CUIText>;
 }

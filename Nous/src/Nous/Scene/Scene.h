@@ -73,6 +73,8 @@ namespace Nous {
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
+        template<typename T>
+        void OnComponentRemoved(Entity entity, T& component);
 
     private:
         entt::registry m_Registry; //注册表=实体上下文，包含所有实体数据

@@ -105,71 +105,73 @@ namespace Nous
         if (m_Context && !m_Context->IsRunning())
         {
             Entity selectedEntity = m_Context->GetSelectedEntity();
+
             if (selectedEntity && m_GizmoType >= 0 && m_GizmoType <= 3)
             {
-                ImGuizmo::SetDrawlist();
-                ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y,
-                                  m_ViewportBounds[1].x - m_ViewportBounds[0].x,
-                                  m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-
-                // Editor camera
-                const glm::mat4& cameraProjection = m_EditorCamera->GetProjectionMatrix();
-                glm::mat4 cameraView = m_EditorCamera->GetViewMatrix();
-
                 // Entity Transform
                 auto& tc = selectedEntity.GetComponent<CTransform>();
-                auto transform = tc.GetTransform();
-                transform = tc.ParentTransform * transform;
 
-                // Snapping 吸附
-                bool snap = Input::IsKeyPressed(Key::LeftControl);
-                float snapValue = 0.5f; // 咬合位移/缩放到0.5大小
-                // 将旋转角度吸附到45度
-                if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
-                    snapValue = 45.0f;
-
-                float snapValues[3] = {snapValue, snapValue, snapValue};
-
-                glm::mat4 delta(1.0f);
-                if (m_ShowGizmo)
+                // 不给持有UI控件的实体显示
+                if (tc.UIComponetFlag == 0)
                 {
-                    if (m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic)
-                    {
+                    auto transform = tc.ParentTransform * tc.GetTransform();
 
-                    }
-                    ImGuizmo::SetOrthographic(m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic);
-                    ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                        (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::WORLD, glm::value_ptr(transform),
-                        nullptr, snap ? snapValues : nullptr);
-                }
+                    ImGuizmo::SetDrawlist();
+                    ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y,
+                                        m_ViewportBounds[1].x - m_ViewportBounds[0].x,
+                                        m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
-                auto orientation = m_EditorCamera->GetOrientation();
+                    // Editor camera
+                    const glm::mat4& cameraProjection = m_EditorCamera->GetProjectionMatrix();
+                    glm::mat4 cameraView = m_EditorCamera->GetViewMatrix();
 
-                if (ImGuizmo::IsUsing() && m_ShowGizmo)
-                {
-                    glm::vec3 translation, rotation, scale;
-                    glm::mat4 tr = glm::inverse(tc.ParentTransform) * transform;
-                    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(tr), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
-
-                    if (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE)
-                        tc.Translation = translation;
+                    // Snapping 吸附
+                    bool snap = Input::IsKeyPressed(Key::LeftControl);
+                    float snapValue = 0.5f; // 咬合位移/缩放到0.5大小
+                    // 将旋转角度吸附到45度
                     if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+                        snapValue = 45.0f;
+
+                    float snapValues[3] = {snapValue, snapValue, snapValue};
+
+                    glm::mat4 delta(1.0f);
+                    if (m_ShowGizmo)
                     {
-                        // 解矩阵的旋转值不靠谱，手动吸附一下
-                        if (snap)
-                        {
-                            const float snapV = snapValue * 1.00001f; // 防止万向节锁，乘一个近似1的小数
-                            rotation = glm::round(rotation / snapV) * snapV; // 吸附
-                        }
-                        rotation = glm::mod(glm::mod(rotation, 360.0f) + 360.0f, 360.0f) ; // 锁定在0 ~ 360之间
-
-                        glm::vec3 deltaRotation = glm::radians(rotation) - tc.Rotation;
-                        tc.Rotation += deltaRotation;
+                        ImGuizmo::SetOrthographic(m_EditorCamera->GetProjectionType() == Camera::ProjectionType::Orthographic);
+                        ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                            (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::WORLD, glm::value_ptr(transform),
+                            nullptr, snap ? snapValues : nullptr);
                     }
-                    if (m_GizmoType == ImGuizmo::OPERATION::SCALE)
-                        tc.Scale = scale;
 
-                    TransformSystem::SetSubtreeDirty(m_Context.get(), selectedEntity);
+                    auto orientation = m_EditorCamera->GetOrientation();
+
+                    if (ImGuizmo::IsUsing() && m_ShowGizmo)
+                    {
+                        glm::vec3 translation, rotation, scale;
+
+                        glm::mat4 tr = glm::inverse(tc.ParentTransform) * transform;
+                        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(tr), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+                        
+                        if (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE)
+                            tc.Translation = translation;
+                        if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+                        {
+                            // 解矩阵的旋转值不靠谱，手动吸附一下
+                            if (snap)
+                            {
+                                const float snapV = snapValue * 1.00001f; // 防止万向节锁，乘一个近似1的小数
+                                rotation = glm::round(rotation / snapV) * snapV; // 吸附
+                            }
+                            rotation = glm::mod(glm::mod(rotation, 360.0f) + 360.0f, 360.0f) ; // 锁定在0 ~ 360之间
+
+                            glm::vec3 deltaRotation = glm::radians(rotation) - tc.Rotation;
+                            tc.Rotation += deltaRotation;
+                        }
+                        if (m_GizmoType == ImGuizmo::OPERATION::SCALE)
+                            tc.Scale = scale;
+
+                        TransformSystem::SetSubtreeDirty(m_Context.get(), selectedEntity);
+                    }
                 }
             }
         }

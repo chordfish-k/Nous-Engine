@@ -328,10 +328,12 @@ namespace Nous {
 
             ImGui::Separator();
 
+            DisplayAddComponentEntry<CUIAnchor>("CUIAnchor");
             DisplayAddComponentEntry<CUIButton>("CUIButton");
 
             ImGui::EndPopup();
         }
+
 
         DrawComponent<CTransform>("CTransform", entity, [&](auto& component)
         {
@@ -355,6 +357,32 @@ namespace Nous {
             if (changed)
                 TransformSystem::SetSubtreeDirty(m_Context.get(), entity);
         }, false);
+
+
+        DrawComponent<CUIAnchor>("CUIAnchor", entity, [&](CUIAnchor& component)
+        {
+            const char* anchorHStrings[] = { "Center", "Left", "Right" };
+            const char* anchorVStrings[] = { "Center", "Top", "Bottom" };
+            uint32_t anchorHIndex = (int)component.AnchorH;
+            uint32_t anchorVIndex = (int)component.AnchorV;
+
+            bool changed = false;
+            if (EUI::DrawCombo("Anchor H", anchorHStrings, &anchorHIndex, 3))
+            {
+                component.AnchorH = (UIHorizontalAnchor)anchorHIndex;
+                changed = true;
+            }
+
+            if (EUI::DrawCombo("Anchor V", anchorVStrings, &anchorVIndex, 3))
+            {
+                component.AnchorV = (UIVerticalAnchor)anchorVIndex;
+                changed = true;
+            }
+            if (changed)
+                TransformSystem::SetSubtreeDirty(m_Context.get(), entity);
+        });
+        
+
 
         DrawComponent<CCamera>("CCamera", entity, [](auto& component){
             auto& camera = component.Camera;
@@ -692,20 +720,8 @@ namespace Nous {
 
 
         // UI
-
         DrawComponent<CUIButton>("CUIButton", entity, [](CUIButton& component)
         {
-            const char* anchorHStrings[] = { "Center", "Left", "Right" };
-            const char* anchorVStrings[] = { "Center", "Top", "Bottom"};
-            uint32_t anchorHIndex = (int)component.AnchorH;
-            uint32_t anchorVIndex = (int)component.AnchorV;
-
-            if (EUI::DrawCombo("Anchor H", anchorHStrings, &anchorHIndex, 3))
-                component.AnchorH = (UIHorizontalAnchor)anchorHIndex;
-
-            if (EUI::DrawCombo("Anchor V", anchorVStrings, &anchorVIndex, 3))
-                component.AnchorV = (UIVerticalAnchor)anchorVIndex;
-
             EUI::DrawColor4Control("Idle Color", component.IdleColor);
             EUI::DrawColor4Control("Hover Color", component.HoverColor);
             EUI::DrawColor4Control("Active Color", component.ActiveColor);

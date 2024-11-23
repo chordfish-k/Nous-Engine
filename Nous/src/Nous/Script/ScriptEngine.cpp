@@ -388,12 +388,12 @@ namespace Nous
 			}
 			else
 			{
-				NS_CORE_ERROR("找不到实体 {0} 的 {1} 方法", entity.GetName(), methodName);
+				NS_CORE_ERROR("找不到实体 \"{0} 的 \"{1}\" 方法", entity.GetName(), methodName);
 			}
 		}
 		else
 		{
-			NS_CORE_ERROR("找不到实体 {0}({1}) 的脚本实例", entity.GetName(), entity.GetUUID());
+			NS_CORE_ERROR("找不到实体 \"{0}\"({1}) 的脚本实例", entity.GetName(), entity.GetUUID());
 		}
 	}
 

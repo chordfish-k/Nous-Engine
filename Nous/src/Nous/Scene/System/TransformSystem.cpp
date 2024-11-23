@@ -17,21 +17,35 @@ namespace Nous
 				CalcParentTransform(scene, ch, parent * tr.GetTransform());
 		}
 #endif
-		static const glm::mat4& CalcParentTransform(Scene* scene, Entity entity)
+		static const glm::mat4& CalcParentTransform(Scene* scene, entt::entity ent)
 		{
-			auto& tr = entity.GetComponent<CTransform>();
+			Entity entity{ ent, scene };
+			CTransform& tr = entity.GetComponent<CTransform>();
+
+			glm::mat4 uiAnchor(1.0f);
+
+			//?
 			if (tr.HasRigidBody)
 				return tr.ParentTransform * tr.GetTransform();
+
 			if (tr.Dirty)
 			{
 				UUID pid = tr.Parent;
 				if (pid == 0)
 					return tr.GetTransform();
+
+				if (entity.HasComponent<CUIAnchor>())
+				{
+					auto& ui = entity.GetComponent<CUIAnchor>();
+					uiAnchor *= ui.GetTranslate();
+				}
+
 				Entity pe = scene->GetEntityByUUID(pid);
-				tr.ParentTransform = CalcParentTransform(scene, pe);
+				tr.ParentTransform = CalcParentTransform(scene, pe) * uiAnchor;
 
 				tr.Dirty = false;
 			}
+
 			return tr.ParentTransform * tr.GetTransform();
 		}
 	}
@@ -44,11 +58,11 @@ namespace Nous
 		if (!scene)
 			return;
 
-		auto& view = scene->GetAllEntitiesWith<CTransform>();
+		auto& view = scene->GetAllEntitiesWith<CTransform, CUuid>();
 
 		for (auto& ent : view)
 		{
-			Utils::CalcParentTransform(scene, {ent, scene});
+			Utils::CalcParentTransform(scene, ent);
 		}
 	}
 

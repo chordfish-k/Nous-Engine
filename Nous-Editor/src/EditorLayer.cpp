@@ -522,10 +522,14 @@ namespace Nous
 
         // 绘制选中实体的矩形边框
         Entity selectedEntity;
-        if ((selectedEntity = m_ActiveScene->GetSelectedEntity()) && !m_ActiveScene->IsRunning()) {
+        if ((selectedEntity = m_ActiveScene->GetSelectedEntity()) && !m_ActiveScene->IsRunning() && !selectedEntity.HasComponent<CUI>()) {
             const CTransform& transform = selectedEntity.GetComponent<CTransform>();
-            // Orange
-            Renderer2D::DrawRect(transform.ParentTransform * transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+            // 如果是Ui，不显示边框
+            if (transform.UIComponetFlag == 0)
+            {
+                // Orange
+                Renderer2D::DrawRect(transform.ParentTransform * transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+            }
         }
 
         Renderer2D::EndScene();

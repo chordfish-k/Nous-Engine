@@ -5,6 +5,8 @@
 #include "Nous/Scene/Entity.h"
 #include "Nous/Renderer/Renderer2D.h"
 
+#include "Nous/Scene/System/TransformSystem.h"
+
 namespace Nous
 {
     static Scene* s_Scene = nullptr;
@@ -12,6 +14,8 @@ namespace Nous
     static float s_UICameraRatioH = 9.0f;
     static float s_UICameraRatio = s_UICameraRatioW / s_UICameraRatioH;
     static EditorCamera s_UICamera = EditorCamera(30.0f, s_UICameraRatio, 0.1f, 1000.0f);
+    static float s_AspectStore = -1.0f;
+
 
 	void RenderSystem::Start(Scene* scene)
 	{
@@ -102,52 +106,16 @@ namespace Nous
 
             Renderer2D::EndScene();
 
-            Renderer2D::BeginUIScene();
+            // 设置aspect
+            const float aspect = useEditorCamera ? camera->GetAspectRatio() : ((SceneCamera*)mainCamera)->GetAspectRatio();
+            if (aspect != s_AspectStore) {
+                s_AspectStore = aspect;
 
-            auto view = s_Scene->GetAllEntitiesWith<CTransform, CUIButton>();
-            for (auto ent : view)
-            {
-                auto [transform, btn] = view.get<CTransform, CUIButton>(ent);
-
-                if (!transform.Active)
-                    continue;
-
-                float aspect = useEditorCamera ? camera->GetAspectRatio() : ((SceneCamera*)mainCamera)->GetAspectRatio();
-                float offsetX = 0.0f;
-                float offsetY = 0.0f;
-
-                switch (btn.AnchorH)
-                {
-                case UIHorizontalAnchor::Left:  offsetX = -1.0f * aspect;   break;
-                case UIHorizontalAnchor::Right: offsetX = 1.0f * aspect;    break;
-                }
-
-                switch (btn.AnchorV)
-                {
-                case UIVerticalAnchor::Bottom:  offsetY = -1.0f;            break;
-                case UIVerticalAnchor::Top:     offsetY = 1.0f;             break;
-                }
-
-                // 可能通过新的shader，将部分矩阵运算交给gpu
-                // ui 应该是固定在屏幕上，不受摄像机属性影响
-                glm::mat4 uiTransform = transform.ParentTransform 
-                    * glm::scale(glm::mat4(1.0f), glm::vec3(btn.Size.x / aspect, btn.Size.y, 1.0f)) // 对抗摄像机长宽比
-                    * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, offsetY, 0)) // 根据锚点进行偏移
-                    * transform.GetTransform();
-
-                glm::vec4 color = btn.IdleColor;
-                if (btn.IsHovering) {
-                    color = btn.HoverColor;
-                    btn.IsHovering = false;
-                }
-                if (btn.IsPressing) {
-                    color = btn.ActiveColor;
-                }
-
-                Renderer2D::DrawQuad(uiTransform, color, (int)ent);
+                s_Scene->GetAllEntitiesWith<CUIAnchor>().each([=] (entt::entity ent, CUIAnchor& anchor) {
+                    anchor.Aspect = aspect;
+                    TransformSystem::SetSubtreeDirty(s_Scene, ent);
+                });
             }
-
-            Renderer2D::EndScene();
         }
 	}
 
@@ -155,4 +123,14 @@ namespace Nous
 	{
         s_Scene = nullptr;
 	}
+
+    void RenderSystem::ClearAspectCache()
+    {
+        s_AspectStore = -1.0f;
+    }
+
+    float RenderSystem::GetAspectCache()
+    {
+        return s_AspectStore;
+    }
 }

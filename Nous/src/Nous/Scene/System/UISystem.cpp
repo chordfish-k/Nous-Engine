@@ -8,6 +8,9 @@
 
 #include "Nous/Script/ScriptEngine.h"
 
+#include "Nous/Renderer/Renderer2D.h"
+#include "Nous/Scene/System/RenderSystem.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Nous
@@ -58,44 +61,84 @@ namespace Nous
 
     void UISystem::Update(Timestep dt, const glm::vec2& viewpostLeftTop, const glm::vec2& viewpostSize)
     {
-        if (!s_Scene || ! s_fb)
+        if (!s_Scene || !s_fb)
             return;
 
         if (Entity e = Utils::CheckHoveredEntity())
         {
             if (e.HasComponent<CUIButton>())
             {
-                auto& btn = e.GetComponent<CUIButton>();
-                btn.IsHovering = true;
+                auto& ui = e.GetComponent<CUIButton>();
+
+                ui.IsHovering = true;
 
                 if (Input::IsMouseButtonPressed(Mouse::Button0))
                 {
-                    if (!btn.IsPressing)
+                    if (!ui.IsPressing)
                     {
-                        btn.IsPressing = true;
+                        ui.IsPressing = true;
 
                         // Invoke
-                        Entity invokeEntity = s_Scene->GetEntityByName(btn.InvokeEntity);
+                        Entity invokeEntity = s_Scene->GetEntityByName(ui.InvokeEntity);
                         if (invokeEntity)
                         {
-                            ScriptEngine::InvokeInstanceMethod(invokeEntity, btn.InvokeFunction);
+                            ScriptEngine::InvokeInstanceMethod(invokeEntity, ui.InvokeFunction);
                         }
                         else
                         {
-                            NS_CORE_ERROR("找不到实体 {}", btn.InvokeEntity);
+                            NS_CORE_ERROR("找不到实体 \"{}\"", ui.InvokeEntity);
                         }
                     }
                 }
                 else 
                 {
-                    btn.IsPressing = false;
+                    ui.IsPressing = false;
                 }
             }
+
+            
         }
     }
 
     void UISystem::Stop()
     {
         s_Scene = nullptr;
+    }
+
+    void UIRenderSystem::Update(Timestep dt)
+    {
+        if (!s_Scene)
+            return;
+
+        Renderer2D::BeginUIScene();
+
+        auto view = s_Scene->GetAllEntitiesWith<CTransform, CUIButton>();
+        for (auto ent : view)
+        {
+            auto [transform, btn] = view.get<CTransform, CUIButton>(ent);
+
+            if (!transform.Active)
+                continue;
+
+            Entity entity{ ent, s_Scene };
+
+            // 可能通过新的shader，将部分矩阵运算交给gpu
+            // ui 应该是固定在屏幕上，不受摄像机属性影响
+            glm::mat4 uiTransform = glm::scale(glm::mat4(1.0f), { 1.0f / RenderSystem::GetAspectCache(), 1.0f, 1.0f })
+                * transform.ParentTransform
+                * transform.GetTransform();
+
+            glm::vec4 color = btn.IdleColor;
+            if (btn.IsHovering) {
+                color = btn.HoverColor;
+                btn.IsHovering = false;
+            }
+            if (btn.IsPressing) {
+                color = btn.ActiveColor;
+            }
+            Renderer2D::DrawQuad(uiTransform, color, (int)ent);
+        }
+
+        Renderer2D::EndScene();
     }
 }

@@ -467,16 +467,24 @@ namespace Nous {
             out << YAML::EndMap; // CAnimPlayer
         }
 
+        if (entity.HasComponent<CUIAnchor>())
+        {
+            out << YAML::Key << "CUIAnchor";
+            out << YAML::BeginMap; // CUIAnchor
+
+            auto& btnComponent = entity.GetComponent<CUIAnchor>();
+            out << YAML::Key << "AnchorH" << YAML::Value << UIHorizontalAnchorToString(btnComponent.AnchorH);
+            out << YAML::Key << "AnchorV" << YAML::Value << UIVerticalAnchorToString(btnComponent.AnchorV);
+
+            out << YAML::EndMap; // CUIAnchor
+        }
+
         if (entity.HasComponent<CUIButton>())
         {
             out << YAML::Key << "CUIButton";
             out << YAML::BeginMap; // CUIButton
 
             auto& btnComponent = entity.GetComponent<CUIButton>();
-            out << YAML::Key << "AnchorH" << YAML::Value << UIHorizontalAnchorToString(btnComponent.AnchorH);
-            out << YAML::Key << "AnchorV" << YAML::Value << UIVerticalAnchorToString(btnComponent.AnchorV);
-            out << YAML::Key << "Size" << YAML::Value << btnComponent.Size;
-
             out << YAML::Key << "IdleColor" << YAML::Value << btnComponent.IdleColor;
             out << YAML::Key << "HoverColor" << YAML::Value << btnComponent.HoverColor;
             out << YAML::Key << "ActiveColor" << YAML::Value << btnComponent.ActiveColor;
@@ -651,14 +659,18 @@ namespace Nous {
             ap.Type = animPlayer["Type"].as<int>() == 0 ? AssetType::AnimClip : AssetType::AnimMachine;
         }
 
+        auto uin = node["CUIAnchor"];
+        if (uin)
+        {
+            auto& ui = entity.AddComponent<CUIAnchor>();
+            ui.AnchorH = UIHorizontalAnchorFromString(uin["AnchorH"].as<std::string>());
+            ui.AnchorV = UIVerticalAnchorFromString(uin["AnchorV"].as<std::string>());
+        }
+
         auto uiBtn = node["CUIButton"];
         if (uiBtn)
         {
             auto& ui = entity.AddComponent<CUIButton>();
-            ui.AnchorH = UIHorizontalAnchorFromString(uiBtn["AnchorH"].as<std::string>());
-            ui.AnchorV = UIVerticalAnchorFromString(uiBtn["AnchorV"].as<std::string>());
-            ui.Size = uiBtn["Size"].as<glm::vec2>();
-
             ui.IdleColor = uiBtn["IdleColor"].as<glm::vec4>();
             ui.HoverColor = uiBtn["HoverColor"].as<glm::vec4>();
             ui.ActiveColor = uiBtn["ActiveColor"].as<glm::vec4>();

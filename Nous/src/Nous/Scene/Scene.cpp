@@ -215,6 +215,7 @@ namespace Nous {
         TransformSystem::Update(this);
         RenderSystem::Update(dt);
 
+        UIRenderSystem::Update(dt);
         UISystem::Update(dt);
 
         // 删除要删除的entity
@@ -237,15 +238,18 @@ namespace Nous {
         TransformSystem::Update(this);
         // 渲染
         RenderSystem::Update(dt, &camera);
+        UIRenderSystem::Update(dt);
     }
 
     void Scene::OnUpdateEditor(Timestep dt, EditorCamera& camera)
     {
-        
         TransformSystem::Update(this);
         // 渲染
         RenderSystem::Start(this);
         RenderSystem::Update(dt, &camera);
+
+        UISystem::Start(this);
+        UIRenderSystem::Update(dt);
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -324,6 +328,15 @@ namespace Nous {
         m_StepFrames = frames;
     }
 
+
+#define NS_COMP_ADD(Comp)       \
+    template<>                  \
+    void Scene::OnComponentAdded(Entity entity, Comp& component)
+
+#define NS_COMP_REMOVE(Comp)       \
+    template<>                  \
+    void Scene::OnComponentRemoved(Entity entity, Comp& component)
+
     // 组件添加事件
     template<typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
@@ -331,81 +344,63 @@ namespace Nous {
         static_assert(sizeof(T) == 0);
     }
 
-    template<>
-    void Scene::OnComponentAdded<CUuid>(Entity entity, CUuid& component)
+    template<typename T>
+    void Scene::OnComponentRemoved(Entity entity, T& component)
     {
+        static_assert(sizeof(T) == 0);
     }
 
-    template<>
-    void Scene::OnComponentAdded<CTransform>(Entity entity, CTransform& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CCamera>(Entity entity, CCamera& component)
+    // ADD
+    NS_COMP_ADD(CCamera)
     {
         if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
             component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     }
-
-
-    template<>
-    void Scene::OnComponentAdded<CTag>(Entity entity, CTag& component)
-    {
+    NS_COMP_ADD(CUuid) {}
+    NS_COMP_ADD(CTransform) {}
+    NS_COMP_ADD(CTag) {}
+    NS_COMP_ADD(CSpriteRenderer) {}
+    NS_COMP_ADD(CAnimPlayer) {}
+    NS_COMP_ADD(CCircleRenderer) {}
+    NS_COMP_ADD(CNativeScript) {}
+    NS_COMP_ADD(CMonoScript) {}
+    NS_COMP_ADD(CRigidbody2D) {}
+    NS_COMP_ADD(CBoxCollider2D) {}
+    NS_COMP_ADD(CCircleCollider2D) {}
+    NS_COMP_ADD(CTextRenderer) {}
+    NS_COMP_ADD(CUIAnchor) {
+        entity.GetTransform().UIComponetFlag |= 1 << 0;
+        RenderSystem::ClearAspectCache();
+    }
+    NS_COMP_ADD(CUIButton) {
+        entity.GetTransform().UIComponetFlag |= 1 << 1;
+    }
+    NS_COMP_ADD(CUIText){
+        entity.GetTransform().UIComponetFlag |= 1 << 2;
     }
 
-    template<>
-    void Scene::OnComponentAdded<CSpriteRenderer>(Entity entity, CSpriteRenderer& component)
-    {
+    // Remove
+    NS_COMP_REMOVE(CCamera) {}
+    NS_COMP_REMOVE(CUuid) {}
+    NS_COMP_REMOVE(CTransform) {}
+    NS_COMP_REMOVE(CTag) {}
+    NS_COMP_REMOVE(CSpriteRenderer) {}
+    NS_COMP_REMOVE(CAnimPlayer) {}
+    NS_COMP_REMOVE(CCircleRenderer) {}
+    NS_COMP_REMOVE(CNativeScript) {}
+    NS_COMP_REMOVE(CMonoScript) {}
+    NS_COMP_REMOVE(CRigidbody2D) {}
+    NS_COMP_REMOVE(CBoxCollider2D) {}
+    NS_COMP_REMOVE(CCircleCollider2D) {}
+    NS_COMP_REMOVE(CTextRenderer) {}
+    NS_COMP_REMOVE(CUIAnchor) {
+        entity.GetTransform().UIComponetFlag ^= 1 << 0;
+        TransformSystem::SetSubtreeDirty(this, entity);
     }
-
-    template<>
-    void Scene::OnComponentAdded<CAnimPlayer>(Entity entity, CAnimPlayer& component)
-    {
+    NS_COMP_REMOVE(CUIButton) {
+        entity.GetTransform().UIComponetFlag ^= 1 << 1;
     }
-
-    template<>
-    void Scene::OnComponentAdded<CCircleRenderer>(Entity entity, CCircleRenderer& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CNativeScript>(Entity entity, CNativeScript& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CMonoScript>(Entity entity, CMonoScript& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CRigidbody2D>(Entity entity, CRigidbody2D& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CBoxCollider2D>(Entity entity, CBoxCollider2D& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CCircleCollider2D>(Entity entity, CCircleCollider2D& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CTextRenderer>(Entity entity, CTextRenderer& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CUIButton>(Entity entity, CUIButton& component)
-    {
-    }
-
-    template<>
-    void Scene::OnComponentAdded<CUIText>(Entity entity, CUIText& component)
-    {
+    NS_COMP_REMOVE(CUIText) {
+        entity.GetTransform().UIComponetFlag ^= 1 << 2;
     }
 }

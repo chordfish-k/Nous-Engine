@@ -19,5 +19,11 @@ namespace Nous
 		static void Stop();
 	};
 
+	class UIRenderSystem
+	{
+	public:
+		static void Update(Timestep dt = 0);
+	};
+
 }
 

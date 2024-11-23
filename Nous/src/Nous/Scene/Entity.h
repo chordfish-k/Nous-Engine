@@ -54,6 +54,7 @@ namespace Nous {
         void RemoveComponent()
         {
             NS_CORE_ASSERT(HasComponent<T>(), "实体没有此组件！");
+            m_Scene->OnComponentRemoved<T>(*this, GetComponent<T>());
             m_Scene->m_Registry.remove<T>(m_EntityHandle); // 只在实体拥有该组件时触发
         }
 
