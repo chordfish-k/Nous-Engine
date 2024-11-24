@@ -522,7 +522,7 @@ namespace Nous
 
         // 绘制选中实体的矩形边框
         Entity selectedEntity;
-        if ((selectedEntity = m_ActiveScene->GetSelectedEntity()) && !m_ActiveScene->IsRunning() && !selectedEntity.HasComponent<CUI>()) {
+        if ((selectedEntity = m_ActiveScene->GetSelectedEntity()) && !m_ActiveScene->IsRunning()) {
             const CTransform& transform = selectedEntity.GetComponent<CTransform>();
             // 如果是Ui，不显示边框
             if (transform.UIComponetFlag == 0)

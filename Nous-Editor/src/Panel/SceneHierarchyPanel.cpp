@@ -329,7 +329,9 @@ namespace Nous {
             ImGui::Separator();
 
             DisplayAddComponentEntry<CUIAnchor>("CUIAnchor");
+            DisplayAddComponentEntry<CUIEventBubble>("CUIEventBubble");
             DisplayAddComponentEntry<CUIButton>("CUIButton");
+            DisplayAddComponentEntry<CUIText>("CUIText");
 
             ImGui::EndPopup();
         }
@@ -382,6 +384,11 @@ namespace Nous {
                 TransformSystem::SetSubtreeDirty(m_Context.get(), entity);
         });
         
+
+        DrawComponent<CUIEventBubble>("CUIEventBubble", entity, [&](CUIEventBubble& component)
+        {
+            EUI::DrawCheckbox("Bubble Up", &component.EventBubbleUp);
+        });
 
 
         DrawComponent<CCamera>("CCamera", entity, [](auto& component){
@@ -748,6 +755,15 @@ namespace Nous {
                     return;
                 }
             }
+
+            EUI::DrawVec2Control("Size", component.Size);
+        });
+
+        DrawComponent<CUIText>("CUIText", entity, [](CUIText& component)
+        {
+            EUI::DrawInputTextMultiline("Text", &component.Text);
+            EUI::DrawColor4Control("Color", component.Color);
+            EUI::DrawFloatControl("Size", &component.Size);
         });
     }
 

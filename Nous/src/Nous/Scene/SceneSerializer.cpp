@@ -472,11 +472,22 @@ namespace Nous {
             out << YAML::Key << "CUIAnchor";
             out << YAML::BeginMap; // CUIAnchor
 
-            auto& btnComponent = entity.GetComponent<CUIAnchor>();
-            out << YAML::Key << "AnchorH" << YAML::Value << UIHorizontalAnchorToString(btnComponent.AnchorH);
-            out << YAML::Key << "AnchorV" << YAML::Value << UIVerticalAnchorToString(btnComponent.AnchorV);
+            auto& component = entity.GetComponent<CUIAnchor>();
+            out << YAML::Key << "AnchorH" << YAML::Value << UIHorizontalAnchorToString(component.AnchorH);
+            out << YAML::Key << "AnchorV" << YAML::Value << UIVerticalAnchorToString(component.AnchorV);
 
             out << YAML::EndMap; // CUIAnchor
+        }
+
+        if (entity.HasComponent<CUIEventBubble>())
+        {
+            out << YAML::Key << "CUIEventBubble";
+            out << YAML::BeginMap; // CUIEventBubble
+
+            auto& component = entity.GetComponent<CUIEventBubble>();
+            out << YAML::Key << "EventBubbleUp" << YAML::Value << component.EventBubbleUp;
+
+            out << YAML::EndMap; // CUIEventBubble
         }
 
         if (entity.HasComponent<CUIButton>())
@@ -489,10 +500,26 @@ namespace Nous {
             out << YAML::Key << "HoverColor" << YAML::Value << btnComponent.HoverColor;
             out << YAML::Key << "ActiveColor" << YAML::Value << btnComponent.ActiveColor;
 
+            out << YAML::Key << "Size" << YAML::Value << btnComponent.Size;
+
             out << YAML::Key << "InvokeEntity" << YAML::Value << btnComponent.InvokeEntity;
             out << YAML::Key << "InvokeFunction" << YAML::Value << btnComponent.InvokeFunction;
 
             out << YAML::EndMap; // CUIButton
+        }
+
+        if (entity.HasComponent<CUIText>())
+        {
+            out << YAML::Key << "CUIText";
+            out << YAML::BeginMap; // CUIText
+
+            auto& textComponent = entity.GetComponent<CUIText>();
+            out << YAML::Key << "Text" << YAML::Value << textComponent.Text;
+            // TODO: FontAsset
+            out << YAML::Key << "Color" << YAML::Value << textComponent.Color;
+            out << YAML::Key << "Size" << YAML::Value << textComponent.Size;
+
+            out << YAML::EndMap; // CUIText
         }
 
         out << YAML::EndMap; // Entity
@@ -567,12 +594,6 @@ namespace Nous {
                         READ_SCRIPT_FIELD(Vector4, glm::vec4);
                         READ_SCRIPT_FIELD(Entity, UUID);
                         READ_SCRIPT_FIELD(Prefab, AssetHandleWrapper);
-                    //case ScriptFieldType::Prefab:                   
-                    //{                                                  
-                    //    auto data = scriptField["Data"].as<AssetHandleWrapper>();    
-                    //    fieldInstance.SetValue(data);                  
-                    //    break;                                         
-                    //}
                     }
                 }
             }
@@ -667,6 +688,13 @@ namespace Nous {
             ui.AnchorV = UIVerticalAnchorFromString(uin["AnchorV"].as<std::string>());
         }
 
+        auto uiEb = node["CUIEventBubble"];
+        if (uiEb)
+        {
+            auto& ui = entity.AddComponent<CUIEventBubble>();
+            ui.EventBubbleUp = uiEb["EventBubbleUp"].as<bool>();
+        }
+
         auto uiBtn = node["CUIButton"];
         if (uiBtn)
         {
@@ -675,8 +703,19 @@ namespace Nous {
             ui.HoverColor = uiBtn["HoverColor"].as<glm::vec4>();
             ui.ActiveColor = uiBtn["ActiveColor"].as<glm::vec4>();
 
+            ui.Size = uiBtn["Size"].as<glm::vec2>();
+
             ui.InvokeEntity = uiBtn["InvokeEntity"].as<std::string>();
             ui.InvokeFunction = uiBtn["InvokeFunction"].as<std::string>();
+        }
+
+        auto uiText = node["CUIText"];
+        if (uiText)
+        {
+            auto& tc = entity.AddComponent<CUIText>();
+            tc.Text = uiText["Text"].as<std::string>();
+            tc.Color = uiText["Color"].as<glm::vec4>();
+            tc.Size = uiText["Size"].as<float>();
         }
     
         return true;

@@ -368,6 +368,8 @@ namespace Nous {
     NS_COMP_ADD(CBoxCollider2D) {}
     NS_COMP_ADD(CCircleCollider2D) {}
     NS_COMP_ADD(CTextRenderer) {}
+
+    NS_COMP_ADD(CUIEventBubble) {}
     NS_COMP_ADD(CUIAnchor) {
         entity.GetTransform().UIComponetFlag |= 1 << 0;
         RenderSystem::ClearAspectCache();
@@ -393,6 +395,8 @@ namespace Nous {
     NS_COMP_REMOVE(CBoxCollider2D) {}
     NS_COMP_REMOVE(CCircleCollider2D) {}
     NS_COMP_REMOVE(CTextRenderer) {}
+    
+    NS_COMP_REMOVE(CUIEventBubble) {}
     NS_COMP_REMOVE(CUIAnchor) {
         entity.GetTransform().UIComponetFlag ^= 1 << 0;
         TransformSystem::SetSubtreeDirty(this, entity);

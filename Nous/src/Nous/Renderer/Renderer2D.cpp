@@ -633,7 +633,7 @@ namespace Nous {
         s_Data.FontAtlasTexture = fontAtlas;
 
         double x = 0.0, y = 0.0;
-        double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+        const double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 
         const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
 
@@ -734,6 +734,83 @@ namespace Nous {
     void Renderer2D::DrawString(const glm::mat4& transform, const std::string& str, const CTextRenderer& component, const glm::vec4& color, int entityID)
     {
         DrawString(transform, str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing }, entityID);
+    }
+
+    glm::vec2 Renderer2D::GetDrawStringSize(const std::string& str, Ref<Font> font, const TextParams& textParams)
+    {
+        const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
+        const auto& metrics = fontGeometry.getMetrics();
+        Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
+
+        s_Data.FontAtlasTexture = fontAtlas;
+
+        double maxX = 0.0;
+        double x = 0.0, y = 0.0;
+        const double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+
+        const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
+        for (size_t i = 0; i < str.size(); i++)
+        {
+            char32_t character = str[i];
+
+            // 处理空白字符
+            if (character == '\r')
+                continue;
+
+            if (character == '\n')
+            {
+                maxX = std::max(maxX, x);
+                x = 0;
+                y -= fsScale * metrics.lineHeight + textParams.LineSpacing;
+                continue;
+            }
+
+            if (character == ' ')
+            {
+                float advance = spaceGlyphAdvance;
+                if (i < str.size() - 1)
+                {
+                    char nextCharacter = str[i + 1];
+                    double dAdvance;
+                    fontGeometry.getAdvance(dAdvance, character, nextCharacter);
+                    advance = (float)dAdvance;
+                }
+                x += fsScale * advance + textParams.Kerning;
+                continue;
+            }
+
+            if (character == '\t')
+            {
+                // 1tab = 4空格，可能有问题
+                x += 4.0f * (fsScale * spaceGlyphAdvance + textParams.Kerning);
+                continue;
+            }
+
+            auto glyph = fontGeometry.getGlyph(character);
+            if (!glyph)
+                glyph = fontGeometry.getGlyph('?'); // 未知字符
+            if (!glyph)
+                return {0, 0};
+
+            // 字距调整
+            //if (i < str.size())
+            {
+                double advance = glyph->getAdvance();
+                char nextCharacter = str[i + 1];
+                fontGeometry.getAdvance(advance, character, nextCharacter);
+
+                x += fsScale * advance + textParams.Kerning;
+            }
+        }
+        maxX = std::max(maxX, x);
+        y += fsScale * metrics.lineHeight * 0.5f;
+        return glm::vec2(maxX, -y);
+    }
+
+    glm::vec2 Renderer2D::GetDrawStringSize(const std::string& str, const CTextRenderer& component, const glm::vec4& color)
+    {
+        return GetDrawStringSize(str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing });
     }
 
     float Renderer2D::GetLineWidth()

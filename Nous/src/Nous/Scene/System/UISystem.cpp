@@ -66,9 +66,9 @@ namespace Nous
 
         if (Entity e = Utils::CheckHoveredEntity())
         {
-            if (e.HasComponent<CUIButton>())
+            if (e.HasComponent<CUIEventBubble>())
             {
-                auto& ui = e.GetComponent<CUIButton>();
+                auto& ui = e.GetComponent<CUIEventBubble>();
 
                 ui.IsHovering = true;
 
@@ -79,30 +79,55 @@ namespace Nous
                         ui.IsPressing = true;
 
                         // Invoke
-                        Entity invokeEntity = s_Scene->GetEntityByName(ui.InvokeEntity);
-                        if (invokeEntity)
-                        {
-                            ScriptEngine::InvokeInstanceMethod(invokeEntity, ui.InvokeFunction);
-                        }
-                        else
-                        {
-                            NS_CORE_ERROR("找不到实体 \"{}\"", ui.InvokeEntity);
-                        }
+                        EventEmit(e);
                     }
                 }
-                else 
+                else
                 {
                     ui.IsPressing = false;
                 }
             }
-
-            
         }
     }
 
     void UISystem::Stop()
     {
         s_Scene = nullptr;
+    }
+
+    void UISystem::EventEmit(Entity entityCurr)
+    {
+        while (bool bubbleUp = OnClickEvent(entityCurr))
+        {
+            auto& tr = entityCurr.GetTransform();
+            if (tr.Parent)
+            {
+                entityCurr = s_Scene->GetEntityByUUID(tr.Parent);
+            }
+            else break;
+        }
+    }
+
+    bool UISystem::OnClickEvent(Entity entity)
+    {
+        if (!entity.HasComponent<CUIEventBubble>())
+            return false;
+        auto& uiEventHolder = entity.GetComponent<CUIEventBubble>();
+
+        if (!entity.HasComponent<CUIButton>())
+            return uiEventHolder.EventBubbleUp;
+        auto& uiBtn = entity.GetComponent<CUIButton>();
+
+        Entity invokeEntity = s_Scene->GetEntityByName(uiBtn.InvokeEntity);
+        if (invokeEntity)
+        {
+            ScriptEngine::InvokeInstanceMethod(invokeEntity, uiBtn.InvokeFunction);
+        }
+        else
+        {
+            NS_CORE_ERROR("找不到实体 \"{}\"", uiBtn.InvokeEntity);
+        }
+        return uiEventHolder.EventBubbleUp;
     }
 
     void UIRenderSystem::Update(Timestep dt)
@@ -112,13 +137,12 @@ namespace Nous
 
         Renderer2D::BeginUIScene();
 
-        auto view = s_Scene->GetAllEntitiesWith<CTransform, CUIButton>();
-        for (auto ent : view)
+        // Button
+        s_Scene->GetAllEntitiesWith<CTransform, CUIButton>()
+            .each([&](entt::entity ent, CTransform& transform, CUIButton& btn)
         {
-            auto [transform, btn] = view.get<CTransform, CUIButton>(ent);
-
             if (!transform.Active)
-                continue;
+                return;
 
             Entity entity{ ent, s_Scene };
 
@@ -126,18 +150,48 @@ namespace Nous
             // ui 应该是固定在屏幕上，不受摄像机属性影响
             glm::mat4 uiTransform = glm::scale(glm::mat4(1.0f), { 1.0f / RenderSystem::GetAspectCache(), 1.0f, 1.0f })
                 * transform.ParentTransform
-                * transform.GetTransform();
+                * transform.GetTransform()
+                * glm::scale(glm::mat4(1.0f), glm::vec3(btn.Size.x, btn.Size.y, 1.0f))
+                ;
 
             glm::vec4 color = btn.IdleColor;
-            if (btn.IsHovering) {
-                color = btn.HoverColor;
-                btn.IsHovering = false;
-            }
-            if (btn.IsPressing) {
-                color = btn.ActiveColor;
+            if (entity.HasComponent<CUIEventBubble>())
+            {
+                auto& eventHolder = entity.GetComponent<CUIEventBubble>();
+                if (eventHolder.IsHovering) {
+                    color = btn.HoverColor;
+                    eventHolder.IsHovering = false;
+                }
+                if (eventHolder.IsPressing) {
+                    color = btn.ActiveColor;
+                }
             }
             Renderer2D::DrawQuad(uiTransform, color, (int)ent);
-        }
+        });
+
+
+        s_Scene->GetAllEntitiesWith<CTransform, CUIText>()
+            .each([&](entt::entity ent, CTransform& transform, CUIText& text)
+        {
+            if (!transform.Active)
+                return;
+
+            Entity entity{ ent, s_Scene };
+
+            glm::vec2 size = Renderer2D::GetDrawStringSize(text.Text, text.FontAsset, {});
+
+            glm::mat4 uiTransform =
+                glm::scale(glm::mat4(1.0f), { 1.0f / RenderSystem::GetAspectCache(), 1.0f, 1.0f })
+                * transform.ParentTransform
+                * transform.GetTransform()
+                * glm::scale(glm::mat4(1.0f), glm::vec3(text.Size))
+                * glm::translate(glm::mat4(1.0f), { -size.x * 0.5f, size.y * 0.5f, 0 })
+                ;
+
+            Renderer2D::DrawString(uiTransform, text.Text, text.FontAsset,
+                Renderer2D::TextParams{ glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) },
+                (int)ent);
+        });
 
         Renderer2D::EndScene();
     }

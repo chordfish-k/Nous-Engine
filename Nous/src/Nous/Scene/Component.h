@@ -5,6 +5,8 @@
 #include "Nous/Renderer/Font.h"
 #include "Nous/Core/UUID.h"
 
+#include "Nous/Event/MouseEvent.h"
+
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
@@ -193,11 +195,16 @@ namespace Nous {
         CCircleCollider2D(const CCircleCollider2D&) = default;
     };
 
+    // UI
+
     enum class UIHorizontalAnchor : uint8_t { Center = 0, Left, Right };
     enum class UIVerticalAnchor : uint8_t { Center = 0, Top, Bottom };
 
-    struct CUI
+
+    struct CUIEventBubble
     {
+        bool EventBubbleUp = true;
+        //
         bool IsHovering = false;
         bool IsPressing = false;
     };
@@ -238,20 +245,22 @@ namespace Nous {
         }
     };
 
-    struct CUIButton : public CUI
+    struct CUIText
+    {
+        std::string Text = "Text";
+        float Size = 1.0f;
+        glm::vec4 Color = { 1.0, 1.0, 1.0, 1.0 };
+        Ref<Font> FontAsset = Font::GetDefault();
+    };
+
+    struct CUIButton
     {
         glm::vec4 IdleColor = { 0.6, 0.6, 0.6, 0.8 };
         glm::vec4 HoverColor = { 0.7, 0.7, 0.7, 0.8 };
         glm::vec4 ActiveColor = { 0.8, 0.8, 0.8, 0.8 };
+        glm::vec2 Size = { 1.0f, 0.5f };
         std::string InvokeEntity;
         std::string InvokeFunction;
-    };
-
-    struct CUIText : public CUI
-    {
-        std::string Text = "Text";
-        glm::vec4 Color = { 1.0, 1.0, 1.0, 1.0 };
-        Ref<Font> FontAsset = Font::GetDefault();
     };
 
 
@@ -264,5 +273,5 @@ namespace Nous {
         ComponentGroup<CTransform, CSpriteRenderer, CCircleRenderer, 
         CCamera, CNativeScript, CMonoScript, CRigidbody2D, 
         CBoxCollider2D, CCircleCollider2D, CTextRenderer,
-        CAnimPlayer, CUIAnchor, CUIButton, CUIText>;
+        CAnimPlayer, CUIAnchor, CUIEventBubble, CUIButton, CUIText>;
 }

@@ -5,6 +5,8 @@
 
 namespace Nous
 {
+	struct CUI;
+
 	class UISystem
 	{
 	public:
@@ -17,6 +19,10 @@ namespace Nous
 		static void Update(Timestep dt = 0, const glm::vec2& viewpostLeftTop = glm::vec2(0.0f), const glm::vec2& viewpostSize = glm::vec2(0.0f));
 
 		static void Stop();
+
+		static void EventEmit(Entity entityCurr);
+
+		static bool OnClickEvent(Entity entity);
 	};
 
 	class UIRenderSystem
