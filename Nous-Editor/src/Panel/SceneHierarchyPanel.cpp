@@ -686,7 +686,7 @@ namespace Nous {
 
         DrawComponent<CTextRenderer>("CTextRenderer", entity, [](auto& component)
         {
-            EUI::DrawInputTextMultiline("Text String", &component.TextString);
+            EUI::DrawInputTextMultiline("Text", &component.Text);
             EUI::DrawColor4Control("Color", component.Color);
             EUI::DrawFloatControl("Kerning", &component.Kerning, 0.025f);
             EUI::DrawFloatControl("Line Spacing", &component.LineSpacing, 0.025f);
@@ -733,6 +733,13 @@ namespace Nous {
             EUI::DrawColor4Control("Hover Color", component.HoverColor);
             EUI::DrawColor4Control("Active Color", component.ActiveColor);
 
+            EUI::DrawVec2Control("Size", component.Size);
+            AssetHandle handle = component.Image;
+            if (EUI::DrawAssetDragDropBox("Image", AssetManager::GetAssetFileName(handle), &handle, AssetType::Texture2D))
+            {
+                component.Image = handle;
+            }
+
             static char bufferEntity[64];
             static char bufferFunction[64];
             strcpy_s(bufferEntity, sizeof(bufferEntity), component.InvokeEntity.c_str());
@@ -756,7 +763,6 @@ namespace Nous {
                 }
             }
 
-            EUI::DrawVec2Control("Size", component.Size);
         });
 
         DrawComponent<CUIText>("CUIText", entity, [](CUIText& component)
@@ -764,6 +770,8 @@ namespace Nous {
             EUI::DrawInputTextMultiline("Text", &component.Text);
             EUI::DrawColor4Control("Color", component.Color);
             EUI::DrawFloatControl("Size", &component.Size);
+            EUI::DrawFloatControl("Kerning", &component.Kerning, 0.025f);
+            EUI::DrawFloatControl("Line Spacing", &component.LineSpacing, 0.025f);
         });
     }
 

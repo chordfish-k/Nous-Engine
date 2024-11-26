@@ -14,7 +14,7 @@ namespace Nous
     public class CTransform : Component
     {
         public Vector3 Translation
-        { 
+        {
             get
             {
                 InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);
@@ -109,5 +109,42 @@ namespace Nous
         {
             InternalCalls.AnimPlayerComponent_SetBool(Entity.ID, key, value);
         }
+    }
+
+
+    public class CUIText : Component
+    {
+        public string Text
+        {
+            get => InternalCalls.UITextComponent_GetText(Entity.ID);
+            set => InternalCalls.UITextComponent_SetText(Entity.ID, value);
+        }
+
+        public Vector4 Color
+        {
+            get
+            {
+                InternalCalls.UITextComponent_GetColor(Entity.ID, out Vector4 color);
+                return color;
+            }
+
+            set
+            {
+                InternalCalls.UITextComponent_SetColor(Entity.ID, ref value);
+            }
+        }
+
+        public float Kerning
+        {
+            get => InternalCalls.UITextComponent_GetKerning(Entity.ID);
+            set => InternalCalls.UITextComponent_SetKerning(Entity.ID, value);
+        }
+
+        public float LineSpacing
+        {
+            get => InternalCalls.UITextComponent_GetLineSpacing(Entity.ID);
+            set => InternalCalls.UITextComponent_SetLineSpacing(Entity.ID, value);
+        }
+
     }
 }

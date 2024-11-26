@@ -3,6 +3,9 @@
 
 #include "Nous/Scene/Entity.h"
 #include "Nous/Scene/Component.h"
+
+#include "Nous/Scene/System/TransformSystem.h"
+
 #include "Nous/Script/ScriptEngine.h"
 #include "Nous/Script/ScriptGlue.h"
 #include "Nous/Core/UUID.h"
@@ -446,7 +449,7 @@ namespace Nous {
             out << YAML::BeginMap; // CTextRenderer
 
             auto& textComponent = entity.GetComponent<CTextRenderer>();
-            out << YAML::Key << "TextString" << YAML::Value << textComponent.TextString;
+            out << YAML::Key << "Text" << YAML::Value << textComponent.Text;
             // TODO: FontAsset
             out << YAML::Key << "Color" << YAML::Value << textComponent.Color;
             out << YAML::Key << "Kerning" << YAML::Value << textComponent.Kerning;
@@ -502,6 +505,8 @@ namespace Nous {
 
             out << YAML::Key << "Size" << YAML::Value << btnComponent.Size;
 
+            out << YAML::Key << "Image" << YAML::Value << btnComponent.Image;
+
             out << YAML::Key << "InvokeEntity" << YAML::Value << btnComponent.InvokeEntity;
             out << YAML::Key << "InvokeFunction" << YAML::Value << btnComponent.InvokeFunction;
 
@@ -518,6 +523,8 @@ namespace Nous {
             // TODO: FontAsset
             out << YAML::Key << "Color" << YAML::Value << textComponent.Color;
             out << YAML::Key << "Size" << YAML::Value << textComponent.Size;
+            out << YAML::Key << "Kerning" << YAML::Value << textComponent.Kerning;
+            out << YAML::Key << "LineSpacing" << YAML::Value << textComponent.LineSpacing;
 
             out << YAML::EndMap; // CUIText
         }
@@ -666,7 +673,7 @@ namespace Nous {
         if (textRenderer)
         {
             auto& tc = entity.AddComponent<CTextRenderer>();
-            tc.TextString = textRenderer["TextString"].as<std::string>();
+            tc.Text = textRenderer["Text"].as<std::string>();
             tc.Color = textRenderer["Color"].as<glm::vec4>();
             tc.Kerning = textRenderer["Kerning"].as<float>();
             tc.LineSpacing = textRenderer["LineSpacing"].as<float>();
@@ -705,6 +712,9 @@ namespace Nous {
 
             ui.Size = uiBtn["Size"].as<glm::vec2>();
 
+            if (uiBtn["Image"])
+                ui.Image = uiBtn["Image"].as<AssetHandle>();
+
             ui.InvokeEntity = uiBtn["InvokeEntity"].as<std::string>();
             ui.InvokeFunction = uiBtn["InvokeFunction"].as<std::string>();
         }
@@ -716,6 +726,8 @@ namespace Nous {
             tc.Text = uiText["Text"].as<std::string>();
             tc.Color = uiText["Color"].as<glm::vec4>();
             tc.Size = uiText["Size"].as<float>();
+            tc.Kerning = uiText["Kerning"].as<float>();
+            tc.LineSpacing = uiText["LineSpacing"].as<float>();
         }
     
         return true;
@@ -740,6 +752,10 @@ namespace Nous {
                 Entity parent = scene->GetEntityByUUID(tr.Parent);
                 parent.GetTransform().Children.push_back(entity.GetUUID());
             }
+        }
+        for (auto& [uid, e] : scene->GetRootEntities())
+        {
+            TransformSystem::SetSubtreeDirty(scene, e);
         }
     }
 

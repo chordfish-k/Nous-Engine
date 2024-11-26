@@ -5,7 +5,7 @@
 #include "Nous/Scene/Component.h"
 #include "Nous/Scene/Entity.h"
 #include "Nous/Core/MouseCodes.h"
-
+#include "Nous/Asset/AssetManager.h"
 #include "Nous/Script/ScriptEngine.h"
 
 #include "Nous/Renderer/Renderer2D.h"
@@ -137,6 +137,8 @@ namespace Nous
 
         Renderer2D::BeginUIScene();
 
+        auto antiAspectMat = glm::scale(glm::mat4(1.0f), { 1.0f / RenderSystem::GetAspectCache(), 1.0f, 1.0f });
+
         // Button
         s_Scene->GetAllEntitiesWith<CTransform, CUIButton>()
             .each([&](entt::entity ent, CTransform& transform, CUIButton& btn)
@@ -148,11 +150,10 @@ namespace Nous
 
             // 可能通过新的shader，将部分矩阵运算交给gpu
             // ui 应该是固定在屏幕上，不受摄像机属性影响
-            glm::mat4 uiTransform = glm::scale(glm::mat4(1.0f), { 1.0f / RenderSystem::GetAspectCache(), 1.0f, 1.0f })
+            glm::mat4 uiTransform = antiAspectMat
                 * transform.ParentTransform
                 * transform.GetTransform()
-                * glm::scale(glm::mat4(1.0f), glm::vec3(btn.Size.x, btn.Size.y, 1.0f))
-                ;
+                * glm::scale(glm::mat4(1.0f), glm::vec3(btn.Size.x, btn.Size.y, 1.0f));
 
             glm::vec4 color = btn.IdleColor;
             if (entity.HasComponent<CUIEventBubble>())
@@ -166,7 +167,8 @@ namespace Nous
                     color = btn.ActiveColor;
                 }
             }
-            Renderer2D::DrawQuad(uiTransform, color, (int)ent);
+            Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(btn.Image);
+            Renderer2D::DrawQuad(uiTransform, texture, 1.0f, color, (int)ent);
         });
 
 
@@ -180,17 +182,13 @@ namespace Nous
 
             glm::vec2 size = Renderer2D::GetDrawStringSize(text.Text, text.FontAsset, {});
 
-            glm::mat4 uiTransform =
-                glm::scale(glm::mat4(1.0f), { 1.0f / RenderSystem::GetAspectCache(), 1.0f, 1.0f })
+            glm::mat4 uiTransform = antiAspectMat
                 * transform.ParentTransform
                 * transform.GetTransform()
                 * glm::scale(glm::mat4(1.0f), glm::vec3(text.Size))
-                * glm::translate(glm::mat4(1.0f), { -size.x * 0.5f, size.y * 0.5f, 0 })
-                ;
+                * glm::translate(glm::mat4(1.0f), { -size.x * 0.5f, size.y * 0.5f, 0 });
 
-            Renderer2D::DrawString(uiTransform, text.Text, text.FontAsset,
-                Renderer2D::TextParams{ glm::vec4(1.0f, 1.0f, 1.0f, 1.0f) },
-                (int)ent);
+            Renderer2D::DrawString(uiTransform, text.Text, text, text.Color, (int)ent);
         });
 
         Renderer2D::EndScene();

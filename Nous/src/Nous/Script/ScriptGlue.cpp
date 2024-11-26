@@ -349,7 +349,7 @@ namespace Nous
 		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
 
 		auto& tc = entity.GetComponent<CTextRenderer>();
-		return ScriptEngine::CreateString(tc.TextString.c_str());
+		return ScriptEngine::CreateString(tc.Text.c_str());
 	}
 
 	static void TextRendererComponent_SetText(UUID entityID, MonoString* textString)
@@ -358,7 +358,7 @@ namespace Nous
 		NS_CORE_ASSERT_COMPONENT(CTextRenderer);
 
 		auto& tc = entity.GetComponent<CTextRenderer>();
-		tc.TextString = Utils::MonnoStringToString(textString);
+		tc.Text = Utils::MonnoStringToString(textString);
 	}
 
 	static void TextRendererComponent_GetColor(UUID entityID, glm::vec4* color)
@@ -439,6 +439,78 @@ namespace Nous
 			Ref<AnimMachine> m = AssetManager::GetAsset<AnimMachine>(c.AnimClip);
 			m->SetBool(entityID, Utils::MonnoStringToString(key), value);
 		}
+	}
+
+	static MonoString* UITextComponent_GetText(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		return ScriptEngine::CreateString(tc.Text.c_str());
+	}
+
+	static void UITextComponent_SetText(UUID entityID, MonoString* textString)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		tc.Text = Utils::MonnoStringToString(textString);
+	}
+
+	static void UITextComponent_GetColor(UUID entityID, glm::vec4* color)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		*color = tc.Color;
+	}
+
+	static void UITextComponent_SetColor(UUID entityID, glm::vec4* color)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		tc.Color = *color;
+	}
+
+	static float UITextComponent_GetKerning(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		return tc.Kerning;
+	}
+
+	static void UITextComponent_SetKerning(UUID entityID, float kerning)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		tc.Kerning = kerning;
+	}
+
+	static float UITextComponent_GetLineSpacing(UUID entityID)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		return tc.LineSpacing;
+	}
+
+	static void UITextComponent_SetLineSpacing(UUID entityID, float lineSpacing)
+	{
+		NS_CORE_ASSERT_ENTITYID(entityID);
+		NS_CORE_ASSERT_COMPONENT(CUIText);
+
+		auto& tc = entity.GetComponent<CUIText>();
+		tc.LineSpacing = lineSpacing;
 	}
 
 	static MonoString* Prefab_GetFilePath(AssetHandle handle)
@@ -597,6 +669,15 @@ namespace Nous
 
 		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetFloat);
 		NS_ADD_INTERNAL_CALL(AnimPlayerComponent_SetBool);
+
+		NS_ADD_INTERNAL_CALL(UITextComponent_GetText);
+		NS_ADD_INTERNAL_CALL(UITextComponent_SetText);
+		NS_ADD_INTERNAL_CALL(UITextComponent_GetColor);
+		NS_ADD_INTERNAL_CALL(UITextComponent_SetColor);
+		NS_ADD_INTERNAL_CALL(UITextComponent_GetKerning);
+		NS_ADD_INTERNAL_CALL(UITextComponent_SetKerning);
+		NS_ADD_INTERNAL_CALL(UITextComponent_GetLineSpacing);
+		NS_ADD_INTERNAL_CALL(UITextComponent_SetLineSpacing);
 
 		NS_ADD_INTERNAL_CALL(Prefab_GetFilePath);
 		NS_ADD_INTERNAL_CALL(Prefab_Instantate);

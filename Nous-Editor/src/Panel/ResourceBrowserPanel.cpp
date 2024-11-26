@@ -88,14 +88,14 @@ namespace Nous
             for (const auto& [item, treeNodeIndex] : node->Children)
             {
                 const std::string itemStr = item.generic_string();
-
-                const bool isDirectory = std::filesystem::is_directory(item);
+                const auto path = m_CurrentDirectory / item;
+                const bool isDirectory = std::filesystem::is_directory(path);
 
                 // 缩略图 Thumbnail
                 Ref<Texture2D> thumbnail = m_DirectoryIcon;
                 if (!isDirectory)
                 {
-                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(m_CurrentDirectory / item);
+                    thumbnail = m_ThumbnailCache->GetOrCreateThumbnail(path);
                     if (!thumbnail)
                         thumbnail = m_FileIcon;
                 }

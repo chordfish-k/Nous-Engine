@@ -54,8 +54,8 @@ namespace Nous {
         };
         static void DrawString(const glm::mat4& transform, const std::string& str, Ref<Font> font, const TextParams& textParams, int entityID = -1);
         static void DrawString(const glm::mat4& transform, const std::string& str, const CTextRenderer& component, const glm::vec4& color, int entityID = -1);
+        static void DrawString(const glm::mat4& transform, const std::string& str, const CUIText& component, const glm::vec4& color, int entityID = -1);
         static glm::vec2 GetDrawStringSize(const std::string& str, Ref<Font> font, const TextParams& textParams);
-        static glm::vec2 GetDrawStringSize(const std::string& str, const CTextRenderer& component, const glm::vec4& color);
 
         static float GetLineWidth();
         static void SetLineWidth(float width);

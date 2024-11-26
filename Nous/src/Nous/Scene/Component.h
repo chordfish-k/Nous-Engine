@@ -103,7 +103,7 @@ namespace Nous {
 
     struct CTextRenderer
     {
-        std::string TextString;
+        std::string Text;
         Ref<Font> FontAsset = Font::GetDefault();
         glm::vec4 Color{ 1.0f };
         float Kerning = 0.0f; // 字距
@@ -251,6 +251,8 @@ namespace Nous {
         float Size = 1.0f;
         glm::vec4 Color = { 1.0, 1.0, 1.0, 1.0 };
         Ref<Font> FontAsset = Font::GetDefault();
+        float Kerning = 0.0f; // 字距
+        float LineSpacing = 0.0f; // 行距
     };
 
     struct CUIButton
@@ -259,6 +261,7 @@ namespace Nous {
         glm::vec4 HoverColor = { 0.7, 0.7, 0.7, 0.8 };
         glm::vec4 ActiveColor = { 0.8, 0.8, 0.8, 0.8 };
         glm::vec2 Size = { 1.0f, 0.5f };
+        AssetHandle Image = 0;
         std::string InvokeEntity;
         std::string InvokeFunction;
     };

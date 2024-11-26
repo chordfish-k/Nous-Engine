@@ -8,10 +8,10 @@ namespace Nous
 		#region NousConsole
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool NousConsole_Log(string log, string filepath, int lineNumber);
-        #endregion
+		#endregion
 
-        #region Entity
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+		#region Entity
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -59,8 +59,8 @@ namespace Nous
 		internal extern static void TransformComponent_SetTranslation(ulong entityID, Vector3 translation);
 		#endregion
 
-        #region Rigidbody2DComponent
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+		#region Rigidbody2DComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Rigidbody2DComponent_ApplyLinearImpulse(ulong entityID, ref Vector2 impulse, ref Vector2 point, bool wake);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -74,13 +74,13 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static CRigidbody2D.BodyType Rigidbody2DComponent_GetType(ulong entityID);
-		
+
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Rigidbody2DComponent_SetType(ulong entityID, CRigidbody2D.BodyType type);
-        #endregion
+		#endregion
 
-        #region TextComponent
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+		#region TextComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string TextRendererComponent_GetText(ulong entityID);
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -113,6 +113,32 @@ namespace Nous
 		internal extern static void AnimPlayerComponent_SetBool(ulong entityID, string key, bool value);
 		#endregion AnimPlayerComponent
 
+		#region UITextComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static string UITextComponent_GetText(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void UITextComponent_SetText(ulong entityID, string text);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void UITextComponent_GetColor(ulong entityID, out Vector4 color);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void UITextComponent_SetColor(ulong entityID, ref Vector4 color);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static float UITextComponent_GetKerning(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void UITextComponent_SetKerning(ulong entityID, float kerning);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static float UITextComponent_GetLineSpacing(ulong entityID);
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void UITextComponent_SetLineSpacing(ulong entityID, float lineSpacing);
+		#endregion
+
 		#region Prefab
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static string Prefab_GetFilePath(ulong handle);
@@ -137,5 +163,6 @@ namespace Nous
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void Game_ChangeScene(string sceneName);
+
 	}
 }

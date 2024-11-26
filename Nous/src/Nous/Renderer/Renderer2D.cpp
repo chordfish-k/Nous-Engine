@@ -736,6 +736,11 @@ namespace Nous {
         DrawString(transform, str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing }, entityID);
     }
 
+    void Renderer2D::DrawString(const glm::mat4& transform, const std::string& str, const CUIText& component, const glm::vec4& color, int entityID)
+    {
+        DrawString(transform, str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing }, entityID);
+    }
+
     glm::vec2 Renderer2D::GetDrawStringSize(const std::string& str, Ref<Font> font, const TextParams& textParams)
     {
         const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
@@ -806,11 +811,6 @@ namespace Nous {
         maxX = std::max(maxX, x);
         y += fsScale * metrics.lineHeight * 0.5f;
         return glm::vec2(maxX, -y);
-    }
-
-    glm::vec2 Renderer2D::GetDrawStringSize(const std::string& str, const CTextRenderer& component, const glm::vec4& color)
-    {
-        return GetDrawStringSize(str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing });
     }
 
     float Renderer2D::GetLineWidth()

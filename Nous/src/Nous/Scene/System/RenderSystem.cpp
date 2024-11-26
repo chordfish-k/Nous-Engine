@@ -100,7 +100,7 @@ namespace Nous
                     if (!transform.Active)
                         continue;
 
-                    Renderer2D::DrawString(transform.ParentTransform * transform.GetTransform(), text.TextString, text, text.Color, (int)ent);
+                    Renderer2D::DrawString(transform.ParentTransform * transform.GetTransform(), text.Text, text, text.Color, (int)ent);
                 }
             }
 
