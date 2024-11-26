@@ -110,11 +110,7 @@ namespace Nous
             const float aspect = useEditorCamera ? camera->GetAspectRatio() : ((SceneCamera*)mainCamera)->GetAspectRatio();
             if (aspect != s_AspectStore) {
                 s_AspectStore = aspect;
-
-                s_Scene->GetAllEntitiesWith<CUIAnchor>().each([=] (entt::entity ent, CUIAnchor& anchor) {
-                    anchor.Aspect = aspect;
-                    TransformSystem::SetSubtreeDirty(s_Scene, ent);
-                });
+                TransformSystem::SetSubtreeDirty(s_Scene);
             }
         }
 	}

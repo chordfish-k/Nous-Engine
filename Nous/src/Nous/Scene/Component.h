@@ -214,9 +214,7 @@ namespace Nous {
         UIHorizontalAnchor AnchorH = UIHorizontalAnchor::Center;
         UIVerticalAnchor AnchorV = UIVerticalAnchor::Center;
 
-        float Aspect = 1.0f;
-
-        glm::vec2 GetOffset() const
+        glm::vec2 GetOffset(float aspect) const
         {
             float offsetX = 0.0f;
             float offsetY = 0.0f;
@@ -225,8 +223,8 @@ namespace Nous {
 
             switch (AnchorH)
             {
-            case UIHorizontalAnchor::Left:  offsetX = -k * Aspect;   break;
-            case UIHorizontalAnchor::Right: offsetX = k * Aspect;    break;
+            case UIHorizontalAnchor::Left:  offsetX = -k * aspect;   break;
+            case UIHorizontalAnchor::Right: offsetX = k * aspect;    break;
             }
 
             switch (AnchorV)
@@ -238,9 +236,9 @@ namespace Nous {
             return { offsetX, offsetY };
         }
 
-        glm::mat4 GetTranslate() const
+        glm::mat4 GetTranslate(float aspect) const
         {
-            auto offset = GetOffset();
+            auto offset = GetOffset(aspect);
             return glm::translate(glm::mat4(1.0f), { offset.x, offset.y, 0.0f });
         }
     };

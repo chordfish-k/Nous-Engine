@@ -9,7 +9,7 @@ namespace Nous
 	public:
 		static void Update(Scene* scene);
 
-		static void SetSubtreeDirty(Scene* scene, entt::entity entity);
+		static void SetSubtreeDirty(Scene* scene, entt::entity entity = entt::null);
 		static void SetSubtreeActive(Scene* scene, entt::entity entity, bool active = true);
 
 	};

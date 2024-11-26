@@ -104,6 +104,9 @@ namespace Nous {
         // 复制 Component 给新 Registry
         CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
 
+        // 设置dirty
+        TransformSystem::SetSubtreeDirty(newScene.get());
+
         return newScene;
     }
 

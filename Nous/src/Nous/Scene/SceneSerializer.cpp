@@ -753,10 +753,6 @@ namespace Nous {
                 parent.GetTransform().Children.push_back(entity.GetUUID());
             }
         }
-        for (auto& [uid, e] : scene->GetRootEntities())
-        {
-            TransformSystem::SetSubtreeDirty(scene, e);
-        }
     }
 
     void SceneSerializer::Serialize(const std::filesystem::path& filepath)

@@ -3,6 +3,8 @@
 
 #include "Nous/Scene/Entity.h"
 
+#include "Nous/Scene/System/RenderSystem.h"
+
 namespace Nous
 {
 	namespace Utils
@@ -37,7 +39,7 @@ namespace Nous
 				if (entity.HasComponent<CUIAnchor>())
 				{
 					auto& ui = entity.GetComponent<CUIAnchor>();
-					uiAnchor *= ui.GetTranslate();
+					uiAnchor *= ui.GetTranslate(RenderSystem::GetAspectCache());
 				}
 
 				Entity pe = scene->GetEntityByUUID(pid);
@@ -68,13 +70,23 @@ namespace Nous
 
 	void TransformSystem::SetSubtreeDirty(Scene* scene, entt::entity entity)
 	{
-		Entity e{ entity, scene };
-		auto& tr = e.GetTransform();
-		tr.Dirty = true;
-
-		for (auto& uuid : tr.Children)
+		if (entity != entt::null)
 		{
-			SetSubtreeDirty(scene, scene->GetEntityByUUID(uuid));
+			Entity e{ entity, scene };
+			auto& tr = e.GetTransform();
+			tr.Dirty = true;
+
+			for (auto& uuid : tr.Children)
+			{
+				SetSubtreeDirty(scene, scene->GetEntityByUUID(uuid));
+			}
+		}
+		else
+		{
+			for (auto& [uid, e] : scene->GetRootEntities())
+			{
+				TransformSystem::SetSubtreeDirty(scene, e);
+			}
 		}
 	}
 
