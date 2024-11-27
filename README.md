@@ -27,9 +27,9 @@
 
 ### UI系统
 
-- [ ] 支持绘制固定在屏幕的文字
+- [x] 支持绘制固定在屏幕的文字
 - [ ] UI层级结构
-- [ ] 按钮和事件
+- [x] 按钮和事件
 
 ### 节点树系统
 
@@ -38,7 +38,7 @@
 - [ ] 物理系统可能要处理碰撞体的形变，改用多边形来描述碰撞体(?)
 - [x] 预制体prefab
 - [ ] 预制体二次编辑
-- [ ] 节点隐藏(active)
+- [x] 节点隐藏(active)
 
 ### 项目系统
 
@@ -47,6 +47,19 @@
 - [x] 打包成可游玩的游戏，具体操作是修改Sandbox子项目，让它只保留runtime并将framebuffer进行渲染
 - [x] 项目基本设置：初始场景选择
 - [x] 场景转换
+
+### TileMap & Grid
+
+- [ ] 一个Grid定义网格信息 + 辅助线绘制，子节点多个TileMap层(每个TileMap都需要绑定一个Grid父节点才能生效)
+- [ ] WorldToCell(position) & GetCellCenterWorld(position)，应该会用到摄像机属性，应提前整理摄像机和BeginScene代码
+- [ ] 鼠标放置和清除cell
+- [ ] TileSet属性，设置pivot
+
+后续再考虑：
+
+- [ ] 碰撞体的添加：可能要合并多个共面cell的shape，需要一定的算法
+
+
 
 ### 其它
 
@@ -60,7 +73,7 @@
 - [ ] 无法进行抗锯齿处理的bug
 - [ ] 快捷键、ImGui的事件blocking逻辑
 - [ ] 资源被修改要即时响应，重载
-- [ ] Save scene as... 初始目录应为项目目录
+- [x] Save scene as... 初始目录应为项目目录
 - [x] 不能提供CTransform的删除选项
 - [ ] 物理系统正在运行时才能进行SetLinearVelocity等操作
 - [x] 脚本修改带rigbody的实体无法得到正确反馈

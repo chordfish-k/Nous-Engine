@@ -566,7 +566,7 @@ Entities:
     CMonoScript:
       ClassName: Sandbox.TheText
     CTextRenderer:
-      TextString: Hello World
+      Text: Hello World
       Color: [1, 1, 1, 1]
       Kerning: 0
       LineSpacing: 0

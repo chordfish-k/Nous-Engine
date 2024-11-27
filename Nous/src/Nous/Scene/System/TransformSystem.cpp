@@ -27,8 +27,8 @@ namespace Nous
 			glm::mat4 uiAnchor(1.0f);
 
 			//?
-			if (tr.HasRigidBody)
-				return tr.ParentTransform * tr.GetTransform();
+			//if (tr.HasRigidBody)
+			//	return tr.ParentTransform * tr.GetTransform();
 
 			if (tr.Dirty)
 			{

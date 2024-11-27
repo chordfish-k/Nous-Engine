@@ -663,7 +663,7 @@ namespace Nous
 
     void EditorLayer::SaveSceneAs()
     {
-        std::filesystem::path filepath = FileDialogs::SaveFile("Nous Scene (*Nous)\0*.nous\0");
+        std::filesystem::path filepath = FileDialogs::SaveFile("Nous Scene (*Nous)\0*.nous\0", Project::GetActiveProjectDirectory().string());
         filepath = std::filesystem::relative(filepath, Project::GetActiveAssetDirectory());
         std::string pathString = filepath.generic_string();
 

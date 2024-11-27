@@ -542,11 +542,6 @@ namespace Nous
 				ScriptEngine::OnStartEntity(e);
 			}
 
-			if (e.HasComponent<CRigidbody2D>())
-			{
-				//PhysicsSystem::SetupRigidbody(e, nullptr);
-			}
-
 			*newEntity = outRoot;
 		}
 	}

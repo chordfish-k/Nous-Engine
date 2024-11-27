@@ -38,7 +38,7 @@ namespace Nous {
     }
 
     // 保存文件 返回文件名 空字符串代表取消
-    std::string FileDialogs::SaveFile(const char* filter)
+    std::string FileDialogs::SaveFile(const char* filter, const std::string& dir)
     {
         OPENFILENAMEA ofn;
         CHAR szFile[260] = { 0 };
@@ -48,8 +48,14 @@ namespace Nous {
         ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
         ofn.lpstrFile = szFile;
         ofn.nMaxFile = sizeof(szFile);
-        if (GetCurrentDirectoryA(256, currentDir))
-            ofn.lpstrInitialDir = currentDir;
+        if (!dir.empty())
+        {
+            std::string path = dir;
+            std::replace(path.begin(), path.end(), '/', '\\');
+            memcpy_s(currentDir, sizeof(currentDir), path.c_str(), path.size() * sizeof(char));
+        }
+        else GetCurrentDirectoryA(256, currentDir);
+        ofn.lpstrInitialDir = currentDir;
         ofn.lpstrFilter = filter;
         ofn.nFilterIndex = 1;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
