@@ -24,7 +24,6 @@ namespace Nous
 			Entity entity{ ent, scene };
 			CTransform& tr = entity.GetComponent<CTransform>();
 
-			glm::mat4 uiAnchor(1.0f);
 
 			//?
 			//if (tr.HasRigidBody)
@@ -36,14 +35,17 @@ namespace Nous
 				if (pid == 0)
 					return tr.GetTransform();
 
+				Entity pe = scene->GetEntityByUUID(pid);
+				tr.ParentTransform = CalcParentTransform(scene, pe);
+
 				if (entity.HasComponent<CUIAnchor>())
 				{
 					auto& ui = entity.GetComponent<CUIAnchor>();
-					uiAnchor *= ui.GetTranslate(RenderSystem::GetAspectCache());
-				}
+					glm::mat4 uiAnchor(1.0f);
 
-				Entity pe = scene->GetEntityByUUID(pid);
-				tr.ParentTransform = CalcParentTransform(scene, pe) * uiAnchor;
+					uiAnchor = ui.GetTranslate(RenderSystem::GetAspectCache());
+					tr.ParentTransform = tr.ParentTransform * uiAnchor;
+				}
 
 				tr.Dirty = false;
 			}

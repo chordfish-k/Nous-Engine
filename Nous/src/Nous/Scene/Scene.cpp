@@ -383,6 +383,9 @@ namespace Nous {
     NS_COMP_ADD(CUIText){
         entity.GetTransform().UIComponetFlag |= 1 << 2;
     }
+    NS_COMP_ADD(CUIImage) {
+        entity.GetTransform().UIComponetFlag |= 1 << 3;
+    }
 
     // Remove
     NS_COMP_REMOVE(CCamera) {}
@@ -409,5 +412,8 @@ namespace Nous {
     }
     NS_COMP_REMOVE(CUIText) {
         entity.GetTransform().UIComponetFlag ^= 1 << 2;
+    }
+    NS_COMP_REMOVE(CUIImage) {
+        entity.GetTransform().UIComponetFlag ^= 1 << 3;
     }
 }

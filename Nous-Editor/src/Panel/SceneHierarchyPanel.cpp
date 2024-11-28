@@ -332,6 +332,7 @@ namespace Nous {
             DisplayAddComponentEntry<CUIEventBubble>("CUIEventBubble");
             DisplayAddComponentEntry<CUIButton>("CUIButton");
             DisplayAddComponentEntry<CUIText>("CUIText");
+            DisplayAddComponentEntry<CUIImage>("CUIImage");
 
             ImGui::EndPopup();
         }
@@ -623,26 +624,14 @@ namespace Nous {
 
         DrawComponent<CSpriteRenderer>("CSpriteRenderer", entity, [](auto& component)
         {
-            EUI::DrawColor4Control("Color", component.Color);
-            
-            std::string btnLabel = "None";
-            bool isTextureValid = false;
-            if (component.Texture != 0)
-            {
-                btnLabel = AssetManager::GetAssetFileName(component.Texture);
-            }
-
             AssetHandle handle = component.Texture;
-            if (EUI::DrawAssetDragDropBox("Texture", btnLabel, &handle, AssetType::Texture2D))
-            {
+            if (EUI::DrawAssetDragDropBox("Texture", AssetManager::GetAssetFileName(component.Texture), &handle, AssetType::Texture2D))
                 component.Texture = handle;
-            }
-
+            EUI::DrawColor4Control("Color", component.Color);
             EUI::DrawFloatControl("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
             EUI::DrawIntControl("Sheet Width", &component.SheetWidth, 0);
             EUI::DrawIntControl("Sheet Height", &component.SheetHeight, 0);
             EUI::DrawIntControl("Index", &component.Index, 0);
-
         });
 
         DrawComponent<CCircleRenderer>("CCircleRenderer", entity, [](auto& component)
@@ -736,9 +725,11 @@ namespace Nous {
             EUI::DrawVec2Control("Size", component.Size);
             AssetHandle handle = component.Image;
             if (EUI::DrawAssetDragDropBox("Image", AssetManager::GetAssetFileName(handle), &handle, AssetType::Texture2D))
-            {
                 component.Image = handle;
-            }
+
+            EUI::DrawIntControl("Sheet Width", &component.SheetWidth, 0);
+            EUI::DrawIntControl("Sheet Height", &component.SheetHeight, 0);
+            EUI::DrawIntControl("Index", &component.Index, 0);
 
             static char bufferEntity[64];
             static char bufferFunction[64];
@@ -746,23 +737,12 @@ namespace Nous {
             strcpy_s(bufferFunction, sizeof(bufferFunction), component.InvokeFunction.c_str());
 
             // 要触发的实体名
-            {
-                if (EUI::DrawInputText("Invoke Entity", bufferEntity, sizeof(bufferEntity)))
-                {
-                    component.InvokeEntity = bufferEntity;
-                    return;
-                }
-            }
+            if (EUI::DrawInputText("Invoke Entity", bufferEntity, sizeof(bufferEntity)))
+                component.InvokeEntity = bufferEntity;
 
             // 要触发的实体脚本内方法名
-            {
-                if (EUI::DrawInputText("Invoke Function", bufferFunction, sizeof(bufferFunction)))
-                {
-                    component.InvokeFunction = bufferFunction;
-                    return;
-                }
-            }
-
+            if (EUI::DrawInputText("Invoke Function", bufferFunction, sizeof(bufferFunction)))
+                component.InvokeFunction = bufferFunction;
         });
 
         DrawComponent<CUIText>("CUIText", entity, [](CUIText& component)
@@ -772,6 +752,18 @@ namespace Nous {
             EUI::DrawFloatControl("Size", &component.Size);
             EUI::DrawFloatControl("Kerning", &component.Kerning, 0.025f);
             EUI::DrawFloatControl("Line Spacing", &component.LineSpacing, 0.025f);
+        });
+
+        DrawComponent<CUIImage>("CUIImage", entity, [](CUIImage& component)
+        {
+            AssetHandle handle = component.Image;
+            if (EUI::DrawAssetDragDropBox("Texture", AssetManager::GetAssetFileName(component.Image), &handle, AssetType::Texture2D))
+                component.Image = handle;
+            EUI::DrawColor4Control("Color", component.Color);
+            EUI::DrawVec2Control("Size", component.Size);
+            EUI::DrawIntControl("Sheet Width", &component.SheetWidth, 0);
+            EUI::DrawIntControl("Sheet Height", &component.SheetHeight, 0);
+            EUI::DrawIntControl("Index", &component.Index, 0);
         });
     }
 

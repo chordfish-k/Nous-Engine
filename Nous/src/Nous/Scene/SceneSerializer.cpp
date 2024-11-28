@@ -507,6 +507,10 @@ namespace Nous {
 
             out << YAML::Key << "Image" << YAML::Value << btnComponent.Image;
 
+            out << YAML::Key << "SheetWidth" << YAML::Value << btnComponent.SheetWidth;
+            out << YAML::Key << "SheetHeight" << YAML::Value << btnComponent.SheetHeight;
+            out << YAML::Key << "Index" << YAML::Value << btnComponent.Index;
+
             out << YAML::Key << "InvokeEntity" << YAML::Value << btnComponent.InvokeEntity;
             out << YAML::Key << "InvokeFunction" << YAML::Value << btnComponent.InvokeFunction;
 
@@ -527,6 +531,24 @@ namespace Nous {
             out << YAML::Key << "LineSpacing" << YAML::Value << textComponent.LineSpacing;
 
             out << YAML::EndMap; // CUIText
+        }
+
+        if (entity.HasComponent<CUIImage>())
+        {
+            out << YAML::Key << "CUIImage";
+            out << YAML::BeginMap; // CUIImage
+
+            auto& imageComponent = entity.GetComponent<CUIImage>();
+            out << YAML::Key << "Color" << YAML::Value << imageComponent.Color;
+
+            out << YAML::Key << "Image" << YAML::Value << imageComponent.Image;
+            out << YAML::Key << "Size" << YAML::Value << imageComponent.Size;
+
+            out << YAML::Key << "SheetWidth" << YAML::Value << imageComponent.SheetWidth;
+            out << YAML::Key << "SheetHeight" << YAML::Value << imageComponent.SheetHeight;
+            out << YAML::Key << "Index" << YAML::Value << imageComponent.Index;
+
+            out << YAML::EndMap; // CUIImage
         }
 
         out << YAML::EndMap; // Entity
@@ -611,21 +633,11 @@ namespace Nous {
         {
             auto& src = entity.AddComponent<CSpriteRenderer>();
             src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
-
-            if (spriteRendererComponent["TextureHandle"])
-                src.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
-
-            if (spriteRendererComponent["TilingFactor"])
-                src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
-
-            if (spriteRendererComponent["SheetWidth"])
-                src.SheetWidth = spriteRendererComponent["SheetWidth"].as<int>();
-
-            if (spriteRendererComponent["SheetHeight"])
-                src.SheetHeight = spriteRendererComponent["SheetHeight"].as<int>();
-
-            if (spriteRendererComponent["Index"])
-                src.Index = spriteRendererComponent["Index"].as<int>();
+            src.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
+            src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+            src.SheetWidth = spriteRendererComponent["SheetWidth"].as<int>();
+            src.SheetHeight = spriteRendererComponent["SheetHeight"].as<int>();
+            src.Index = spriteRendererComponent["Index"].as<int>();
         }
 
         auto circleRendererComponent = node["CCircleRenderer"];
@@ -712,8 +724,12 @@ namespace Nous {
 
             ui.Size = uiBtn["Size"].as<glm::vec2>();
 
-            if (uiBtn["Image"])
-                ui.Image = uiBtn["Image"].as<AssetHandle>();
+            ui.Image = uiBtn["Image"].as<AssetHandle>();
+
+            
+            if (uiBtn["SheetWidth"])ui.SheetWidth = uiBtn["SheetWidth"].as<int>();
+            if (uiBtn["SheetHeight"])ui.SheetHeight = uiBtn["SheetHeight"].as<int>();
+            if (uiBtn["Index"])ui.Index = uiBtn["Index"].as<int>();
 
             ui.InvokeEntity = uiBtn["InvokeEntity"].as<std::string>();
             ui.InvokeFunction = uiBtn["InvokeFunction"].as<std::string>();
@@ -728,6 +744,18 @@ namespace Nous {
             tc.Size = uiText["Size"].as<float>();
             tc.Kerning = uiText["Kerning"].as<float>();
             tc.LineSpacing = uiText["LineSpacing"].as<float>();
+        }
+
+        auto uiImage = node["CUIImage"];
+        if (uiImage)
+        {
+            auto& ui = entity.AddComponent<CUIImage>();
+            ui.Color = uiImage["Color"].as<glm::vec4>();
+            ui.Image = uiImage["Image"].as<AssetHandle>();
+            ui.Size = uiImage["Size"].as<glm::vec2>();
+            ui.SheetWidth = uiImage["SheetWidth"].as<int>();
+            ui.SheetHeight = uiImage["SheetHeight"].as<int>();
+            ui.Index = uiImage["Index"].as<int>();
         }
     
         return true;

@@ -39,7 +39,7 @@ namespace Nous {
         bool Active = true;
 
         // 不显示的字段
-        glm::mat4 ParentTransform{ 1.0f };
+        glm::mat4 ParentTransform = glm::mat4(1.0f);
         UUID Parent = 0;
         bool Open = true;
         bool HideChild = false;
@@ -207,12 +207,18 @@ namespace Nous {
         //
         bool IsHovering = false;
         bool IsPressing = false;
+
+        CUIEventBubble() = default;
+        CUIEventBubble(const CUIEventBubble&) = default;
     };
 
     struct CUIAnchor
     {
         UIHorizontalAnchor AnchorH = UIHorizontalAnchor::Center;
         UIVerticalAnchor AnchorV = UIVerticalAnchor::Center;
+
+        CUIAnchor() = default;
+        CUIAnchor(const CUIAnchor&) = default;
 
         glm::vec2 GetOffset(float aspect) const
         {
@@ -251,17 +257,39 @@ namespace Nous {
         Ref<Font> FontAsset = Font::GetDefault();
         float Kerning = 0.0f; // 字距
         float LineSpacing = 0.0f; // 行距
+
+        CUIText() = default;
+        CUIText(const CUIText&) = default;
     };
 
     struct CUIButton
     {
+        AssetHandle Image = 0;
         glm::vec4 IdleColor = { 0.6, 0.6, 0.6, 0.8 };
         glm::vec4 HoverColor = { 0.7, 0.7, 0.7, 0.8 };
         glm::vec4 ActiveColor = { 0.8, 0.8, 0.8, 0.8 };
         glm::vec2 Size = { 1.0f, 0.5f };
-        AssetHandle Image = 0;
+        int SheetWidth = 0; // 0 = Max
+        int SheetHeight = 0;
+        int Index = 0;
         std::string InvokeEntity;
         std::string InvokeFunction;
+
+        CUIButton() = default;
+        CUIButton(const CUIButton&) = default;
+    };
+
+    struct CUIImage
+    {
+        AssetHandle Image = 0;
+        glm::vec4 Color = {1.0, 1.0, 1.0, 1.0};
+        glm::vec2 Size = { 1.0f, 0.5f };
+        int SheetWidth = 0; // 0 = Max
+        int SheetHeight = 0;
+        int Index = 0;
+
+        CUIImage() = default;
+        CUIImage(const CUIImage&) = default;
     };
 
 
@@ -274,5 +302,5 @@ namespace Nous {
         ComponentGroup<CTransform, CSpriteRenderer, CCircleRenderer, 
         CCamera, CNativeScript, CMonoScript, CRigidbody2D, 
         CBoxCollider2D, CCircleCollider2D, CTextRenderer,
-        CAnimPlayer, CUIAnchor, CUIEventBubble, CUIButton, CUIText>;
+        CAnimPlayer, CUIAnchor, CUIEventBubble, CUIButton, CUIText, CUIImage>;
 }

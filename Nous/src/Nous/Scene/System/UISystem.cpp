@@ -168,10 +168,30 @@ namespace Nous
                 }
             }
             Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(btn.Image);
-            Renderer2D::DrawQuad(uiTransform, texture, 1.0f, color, (int)ent);
+            Renderer2D::DrawQuad(uiTransform, texture, btn.SheetWidth, btn.SheetHeight, btn.Index, 1.0f, color, (int)ent);
         });
 
+        // Image
+        s_Scene->GetAllEntitiesWith<CTransform, CUIImage>()
+            .each([&](entt::entity ent, CTransform& transform, CUIImage& img)
+        {
+            if (!transform.Active)
+                return;
 
+            Entity entity{ ent, s_Scene };
+
+            // 可能通过新的shader，将部分矩阵运算交给gpu
+            // ui 应该是固定在屏幕上，不受摄像机属性影响
+            glm::mat4 uiTransform = antiAspectMat
+                * transform.ParentTransform
+                * transform.GetTransform()
+                * glm::scale(glm::mat4(1.0f), glm::vec3(img.Size.x, img.Size.y, 1.0f));;
+
+            Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(img.Image);
+            Renderer2D::DrawQuad(uiTransform, texture, img.SheetWidth, img.SheetHeight, img.Index, 1.0f, img.Color, (int)ent);
+        });
+
+        // Text
         s_Scene->GetAllEntitiesWith<CTransform, CUIText>()
             .each([&](entt::entity ent, CTransform& transform, CUIText& text)
         {
