@@ -5,6 +5,8 @@
 #include "SceneImporter.h"
 #include "AnimClipImporter.h"
 #include "AnimMachineImporter.h"
+#include "AnimMachineImporter.h"
+#include "FontImporter.h"
 
 #include <map>
 
@@ -17,7 +19,8 @@ namespace Nous
 		{ AssetType::Scene, SceneImporter::ImportScene },
 		{ AssetType::Prefab, SceneImporter::ImportScene },
 		{ AssetType::AnimClip, AnimClipImporter::ImportAnimClip },
-		{ AssetType::AnimMachine, AnimMachineImporter::ImportAnimMachine }
+		{ AssetType::AnimMachine, AnimMachineImporter::ImportAnimMachine },
+		{ AssetType::Font, FontImporter::ImportFont }
 	};
 
 	Ref<Asset> AssetImporter::ImportAsset(AssetHandle handle, const AssetMetadata& metadata)

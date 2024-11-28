@@ -31,9 +31,9 @@ namespace Nous
 			return Project::GetActive()->GetAssetManager()->GetAssetType(handle);
 		}
 
-		static std::string GetAssetFileName(AssetHandle handle)
+		static std::string GetAssetFileName(AssetHandle handle, const std::string& defaultName = "None")
 		{
-			std::string btnLabel = "None";
+			std::string btnLabel = defaultName;
 			if (handle != 0)
 			{
 				if (AssetManager::IsAssetHandleValid(handle))

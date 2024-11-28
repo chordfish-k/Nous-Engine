@@ -747,6 +747,11 @@ namespace Nous {
 
         DrawComponent<CUIText>("CUIText", entity, [](CUIText& component)
         {
+            AssetHandle handle = component.FontAsset;
+            if (EUI::DrawAssetDragDropBox("Font", AssetManager::GetAssetFileName(handle, "Default"), &handle, AssetType::Font))
+            {
+                component.FontAsset = handle;
+            }
             EUI::DrawInputTextMultiline("Text", &component.Text);
             EUI::DrawColor4Control("Color", component.Color);
             EUI::DrawFloatControl("Size", &component.Size);

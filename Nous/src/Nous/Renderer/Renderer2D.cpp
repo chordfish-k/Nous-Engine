@@ -52,7 +52,7 @@ namespace Nous {
         glm::vec3 Position;
         glm::vec4 Color;
         glm::vec2 TexCoord;
-
+        float TexIndex;
         // 仅在编辑器使用
         int EntityID;
     };
@@ -102,7 +102,8 @@ namespace Nous {
         std::array<Ref < Texture2D>, MaxTextureSlots> TextureSlots;
         uint32_t TextureSlotIndex = 1; // 0 = 白色纹理
 
-        Ref<Texture2D> FontAtlasTexture;
+        std::array<Ref < Texture2D>, MaxTextureSlots> FontAtlasTextureSlots;
+        uint32_t FontAtlasTextureSlotIndex = 1; // 0 = 白色纹理
 
         glm::vec4 QuadVertexPositions[4];
 
@@ -198,6 +199,7 @@ namespace Nous {
                 {ShaderDataType::Float3, "a_Position"},
                 {ShaderDataType::Float4, "a_Color"},
                 {ShaderDataType::Float2, "a_TexCoord"},
+                {ShaderDataType::Float,  "a_TexIndex"},
                 {ShaderDataType::Int,    "a_EntityID"}
             });
         s_Data.TextVertexArray->AddVertexBuffer(s_Data.TextVertexBuffer);
@@ -210,10 +212,6 @@ namespace Nous {
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.WhiteTexture->SetData(Buffer(& whiteTextureData, sizeof(uint32_t)));
 
-        int32_t samplers[s_Data.MaxTextureSlots];
-        for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
-            samplers[i] = i;
-
         s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
         s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
         s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
@@ -221,6 +219,8 @@ namespace Nous {
 
         // 设置0号槽为白色纹理
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+
+        s_Data.FontAtlasTextureSlots[0] = Font::GetDefault()->GetAtlasTexture();
 
         s_Data.QuadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
         s_Data.QuadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
@@ -299,10 +299,14 @@ namespace Nous {
         s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
+
+        s_Data.FontAtlasTextureSlotIndex = 1;
     }
 
     void Renderer2D::Flush()
     {
+        
+
         if (s_Data.QuadIndexCount)
         {
             uint32_t dataSize = (uint32_t) ((uint8_t*) s_Data.QuadVertexBufferPtr -
@@ -347,7 +351,11 @@ namespace Nous {
             uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.TextVertexBufferPtr - (uint8_t*)s_Data.TextVertexBufferBase);
             s_Data.TextVertexBuffer->SetData(s_Data.TextVertexBufferBase, dataSize);
 
-            s_Data.FontAtlasTexture->Bind(0);
+            // 纹理绑定
+            for (uint32_t i = 0; i < s_Data.FontAtlasTextureSlotIndex; i++)
+            {
+                s_Data.FontAtlasTextureSlots[i]->Bind(i);
+            }
 
             s_Data.TextShader->Bind();
             RenderCommand::DrawIndexed(s_Data.TextVertexArray, s_Data.TextIndexCount);
@@ -630,12 +638,37 @@ namespace Nous {
         const auto& metrics = fontGeometry.getMetrics();
         Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
 
-        s_Data.FontAtlasTexture = fontAtlas;
-
         double x = 0.0, y = 0.0;
         const double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 
         const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
+        float textureIndex = 0.0f;
+        // 找出当前纹理的id
+        if (fontAtlas)
+        {
+            for (uint32_t i = 1; i < s_Data.FontAtlasTextureSlotIndex; i++)
+            {
+                if (*s_Data.FontAtlasTextureSlots[i] == *fontAtlas.get())
+                {
+                    textureIndex = (float)i;
+                    break;
+                }
+            }
+        }
+
+
+        // 如果是新纹理，则添加到纹理槽
+        if (fontAtlas && textureIndex == 0.0f)
+        {
+            // TODO 待优化，可能应该同一张纹理一批
+            if (s_Data.FontAtlasTextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+                NextBatch();
+
+            textureIndex = (float)s_Data.FontAtlasTextureSlotIndex;
+            s_Data.FontAtlasTextureSlots[s_Data.FontAtlasTextureSlotIndex] = fontAtlas;
+            s_Data.FontAtlasTextureSlotIndex++;
+        }
 
         for (size_t i = 0; i < str.size(); i++)
         {
@@ -708,11 +741,13 @@ namespace Nous {
                 glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f),
             };
 
+
             for (size_t i = 0; i < 4; i++)
             {
                 s_Data.TextVertexBufferPtr->Position = transform * quadVertexs[i];
                 s_Data.TextVertexBufferPtr->Color = textParams.Color;
                 s_Data.TextVertexBufferPtr->TexCoord = textureCoords[i];
+                s_Data.TextVertexBufferPtr->TexIndex = textureIndex;
                 s_Data.TextVertexBufferPtr->EntityID = entityID; // TODO
                 s_Data.TextVertexBufferPtr++;
             }
@@ -736,18 +771,12 @@ namespace Nous {
         DrawString(transform, str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing }, entityID);
     }
 
-    void Renderer2D::DrawString(const glm::mat4& transform, const std::string& str, const CUIText& component, const glm::vec4& color, int entityID)
-    {
-        DrawString(transform, str, component.FontAsset, { component.Color, component.Kerning, component.LineSpacing }, entityID);
-    }
 
     glm::vec2 Renderer2D::GetDrawStringSize(const std::string& str, Ref<Font> font, const TextParams& textParams)
     {
         const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
         const auto& metrics = fontGeometry.getMetrics();
         Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
-
-        s_Data.FontAtlasTexture = fontAtlas;
 
         double maxX = 0.0;
         double x = 0.0, y = 0.0;

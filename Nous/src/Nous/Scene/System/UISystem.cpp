@@ -200,15 +200,19 @@ namespace Nous
 
             Entity entity{ ent, s_Scene };
 
-            glm::vec2 size = Renderer2D::GetDrawStringSize(text.Text, text.FontAsset, {});
+            Ref<Font> font = AssetManager::GetAsset<Font>(text.FontAsset);
+            if (!font)
+                font = Font::GetDefault();
+
+            glm::vec2 size = Renderer2D::GetDrawStringSize(text.Text, font, {});
 
             glm::mat4 uiTransform = antiAspectMat
                 * transform.ParentTransform
                 * transform.GetTransform()
-                * glm::scale(glm::mat4(1.0f), glm::vec3(text.Size))
+                * glm::scale(glm::mat4(1.0f), glm::vec3(text.Size, text.Size, 0))
                 * glm::translate(glm::mat4(1.0f), { -size.x * 0.5f, size.y * 0.5f, 0 });
 
-            Renderer2D::DrawString(uiTransform, text.Text, text, text.Color, (int)ent);
+            Renderer2D::DrawString(uiTransform, text.Text, font, { text.Color, text.Kerning, text.LineSpacing }, (int)ent);
         });
 
         Renderer2D::EndScene();

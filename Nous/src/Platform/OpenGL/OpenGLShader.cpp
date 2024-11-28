@@ -209,8 +209,7 @@ namespace Nous {
                 shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_FilePath.c_str(), options);
                 if (module.GetCompilationStatus() != shaderc_compilation_status_success)
                 {
-                    NS_CORE_ERROR(module.GetErrorMessage());
-                    NS_CORE_ASSERT(false);
+                    NS_CORE_ASSERT("{}", module.GetErrorMessage());
                 }
 
                 shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());

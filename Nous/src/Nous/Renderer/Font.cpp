@@ -38,7 +38,7 @@ namespace Nous
     }
 
     Font::Font(const std::filesystem::path& filepath)
-        : m_Data(new MSDFData())
+        : m_Data(new MSDFData()), m_Filepath(filepath)
     {
         msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
         
@@ -107,7 +107,7 @@ namespace Nous
         {
             msdf_atlas::Workload([&glyphs = m_Data->Glyphs, &coloringSeed](int i, int threadNo) -> bool {
                 uint64_t glyphSeed = (LCG_MUTIPLIER * (coloringSeed ^ i) + LCG_INCREMENT, glyphSeed);
-                glyphs[i].edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
+                glyphs[i].edgeColoring(msdfgen::edgeColoringSimple, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
                 return true;
             }, m_Data->Glyphs.size()).finish(THREAD_COUNT);
         }
@@ -121,22 +121,8 @@ namespace Nous
             }
         }
 
-        m_AtlasTexture = CreateAndCacheAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>("Test", (float)emSize, m_Data->Glyphs, m_Data->FontGeometry, width, height);
+        m_AtlasTexture = CreateAndCacheAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>(filepath.filename().string(), (float)emSize, m_Data->Glyphs, m_Data->FontGeometry, width, height);
 
-#if 0
-        msdfgen::Shape shape;
-        if (msdfgen::loadGlyph(shape, font, 'A'))
-        {
-            shape.normalize();
-            //                      max. angle
-            msdfgen::edgeColoringSimple(shape, 3.0);
-            //           image width, height
-            msdfgen::Bitmap<float, 3> msdf(32, 32);
-            //                     range, scale, translation
-            msdfgen::generateMSDF(msdf, shape, 4.0, 1.0, msdfgen::Vector2(4.0, 4.0));
-            msdfgen::saveBmp(msdf, "output.bmp");
-        }
-#endif
         msdfgen::destroyFont(font);
         msdfgen::deinitializeFreetype(ft);
     }
@@ -150,7 +136,8 @@ namespace Nous
     {
         static Ref<Font> DefaultFont;
         if (!DefaultFont)
-            DefaultFont = CreateRef<Font>("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf");
+            //DefaultFont = CreateRef<Font>("assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf");
+            DefaultFont = CreateRef<Font>("assets/fonts/Arcadepix/Arcadepix.ttf");
         return DefaultFont;
     }
 }

@@ -254,7 +254,7 @@ namespace Nous {
         std::string Text = "Text";
         float Size = 1.0f;
         glm::vec4 Color = { 1.0, 1.0, 1.0, 1.0 };
-        Ref<Font> FontAsset = Font::GetDefault();
+        AssetHandle FontAsset = 0;
         float Kerning = 0.0f; // 字距
         float LineSpacing = 0.0f; // 行距
 

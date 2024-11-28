@@ -16,6 +16,7 @@ namespace Nous
         { ".jpeg", AssetType::Texture2D},
         { ".nsani", AssetType::AnimClip},
         { ".nsanm", AssetType::AnimMachine},
+        { ".ttf", AssetType::Font},
     };
 
     static AssetType GetAssetTypeFromFileExtension(const std::filesystem::path& extension)

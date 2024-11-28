@@ -13,7 +13,8 @@ namespace Nous
 		Prefab,
 		Texture2D,
 		AnimClip,
-		AnimMachine
+		AnimMachine,
+		Font
 	};
 
 	std::string_view AssetTypeToString(AssetType type);
