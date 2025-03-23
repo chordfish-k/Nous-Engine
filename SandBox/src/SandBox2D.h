@@ -3,9 +3,11 @@
 #include "Nous.h"
 #include "ViewportPanel.h"
 
+#include "Nous/Event/Observer.h"
+
 namespace Nous
 {
-    class SandBox2D : public Layer
+    class SandBox2D : public Layer, public Observer
     {
     public:
         SandBox2D();
@@ -18,6 +20,8 @@ namespace Nous
         virtual void OnUpdate(Timestep dt) override;
         virtual void OnImGuiRender() override;
         virtual void OnEvent(Event& event) override;
+        virtual void OnEditorEvent(AppEvent& e) override;
+        
     private:
         bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
@@ -27,10 +31,14 @@ namespace Nous
 
         void OnScenePlay();
 
+        void OnChangeRunningScene(ChangeRunningSceneEvent& e);
+        void ChangeRunningScene(AssetHandle handle);
+
     private:
         Ref<Framebuffer> m_Framebuffer;
         Ref<Scene> m_ActiveScene;
         Ref<Scene> m_EditorScene;
+        AssetHandle m_NextScene = 0;
         std::filesystem::path m_EditorScenePath;
 
         EditorCamera m_EditorCamera;

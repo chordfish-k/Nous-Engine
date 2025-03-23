@@ -16,12 +16,14 @@ namespace Nous
     SandBox2D::SandBox2D()
         : Layer(nullptr, "SandBox2D")
     {
+        AppEventEmitter::AddObserver(this);
         s_Font = Font::GetDefault();
     }
 
     SandBox2D::SandBox2D(Application* application, const ApplicationSpecification& spec)
         : Layer(application, "SandBox2D")
     {
+        AppEventEmitter::AddObserver(this);
     }
 
     void SandBox2D::OnAttached()
@@ -102,6 +104,13 @@ namespace Nous
 
         m_ActiveScene->OnUpdateRuntime(dt);
 
+        // 检查是否需要切换场景
+        if (m_NextScene)
+        {
+            ChangeRunningScene(m_NextScene);
+            m_NextScene = 0;
+        }
+
         // Postprocess
         m_ViewportPanel.CheckHoveredEntity();
 
@@ -116,14 +125,14 @@ namespace Nous
         // Viewport
         m_ViewportPanel.OnImGuiRender();
 
-        ImGui::Begin("Settings");
+        /*ImGui::Begin("Settings");
 
         bool vsync = Application::Get().GetWindow().IsVSync();
         if (ImGui::Checkbox("vsync", &vsync))
         {
             Application::Get().GetWindow().SetVSync(vsync);
         }
-        ImGui::End();
+        ImGui::End();*/
 
         DockingSpace::EndDocking();
     }
@@ -132,6 +141,12 @@ namespace Nous
     void SandBox2D::OnEvent(Event& e)
     {
         m_ViewportPanel.OnEvent(e);
+    }
+
+    void SandBox2D::OnEditorEvent(AppEvent& e)
+    {
+        AppEventDispatcher dispatcher(e);
+        dispatcher.Dispatch<ChangeRunningSceneEvent>(NS_BIND_EVENT_FN(SandBox2D::OnChangeRunningScene));
     }
 
     bool SandBox2D::OpenProject()
@@ -195,5 +210,28 @@ namespace Nous
         m_ActiveScene->OnRuntimeStart();
 
         m_ViewportPanel.SetContext(m_ActiveScene);
+    }
+
+    void SandBox2D::OnChangeRunningScene(ChangeRunningSceneEvent& e)
+    {
+        if (e.Handle)
+        {
+            m_NextScene = e.Handle;
+        }
+    }
+
+    void SandBox2D::ChangeRunningScene(AssetHandle handle)
+    {
+        NS_CORE_ASSERT(handle);
+
+        m_ActiveScene->OnRuntimeStop();
+
+        Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(handle);
+        Ref<Scene> newScene = Scene::Copy(readOnlyScene);
+
+        m_ActiveScene = newScene;
+        m_ViewportPanel.SetContext(m_ActiveScene);
+
+        m_ActiveScene->OnRuntimeStart();
     }
 }
